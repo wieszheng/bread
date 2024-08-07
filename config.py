@@ -9,6 +9,7 @@
 import argparse
 import os
 import sys
+import time
 from functools import lru_cache
 from typing import ClassVar
 
@@ -17,58 +18,108 @@ from pydantic_settings import BaseSettings
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
+LOG_DIR = os.path.join(ROOT, 'logs')
+if not os.path.exists(LOG_DIR):
+    os.mkdir(LOG_DIR)
+
+# 项目运行时所有的日志文件
+SERVER_LOG_FILE: str = os.path.join(LOG_DIR, f'{time.strftime("%Y-%m-%d")}_server.log')
+
+# 错误时的日志文件
+ERROR_LOG_FILE: str = os.path.join(LOG_DIR, f'{time.strftime("%Y-%m-%d")}_error.log')
+
 
 class AppSettings(BaseSettings):
     """
     应用配置
     """
-    APP_ENV: str = 'dev'
-    APP_NAME: str = 'Dash-FasAPI-Admin'
-    APP_ROOT_PATH: str = '/dev-api'
-    APP_HOST: str = '0.0.0.0'
-    APP_PORT: int = 9099
-    APP_VERSION: str = '1.4.0'
-    APP_RELOAD: bool = True
-    APP_IP_LOCATION_QUERY: bool = True
-    APP_SAME_TIME_LOGIN: bool = True
+    APP_ENV: str
+    APP_NAME: str
+    APP_ROOT_PATH: str
+    APP_HOST: str
+    APP_PORT: int
+    APP_VERSION: str
+    APP_RELOAD: bool
+    APP_IP_LOCATION_QUERY: bool
+    APP_SAME_TIME_LOGIN: bool
+
+    # 项目日志滚动配置（日志文件超过10 MB就自动新建文件扩充）
+    LOGGING_ROTATION: str = "10 MB"
+    LOGGING_CONF: dict = {
+        'server_handler': {
+            'file': SERVER_LOG_FILE,
+            'level': 'INFO',
+            'rotation': LOGGING_ROTATION,
+            'backtrace': False,
+            'diagnose': False,
+        },
+        'error_handler': {
+            'file': ERROR_LOG_FILE,
+            'level': 'ERROR',
+            'rotation': LOGGING_ROTATION,
+            'backtrace': True,
+            'diagnose': True,
+        },
+    }
+
+    BANNER: str = """
+                                      \`-,                             
+                                      |   `\                           
+                                      |     \                          
+                                   __/.- - -.\,__                      
+                              _.-'`              `'"'--..,__           
+                          .-'`                              `'--.,_    
+                       .'`   _                         _ ___       `)  
+                     .'   .'` `'-.                    (_`  _`)  _.-'   
+                   .'    '--.     '.                 .-.`"`@ .-'""-,   
+          .------~'     ,.---'      '-._      _.'   /   `'--':::.-'   
+        /`        '   /`  _,..-----.,__ `''''`/    ;__,..--''--'`      
+        `'--.,__ '    |-'`             `'---'|     |                   
+                `\    \                       \   /                    
+                 |     |                       '-'                     
+                  \    |                                               
+                   `\  |                                               
+                     \/  
+
+            """
 
 
 class JwtSettings(BaseSettings):
     """
     Jwt配置
     """
-    JWT_SECRET_KEY: str = 'b01c66dc2c58dc6a0aabfe2144256be36226de378bf87f72c0c795dda67f4d55'
-    JWT_ALGORITHM: str = 'HS256'
-    JWT_EXPIRE_MINUTES: int = 1440
-    JWT_REDIS_EXPIRE_MINUTES: int = 30
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str
+    JWT_EXPIRE_MINUTES: int
+    JWT_REDIS_EXPIRE_MINUTES: int
 
 
 class DataBaseSettings(BaseSettings):
     """
     数据库配置
     """
-    MYSQL_HOST: str = '127.0.0.1'
-    MYSQL_PORT: int = 3306
-    MYSQL_PROTOCOL: str = ''
-    MYSQL_USERNAME: str = 'root'
-    MYSQL_PASSWORD: str = 'mysqlroot'
-    MYSQL_DATABASE: str = 'dash-fastapi'
-    MYSQL_ECHO: bool = True
-    MYSQL_MAX_OVERFLOW: int = 10
-    MYSQL_POOL_SIZE: int = 50
-    MYSQL_POOL_RECYCLE: int = 3600
-    MYSQL_POOL_TIMEOUT: int = 30
+    MYSQL_HOST: str
+    MYSQL_PORT: int
+    MYSQL_PROTOCOL: str
+    MYSQL_USERNAME: str
+    MYSQL_PASSWORD: str
+    MYSQL_DATABASE: str
+    MYSQL_ECHO: bool
+    MYSQL_MAX_OVERFLOW: int
+    MYSQL_POOL_SIZE: int
+    MYSQL_POOL_RECYCLE: int
+    MYSQL_POOL_TIMEOUT: int
 
 
 class RedisSettings(BaseSettings):
     """
     Redis配置
     """
-    REDIS_HOST: str = '127.0.0.1'
-    REDIS_PORT: int = 6379
-    REDIS_USERNAME: str = ''
-    REDIS_PASSWORD: str = ''
-    REDIS_DATABASE: int = 2
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_USERNAME: str
+    REDIS_PASSWORD: str
+    REDIS_DATABASE: int
 
 
 class MinioSettings(BaseSettings):
@@ -168,7 +219,6 @@ DataBaseConfig = get_config.get_database_config()
 RedisConfig = get_config.get_redis_config()
 # Minio配置
 MinioConfig = get_config.get_minio_config()
-
 
 # def get_all_configs():
 #     # 实例化获取配置类
