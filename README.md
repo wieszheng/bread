@@ -1,4 +1,7 @@
-[![SVG Banners](https://svg-banners.vercel.app/api?type=origin&text1=Alden&width=1000&height=400)](https://github.com/wieszheng/Alden)
+<p style="text-align: center;">
+  <img src="docs/icon.svg" alt="示例SVG" style="display: block; margin-left: auto; margin-right: auto;">
+</p>
+
 
 ### Hi there 👋
 
