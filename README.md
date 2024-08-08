@@ -1,5 +1,5 @@
 <p style="text-align: center;">
-  <img src="docs/icon.svg" alt="示例SVG" style="display: block; margin-left: auto; margin-right: auto;">
+  <img src="docs/icon.svg" alt="icon" width="200px">
 </p>
 
 
