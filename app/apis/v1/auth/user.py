@@ -7,10 +7,14 @@
 @Software : PyCharm
 """
 from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordBearer
 
-router = APIRouter(prefix="/users", tags=["用户接口"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
+
+router = APIRouter(prefix="/system/user", tags=["用户接口"])
 
 
-@router.post("/login", summary="用户登录")
-async def login():
-    return {"code": 0, "msg": "登录成功"}
+@router.post("/me", summary="用户")
+async def login(token: str = Depends(oauth2_scheme)):
+
+    return {"code": 0, "msg": token}

@@ -25,19 +25,19 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory=f"{ROOT}/static"), name="static")
 
 
-@app.get('/docs', include_in_schema=False)
-async def custom_swagger_ui_html():
-    return get_swagger_ui_html(
-        openapi_url="/openapi.json",
-        title=AppConfig.APP_NAME + " - Swagger UI",
-        swagger_js_url="/static/swagger-ui-bundle.js",
-        swagger_css_url="/static/swagger-ui.css"
-    )
+# @app.get('/docs', include_in_schema=False)
+# async def custom_swagger_ui_html():
+#     return get_swagger_ui_html(
+#         openapi_url="/openapi.json",
+#         title=AppConfig.APP_NAME + " - Swagger UI",
+#         swagger_js_url="/static/swagger-ui-bundle.js",
+#         swagger_css_url="/static/swagger-ui.css"
+#     )
 
 
 # 初始化日志
 init_logging(AppConfig.LOGGING_CONF)
-
-# 注册中间件
+# 注册中间件处理方法
 register_middlewares(app)
+# 注册全局异常处理方法
 register_global_exceptions_handler(app)

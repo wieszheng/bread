@@ -32,6 +32,7 @@ async def init_create_table():
     logger.info("数据库连接成功")
 
 
+# 生命周期事件
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML model
