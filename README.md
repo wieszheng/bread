@@ -1,7 +1,6 @@
-<p style="text-align: center;">
+<div align="center">
   <img src="docs/icon.svg" alt="icon" width="200px">
-</p>
-
+</div>
 
 ### Hi there 👋
 
@@ -17,6 +16,7 @@
 ![Kubernetes](https://img.shields.io/badge/-Kubernetes-black?logo=kubernetes&style=social)&nbsp;&nbsp;
 
 ### 😆 Views
+
 <div align="left">
 <img src='https://count.getloli.com/get/@wieszheng.github.readme'>
 </div>
@@ -58,7 +58,6 @@ docker-compose -f docker-compose.yml up -d
     大家好，我是 wieszheng，一个乐于分享，喜欢钻研技术的测试开发工程师。
 
     一个打游戏不拿首胜不睡觉的酒0后。
-
 
 #### ❤️ 喜欢我？
 
