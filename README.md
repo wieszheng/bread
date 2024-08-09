@@ -1,12 +1,14 @@
 <div align="center">
-  <img src="docs/icon.svg" alt="icon" width="170px" height="180px">
+  <img src="docs/icon.svg" alt="icon" width="150px" height="150px">
+  <h1>
+    FasAPI-Bread v1.0.0 👋
+  </h1>
 </div>
 
-### Hi there 👋
 
 <img align='right' src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif" width="280">
 
-😶 I'm a Devops Engineer
+
 
 ### Abilities
 

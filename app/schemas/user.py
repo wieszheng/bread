@@ -46,3 +46,12 @@ class AddUserModel(UserModel):
     role_id: Optional[str]
     post_id: Optional[str]
     type: Optional[str]
+
+
+class AddUser(BaseModel):
+
+    username: Optional[str]
+    nickname: Optional[str]
+    password: Optional[str]
+    created_by: Optional[int]
+    updated_by: Optional[int]

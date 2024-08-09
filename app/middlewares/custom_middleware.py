@@ -2,48 +2,24 @@
 # -*- coding:utf-8 -*-
 """
 @Version  : Python 3.12
-@Time     : 2024/8/7 11:39
+@Time     : 2024/8/9 12:54
 @Author   : wiesZheng
 @Software : PyCharm
 """
 import time
 import uuid
 
+from fastapi import FastAPI
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
 
-async def set_body(request: Request):
-    receive_ = await request.receive()
-
-    async def receive():
-        return receive_
-
-    request._receive = receive
-
-
-def make_traceid(request) -> None:
-    '''
-    生成追踪链路ID
-    :param request:
-    :return:
-    '''
-    request.state.traceid = uuid.uuid4()
-    # 追踪索引序号
-    request.state.trace_links_index = 0
-    # 追踪ID
-    request.state.traceid = uuid.uuid4()
-
-
-class LoggingMiddleware(BaseHTTPMiddleware):
-    """
-    日志中间件
-    记录请求参数信息、计算响应时间
-    """
-
-    async def dispatch(self, request: Request, call_next) -> Response:
+def add_custom_middleware(app: FastAPI):
+    # 日志中间件 记录请求参数信息、计算响应时间
+    @app.middleware("http")
+    async def request_log_middleware(request: Request, call_next) -> Response:
         start_time = time.perf_counter()
         make_traceid(request)
         # 打印请求信息
@@ -70,3 +46,25 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             f"<-- {request.state.traceid} {response.status_code} {request.url.path} (took: {process_time:.6f}s)\n")
 
         return response
+
+
+async def set_body(request: Request):
+    receive_ = await request.receive()
+
+    async def receive():
+        return receive_
+
+    request._receive = receive
+
+
+def make_traceid(request) -> None:
+    '''
+    生成追踪链路ID
+    :param request:
+    :return:
+    '''
+    request.state.traceid = uuid.uuid4()
+    # 追踪索引序号
+    request.state.trace_links_index = 0
+    # 追踪ID
+    request.state.traceid = uuid.uuid4()

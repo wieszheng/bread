@@ -9,7 +9,7 @@
 from fastapi import FastAPI
 
 from app import lifespan, init_logging
-from app.exceptions import register_global_exceptions_handler
+from app.exceptions import register_exceptions_handler
 from app.middlewares import register_middlewares
 from config import AppConfig, ROOT
 from starlette.staticfiles import StaticFiles
@@ -52,4 +52,4 @@ init_logging(AppConfig.LOGGING_CONF)
 # 注册中间件处理方法
 register_middlewares(app)
 # 注册全局异常处理方法
-register_global_exceptions_handler(app)
+register_exceptions_handler(app)
