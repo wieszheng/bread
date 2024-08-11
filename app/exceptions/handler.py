@@ -17,8 +17,8 @@ from loguru import logger
 from app.commons import R
 from app.commons.resq import (MethodNotAllowedException, LimiterResException, InternalErrorException, NotfoundException,
                               BadRequestException, OtherException, ParameterException, BusinessError,
-                              UnauthorizedException, ForbiddenException)
-from app.enums.exception import ErrorCodeEnum
+                              InvalidTokenException, ForbiddenException)
+
 from app.exceptions.exception import BusinessException, AuthException, PermissionException
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -33,7 +33,7 @@ def register_exceptions_handler(app: FastAPI):
     async def auth_exception_handler(request: Request, exc: AuthException):
         """ 认证异常处理 """
         logger.info('认证失败')
-        return UnauthorizedException()
+        return InvalidTokenException()
 
     # 自定义权限检验异常
     @app.exception_handler(PermissionException)
@@ -63,7 +63,7 @@ def register_exceptions_handler(app: FastAPI):
             case 400:
                 return BadRequestException(message=exc.detail)
             case _:
-                return OtherException(message=exc.detail)
+                return OtherException(message=str(exc.detail))
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -111,11 +111,8 @@ def register_exceptions_handler(app: FastAPI):
 
         if isinstance(exc, ConnectionError):
             message = f'网络异常, {traceback.format_exc()}'
-            error = ErrorCodeEnum.SOCKET_ERR
         else:
             message = f'系统异常, {traceback.format_exc()}'
-            error = ErrorCodeEnum.SYSTEM_ERR
 
         logger.error(message)
-
         return InternalErrorException(result={"detail": message})

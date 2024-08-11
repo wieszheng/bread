@@ -11,10 +11,20 @@ from app.crud import BaseCRUD
 from app.models.user import SysUser
 from app.schemas.user import AddUser
 
-user_crud = BaseCRUD(SysUser)
 
+class UserCRUD(BaseCRUD):
+    __model__ = SysUser
 
-class UserCRUD:
     @staticmethod
     async def add_user(user: AddUser):
-        return await user_crud.create(obj=user)
+        return await UserCRUD.create(obj=user)
+
+    @staticmethod
+    async def get_user_info(id: str):
+        """
+        获取用户信息
+        :param id:
+        :return:
+        """
+        data = await UserCRUD.get(id=id)
+        return data

@@ -171,7 +171,7 @@ class MethodNotAllowedException(ApiResponse):
 
 
 class OtherException(ApiResponse):
-    http_status_code = 800
+    http_status_code = 200
     result = {}
     message = '未知的其他HTTP PARAMETER异常'
     api_code = 10034

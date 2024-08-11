@@ -7,20 +7,19 @@
 @Software : PyCharm
 """
 from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordBearer
 
 from app.commons.resq import unified_resp
 from app.crud.auth.user import UserCRUD
+from app.crud.auth.login import LoginCRUD
 from app.schemas.user import AddUser
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
 
 router = APIRouter(prefix="/system/user", tags=["用户接口"])
 
 
 @router.post("/me", summary="用户")
-async def login(token: str = Depends(oauth2_scheme)):
-    return {"code": 0, "msg": token}
+@unified_resp
+async def login(token: str = Depends(LoginCRUD.get_current_user)):
+    return token
 
 
 @router.post("/add", summary="添加用户")

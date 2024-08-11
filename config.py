@@ -92,6 +92,7 @@ class JwtSettings(BaseSettings):
     JWT_ALGORITHM: str
     JWT_EXPIRE_MINUTES: int
     JWT_REDIS_EXPIRE_MINUTES: int
+    JWT_ISS: str
 
 
 class DataBaseSettings(BaseSettings):

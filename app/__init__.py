@@ -13,7 +13,7 @@ from fastapi import FastAPI
 
 from loguru import logger
 
-from app.apis import register_routers
+from app.apis.v1 import register_routers
 from config import AppConfig
 from app.models import async_engine, BaseOrmTable
 
@@ -22,6 +22,7 @@ def init_logging(logging_conf: dict):
     for log_handler, log_conf in logging_conf.items():
         log_file = log_conf.pop('file', None)
         logger.add(log_file, **log_conf)
+    logger.info("setup logging success")
 
 
 async def init_create_table():

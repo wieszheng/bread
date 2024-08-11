@@ -11,7 +11,6 @@ import uuid
 
 from fastapi import FastAPI
 from loguru import logger
-from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -21,7 +20,7 @@ def add_custom_middleware(app: FastAPI):
     @app.middleware("http")
     async def request_log_middleware(request: Request, call_next) -> Response:
         start_time = time.perf_counter()
-        make_traceid(request)
+        request.state.traceid = uuid.uuid4()
         # 打印请求信息
         logger.info(f"--> {request.state.traceid} {request.method} {request.url.path} {request.client.host}")
         if request.query_params:
@@ -55,16 +54,3 @@ async def set_body(request: Request):
         return receive_
 
     request._receive = receive
-
-
-def make_traceid(request) -> None:
-    '''
-    生成追踪链路ID
-    :param request:
-    :return:
-    '''
-    request.state.traceid = uuid.uuid4()
-    # 追踪索引序号
-    request.state.trace_links_index = 0
-    # 追踪ID
-    request.state.traceid = uuid.uuid4()
