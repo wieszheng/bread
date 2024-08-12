@@ -8,7 +8,7 @@
 """
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 
 class UserModel(BaseModel):
@@ -39,19 +39,24 @@ class UserModel(BaseModel):
         orm_mode = True
 
 
-class AddUserModel(UserModel):
-    """
-    新增用户模型
-    """
-    role_id: Optional[str]
-    post_id: Optional[str]
-    type: Optional[str]
+class UserRegisterIn(BaseModel):
+    """ 用户注册入参 """
+    username: str = Field(..., min_length=3, max_length=50, description='用户名')
+    nickname: str = Field(..., min_length=2, max_length=50, description='用户昵称')
+    phone: str = Field(..., min_length=11, description='用户手机号')
+    password: str = Field(..., min_length=6, max_length=50, description='用户密码')
 
 
 class AddUser(BaseModel):
-
     username: Optional[str]
     nickname: Optional[str]
     password: Optional[str]
-    created_by: Optional[int]
-    updated_by: Optional[int]
+
+
+class CurrentUserInfo(BaseModel):
+    """
+    数据库返回当前用户信息
+    """
+    username: Optional[str]
+    nickname: Optional[str]
+    password: Optional[str]

@@ -9,6 +9,11 @@
 from pydantic import BaseModel, Field
 
 
-class UserLogin(BaseModel):
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class UserLoginIn(BaseModel):
     username: str = Field(description='用户名称')
     password: str = Field(description='用户密码')

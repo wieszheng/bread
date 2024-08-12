@@ -68,10 +68,16 @@ def register_exceptions_handler(app: FastAPI):
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
         """ 全局捕捉参数验证异常 """
+        logger.warning(
+            f"Http请求异常: value_exception_handler\n"
+            f"Method:{request.method}\n"
+            f"URL:{request.url}\n"
+            f"Headers:{request.headers}\n"
+            f"Message:{exc.errors()}\n"
+        )
         message = '.'.join([f'{".".join(map(lambda x: str(x), error.get("loc")))}:{error.get("msg")};'
                             for error in exc.errors()])
 
-        logger.warning(message)
         return ParameterException(result={"detail": message, "body": exc.body})
 
     @app.exception_handler(ValueError)
@@ -80,7 +86,7 @@ def register_exceptions_handler(app: FastAPI):
         捕获值异常
         """
         logger.warning(
-            f"Http请求异常: value_exception_handler\n"
+            f"参数处理异常: value_exception_handler\n"
             f"Method:{request.method}\n"
             f"URL:{request.url}\n"
             f"Headers:{request.headers}\n"
@@ -92,8 +98,8 @@ def register_exceptions_handler(app: FastAPI):
     @app.exception_handler(BusinessException)
     async def business_exception_handler(request: Request, exc: BusinessException):
         """ 全局业务异常处理 """
-        logger.info(
-            f"Http请求异常\n"
+        logger.warning(
+            f"业务处理异常\n"
             f"Method:{request.method}\n"
             f"URL:{request.url}\n"
             f"Headers:{request.headers}\n"

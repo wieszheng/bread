@@ -6,25 +6,24 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from app.commons.resq import unified_resp
-from app.crud.auth.user import UserCRUD
-from app.crud.auth.login import LoginCRUD
-from app.schemas.user import AddUser
+from app.schemas.user import CurrentUserInfo
+from app.service.user_s import UserService
 
 router = APIRouter(prefix="/system/user", tags=["用户接口"])
 
+router.add_api_route(
+    "/me",
+    endpoint=UserService.get_current_user_info,
+    response_model=CurrentUserInfo,
+    methods=["post"],
+    summary="用户信息"
+)
 
-@router.post("/me", summary="用户")
-@unified_resp
-async def login(token: str = Depends(LoginCRUD.get_current_user)):
-    return token
-
-
-@router.post("/add", summary="添加用户")
-@unified_resp
-async def create_user(user: AddUser):
-    data = await UserCRUD.add_user(user)
-
-    return data.to_dict()
+router.add_api_route(
+    "/add",
+    endpoint=UserService.create_user,
+    methods=["post"],
+    summary="添加用户"
+)

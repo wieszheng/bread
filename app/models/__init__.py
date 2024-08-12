@@ -59,6 +59,7 @@ class BaseOrmTable(AsyncAttrs, DeclarativeBase):
             exclude_none: 默认排查None值
         Returns: dict
         """
+
         alias_dict = alias_dict or {}
         if exclude_none:
             return {
@@ -87,9 +88,9 @@ class OperatorColumns(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    created_by: Mapped[int] = mapped_column(comment="创建人")
+    created_by: Mapped[int] = mapped_column(default=1, comment="创建人")
 
-    updated_by: Mapped[int] = mapped_column(comment="更新人")
+    updated_by: Mapped[int] = mapped_column(default=1, comment="更新人")
 
     deleted_by: Mapped[int] = mapped_column(nullable=True, comment="删除人")
 
