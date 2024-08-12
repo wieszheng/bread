@@ -50,7 +50,7 @@ class BaseOrmTable(AsyncAttrs, DeclarativeBase):
     def __repr__(self):
         return str(self.to_dict())
 
-    def to_dict(self, alias_dict: dict = None, exclude_none=True) -> dict:
+    def to_dict(self, *ignore: str, alias_dict: dict = None, exclude_none=True) -> dict:
         """
         数据库模型转成字典
         Args:
@@ -63,12 +63,17 @@ class BaseOrmTable(AsyncAttrs, DeclarativeBase):
         alias_dict = alias_dict or {}
         if exclude_none:
             return {
-                alias_dict.get(c.name, c.name): getattr(self, c.name)
+                alias_dict.get(c.name, c.name): getattr(self, c.name).strftime("%Y-%m-%d %H:%M:%S") if isinstance(
+                    getattr(self, c.name), datetime) else getattr(self, c.name)
                 for c in self.__table__.columns
-                if getattr(self, c.name) is not None
+                if getattr(self, c.name) is not None and c.name not in ignore
             }
         else:
-            return {alias_dict.get(c.name, c.name): getattr(self, c.name, None) for c in self.__table__.columns}
+            return {
+                alias_dict.get(c.name, c.name): getattr(self, c.name, None).strftime("%Y-%m-%d %H:%M:%S") if isinstance(
+                    getattr(self, c.name, None), datetime) else getattr(self, c.name, None)
+                for c in self.__table__.columns
+            }
 
 
 class TimestampColumns(AsyncAttrs, DeclarativeBase):

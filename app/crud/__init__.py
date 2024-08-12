@@ -17,6 +17,7 @@ from sqlalchemy.orm.util import AliasedClass
 
 from app.commons.helper import JoinConfig
 from app.commons.types import ModelType, CreateSchemaType, UpdateSchemaType
+from app.exceptions.exception import DBException
 from app.models import async_session_maker
 
 
@@ -51,6 +52,7 @@ def with_session(method):
                 f"错误：{e}\n"
             )
             logger.error(traceback.format_exc())
+            raise DBException(message=f"操作Model：{cls.__model__.__name__}: {e}")
 
     return wrapper
 

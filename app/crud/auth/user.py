@@ -47,6 +47,7 @@ class UserCRUD(BaseCRUD):
         await cls.verify_user_register_info(user_item)
         # 创建注册用户
         user = await cls.create(obj=user_item)
+        current_user = user.to_dict("password")
         # 注册成功则保存登录状态，签发token
-        token, refresh_token = await LoginService.create_access_token(user)
-        return True
+        token = await LoginService.create_access_token(current_user)
+        return current_user, token

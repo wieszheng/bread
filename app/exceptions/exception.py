@@ -24,14 +24,6 @@ class BusinessException(Exception):
         super().__init__(self)
 
 
-class AuthorizationException(BusinessException):
-    """ 认证异常类 """
-
-    def __init__(self):
-        self.code = ErrorCodeEnum.AUTHORIZATION_ERR.code
-        self.message = ErrorCodeEnum.AUTHORIZATION_ERR.msg
-
-
 class AuthException(Exception):
     """
     自定义令牌异常AuthException
@@ -45,6 +37,16 @@ class AuthException(Exception):
 class PermissionException(Exception):
     """
     自定义权限异常PermissionException
+    """
+
+    def __init__(self, data: str = None, message: str = None):
+        self.data = data
+        self.message = message
+
+
+class DBException(Exception):
+    """
+    自定义令数据库DBException
     """
 
     def __init__(self, data: str = None, message: str = None):

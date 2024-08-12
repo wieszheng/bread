@@ -6,6 +6,8 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+from typing import Dict, Any, Union
+
 import jwt
 import pytz
 from fastapi import Request, Depends
@@ -17,7 +19,6 @@ from loguru import logger
 from app.commons.resq import Success
 
 from app.exceptions.exception import AuthException
-from app.models.user import SysUser
 from app.schemas.login import UserLoginIn
 from config import JwtConfig
 
@@ -28,11 +29,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
 
 class LoginService:
     @classmethod
-    async def create_access_token(cls, user: SysUser):
+    async def create_access_token(cls, payload: Dict[Any, Union[str, Any]]):
         """
         根据登录信息创建当前用户token
 
-        :param user: 用户信息
+        :param payload: 用户信息
         :return: token
         """
         current_time = datetime.now(ChinaTimeZone)
@@ -41,7 +42,7 @@ class LoginService:
             "iss": JwtConfig.JWT_ISS,
             "iat": current_time,
             "exp": current_time + timedelta(minutes=JwtConfig.JWT_EXPIRE_MINUTES)},
-            **user.to_dict())
+            **payload)
         # 生成并返回jwt
         return jwt.encode(new_data,
                           key=JwtConfig.JWT_SECRET_KEY,

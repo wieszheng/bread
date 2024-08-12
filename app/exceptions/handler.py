@@ -19,7 +19,7 @@ from app.commons.resq import (MethodNotAllowedException, LimiterResException, In
                               BadRequestException, OtherException, ParameterException, BusinessError,
                               InvalidTokenException, ForbiddenException)
 
-from app.exceptions.exception import BusinessException, AuthException, PermissionException
+from app.exceptions.exception import BusinessException, AuthException, PermissionException, DBException
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
@@ -39,6 +39,11 @@ def register_exceptions_handler(app: FastAPI):
     @app.exception_handler(PermissionException)
     async def permission_exception_handler(request: Request, exc: PermissionException):
         return ForbiddenException()
+
+    # 自定义数据库操作异常
+    @app.exception_handler(DBException)
+    async def db_exception_handler(request: Request, exc: DBException):
+        return BusinessError(result={"err_code_des": exc.message})
 
     # 处理其他http请求异常
     @app.exception_handler(StarletteHTTPException)
@@ -107,7 +112,7 @@ def register_exceptions_handler(app: FastAPI):
             f"Message:{exc.err_code_des}\n"
         )
 
-        return BusinessError(api_code=exc.err_code, message=exc.err_code_des)
+        return BusinessError(api_code=exc.err_code, result={"err_code_des": exc.err_code_des})
 
     # 处理其他异常
     @app.exception_handler(Exception)
