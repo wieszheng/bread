@@ -9,13 +9,12 @@
 from fastapi import APIRouter, FastAPI
 from loguru import logger
 
-from app.apis.v1.auth import user, login
+from app.apis.v1.auth import user
 
 v1 = APIRouter(prefix="/v1")
 
 RegisterRouterList = [
     user,
-    login
 ]
 
 for item in RegisterRouterList:

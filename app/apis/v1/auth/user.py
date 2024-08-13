@@ -14,6 +14,13 @@ from app.service.user_s import UserService
 router = APIRouter(prefix="/system/user", tags=["用户接口"])
 
 router.add_api_route(
+    "/login",
+    endpoint=UserService.login,
+    methods=["post"],
+    summary="用户登录"
+)
+
+router.add_api_route(
     "/me",
     endpoint=UserService.get_current_user_info,
     response_model=CurrentUserInfo,
@@ -23,7 +30,7 @@ router.add_api_route(
 
 router.add_api_route(
     "/add",
-    endpoint=UserService.create_user,
+    endpoint=UserService.register_user,
     methods=["post"],
     summary="添加用户"
 )

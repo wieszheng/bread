@@ -36,7 +36,7 @@ class UserModel(BaseModel):
     remark: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserRegisterIn(BaseModel):

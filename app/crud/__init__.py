@@ -51,7 +51,7 @@ def with_session(method):
                 f"参数：args：{[*args]}, kwargs：{kwargs}\n"
                 f"错误：{e}\n"
             )
-            logger.error(traceback.format_exc())
+            # logger.error(traceback.format_exc())
             raise DBException(message=f"操作Model：{cls.__model__.__name__}: {e}")
 
     return wrapper
