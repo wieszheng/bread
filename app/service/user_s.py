@@ -89,7 +89,9 @@ class UserService:
             username=form_data.username,
             password=form_data.password
         ))
-
+        res = await UserCRUD.exists(username=user.username, password=user.password)
+        if not res:
+            raise Exception("用户名或密码错误")
         access_token = await create_access_token({"user_id": '1111'})
         request_from_swagger = request.headers.get('referer').endswith('docs') if request.headers.get(
             'referer') else False
