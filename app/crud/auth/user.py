@@ -64,14 +64,15 @@ class UserCRUD(BaseCRUD):
     @classmethod
     async def user_add(cls, user_item: UserRegisterIn):
         await cls.verify_user_register_info(user_item)
+        info = {}
         # 创建注册用户
         if await cls.count() == 0:
-            print("创建管理员")
-            # user.role = Config.ADMIN
-
-        user = await cls.create(obj=user_item)
+            info["role"] = 2
+        info["last_login_at"] = datetime.now()
+        info.update(user_item.model_dump())
+        user = AddUser.model_validate(info)
+        user = await cls.create(obj=user)
         current_user = user.to_dict("password")
-
         return current_user
 
     @classmethod
@@ -85,5 +86,5 @@ class UserCRUD(BaseCRUD):
         payload = await decode_jwt_token(token)
         user_id: str = payload.get("id")
 
-        user_info = await cls.exists(id=user_id)
+        user_info = await cls.get(id=user_id)
         return user_info

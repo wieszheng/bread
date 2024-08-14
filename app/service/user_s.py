@@ -24,11 +24,11 @@ from app.schemas.user import UserRegisterIn
 class UserService:
 
     @classmethod
-    # @unified_resp
+    @unified_resp
     async def register_user(cls, user_item: UserRegisterIn):
         user = await UserCRUD.user_add(user_item)
         access_token = await create_access_token(user)
-        return {'user': user, 'access_token': access_token, 'token_type': 'Bearer'}
+        return {'user_info': user, 'access_token': access_token, 'token_type': 'Bearer'}
 
     @classmethod
     @unified_resp

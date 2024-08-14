@@ -236,10 +236,8 @@ def unified_resp(func: typing.Callable[..., RT]):
     @wraps(func)
     async def wrapper(*args, **kwargs) -> RT:
         if inspect.iscoroutinefunction(func):
-            try:
-                resp = await func(*args, **kwargs) or []
-            except Exception as e:
-                return Fail(message=str(e))
+
+            resp = await func(*args, **kwargs) or []
         else:
             resp = func(*args, **kwargs) or []
         return Success(result=resp)

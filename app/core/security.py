@@ -19,7 +19,7 @@ from config import JwtConfig
 
 # 设置时区
 ChinaTimeZone = pytz.timezone("Asia/Shanghai")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/system/user/login')
 
 
 async def create_access_token(payload: Dict[Any, Union[str, Any]]) -> str:

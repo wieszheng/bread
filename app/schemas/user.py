@@ -7,9 +7,11 @@
 @Software : PyCharm
 """
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel, Field, field_validator, EmailStr
+
+from app.schemas.resp import ResponseBaseModel
 
 
 class UserModel(BaseModel):
@@ -70,10 +72,9 @@ class UserLoginIn(BaseModel):
     password: str
 
 
-class AddUser(BaseModel):
-    username: Optional[str]
-    nickname: Optional[str]
-    password: Optional[str]
+class AddUser(UserRegisterIn):
+    role: Optional[int] = Field(None, title="用户权限", description="可选填")
+    last_login_at: datetime = Field(..., title="登录时间", description="必传")
 
 
 class CurrentUserInfo(BaseModel):
@@ -83,3 +84,7 @@ class CurrentUserInfo(BaseModel):
     username: Optional[str]
     nickname: Optional[str]
     password: Optional[str]
+
+
+class UserRegisterOut(ResponseBaseModel):
+    result: Union[Token, AddUser]

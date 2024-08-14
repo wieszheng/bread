@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 
 class ResponseBaseModel(BaseModel):
     """ 统一响应模型 """
-    api_code: int
+    code: int
     success: bool
     message: str
     result: dict
