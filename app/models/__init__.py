@@ -7,10 +7,11 @@
 @Software : PyCharm
 """
 from datetime import datetime
+from typing import Tuple
 
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declarative_base
-from sqlalchemy import URL
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import URL, Column
 from sqlalchemy.ext.asyncio import (create_async_engine, AsyncSession,
                                     async_sessionmaker)
 
@@ -43,9 +44,10 @@ async_session_maker = async_sessionmaker(
 class BaseOrmTable(AsyncAttrs, DeclarativeBase):
     """SQLAlchemy Base ORM Model"""
 
-    __abstract__ = True
-
     id: Mapped[int] = mapped_column(primary_key=True, comment="主键ID")
+
+    __abstract__ = True
+    # __fields__: Tuple[Column] = [id]
 
     def __repr__(self):
         return str(self.to_dict())
@@ -81,9 +83,10 @@ class TimestampColumns(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    created_at: Mapped[datetime] = mapped_column(default=datetime.now, comment="创建时间")
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now, nullable=False, comment="创建时间")
 
-    updated_at: Mapped[datetime] = mapped_column(default=datetime.now, onupdate=datetime.now, comment="更新时间")
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.now, nullable=False, onupdate=datetime.now,
+                                                 comment="更新时间")
 
     deleted_at: Mapped[datetime] = mapped_column(nullable=True, comment="删除时间")
 
@@ -93,9 +96,9 @@ class OperatorColumns(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    created_by: Mapped[int] = mapped_column(default=1, comment="创建人")
+    created_by: Mapped[int] = mapped_column(default=1, nullable=False, comment="创建人")
 
-    updated_by: Mapped[int] = mapped_column(default=1, comment="更新人")
+    updated_by: Mapped[int] = mapped_column(default=1, nullable=False, comment="更新人")
 
     deleted_by: Mapped[int] = mapped_column(nullable=True, comment="删除人")
 

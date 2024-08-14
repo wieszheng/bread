@@ -6,9 +6,10 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, EmailStr
 
 
 class UserModel(BaseModel):
@@ -41,10 +42,32 @@ class UserModel(BaseModel):
 
 class UserRegisterIn(BaseModel):
     """ 用户注册入参 """
-    username: str = Field(..., min_length=3, max_length=50, description='用户名')
-    nickname: str = Field(..., min_length=2, max_length=50, description='用户昵称')
-    phone: str = Field(..., min_length=11, description='用户手机号')
-    password: str = Field(..., min_length=6, max_length=50, description='用户密码')
+    username: str = Field(..., title="用户名", description="必传")
+    password: str = Field(..., title="密码", description="必传")
+    nickname: str = Field(..., title="姓名", description="必传")
+    email: EmailStr = Field(..., title="邮箱号", examples=["user@qq.com"], description="必传")
+
+    @field_validator("username")
+    def validate_username(cls, value: str):
+        if len(value) < 4:
+            raise ValueError("用户名长度不能小于4")
+        return value
+
+    @field_validator("email")
+    def validate_email(cls, value: str):
+        if not value.endswith("@qq.com"):
+            raise ValueError("邮箱格式不正确")
+        return value
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class UserLoginIn(BaseModel):
+    username: str
+    password: str
 
 
 class AddUser(BaseModel):

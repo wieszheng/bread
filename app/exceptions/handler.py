@@ -32,7 +32,7 @@ def register_exceptions_handler(app: FastAPI):
     @app.exception_handler(AuthException)
     async def auth_exception_handler(request: Request, exc: AuthException):
         """ 认证异常处理 """
-        logger.info('认证失败')
+
         return InvalidTokenException()
 
     # 自定义权限检验异常
@@ -85,20 +85,19 @@ def register_exceptions_handler(app: FastAPI):
 
         return ParameterException(result={"detail": message, "body": exc.body})
 
-    @app.exception_handler(ValueError)
-    async def value_exception_handler(request: Request, exc: ValueError):
-        """
-        捕获值异常
-        """
-        logger.warning(
-            f"参数处理异常: value_exception_handler\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Message:{exc.__str__()}\n"
-        )
-        # logger.exception(str(exc))
-        ParameterException(result={"detail": str(exc.__str__())})
+    # @app.exception_handler(ValueError)
+    # async def value_exception_handler(request: Request, exc: ValueError):
+    #     """
+    #     捕获值异常
+    #     """
+    #     logger.warning(
+    #         f"参数处理异常: value_exception_handler\n"
+    #         f"Method:{request.method}\n"
+    #         f"URL:{request.url}\n"
+    #         f"Headers:{request.headers}\n"
+    #     )
+    #     # logger.exception(str(exc))
+    #     ParameterException(result={"detail": str(exc.__str__())})
 
     @app.exception_handler(BusinessException)
     async def business_exception_handler(request: Request, exc: BusinessException):
