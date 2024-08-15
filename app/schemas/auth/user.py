@@ -14,6 +14,29 @@ from pydantic import BaseModel, Field, field_validator, EmailStr
 from app.schemas.resp import ResponseBaseModel
 
 
+class UserLogin(BaseModel):
+    username: str = Field(..., description='用户名')
+    password: str = Field(..., description='密码')
+
+
+class UserIn(BaseModel):
+    id: int = Field(None, description='id')
+    avatar: Optional[str] = Field(None, description='头像')
+    username: str = Field(None, description='用户名称')
+    nickname: str = Field(None, description='用户昵称')
+    role: int = Field(None, description='权限')
+    last_login_at: Optional[datetime] = Field(None, description='登录时间')
+
+
+class UserTokenIn(BaseModel):
+    """
+    用户登录返回信息
+    """
+    data: UserIn
+    access_token: str = Field(None, description='令牌token')
+    token_type: str = Field(None, description='令牌类型')
+
+
 class UserModel(BaseModel):
     """
     用户表对应pydantic模型
@@ -62,11 +85,6 @@ class UserRegisterIn(BaseModel):
         return value
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
 class UserLoginIn(BaseModel):
     username: str
     password: str
@@ -84,7 +102,3 @@ class CurrentUserInfo(BaseModel):
     username: Optional[str]
     nickname: Optional[str]
     password: Optional[str]
-
-
-class UserRegisterOut(ResponseBaseModel):
-    result: Union[Token, AddUser]

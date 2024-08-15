@@ -13,11 +13,11 @@ from fastapi.requests import Request
 
 from fastapi.exceptions import RequestValidationError
 from loguru import logger
+from pydantic import ValidationError
 
-from app.commons import R
-from app.commons.resq import (MethodNotAllowedException, LimiterResException, InternalErrorException, NotfoundException,
-                              BadRequestException, OtherException, ParameterException, BusinessError,
-                              InvalidTokenException, ForbiddenException)
+from app.commons.response.resq import (MethodNotAllowedException, LimiterResException, InternalErrorException, NotfoundException,
+                                       BadRequestException, OtherException, ParameterException, BusinessError,
+                                       InvalidTokenException, ForbiddenException)
 
 from app.exceptions.exception import BusinessException, AuthException, PermissionException, DBException
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -72,7 +72,7 @@ def register_exceptions_handler(app: FastAPI):
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
-        """ 全局捕捉参数验证异常 """
+        """ 请求参数验证异常 """
         logger.warning(
             f"Http请求异常: value_exception_handler\n"
             f"Method:{request.method}\n"
@@ -80,24 +80,24 @@ def register_exceptions_handler(app: FastAPI):
             f"Headers:{request.headers}\n"
             f"Message:{exc.errors()}\n"
         )
+        logger.error(traceback.format_exc())
         message = '.'.join([f'{".".join(map(lambda x: str(x), error.get("loc")))}:{error.get("msg")};'
                             for error in exc.errors()])
 
         return ParameterException(result={"detail": message, "body": exc.body})
 
-    # @app.exception_handler(ValueError)
-    # async def value_exception_handler(request: Request, exc: ValueError):
-    #     """
-    #     捕获值异常
-    #     """
-    #     logger.warning(
-    #         f"参数处理异常: value_exception_handler\n"
-    #         f"Method:{request.method}\n"
-    #         f"URL:{request.url}\n"
-    #         f"Headers:{request.headers}\n"
-    #     )
-    #     # logger.exception(str(exc))
-    #     ParameterException(result={"detail": str(exc.__str__())})
+    @app.exception_handler(ValidationError)
+    async def inner_validation_exception_handler(request: Request, exc: ValidationError):
+        """ 内部参数验证异常 """
+        logger.error(
+            f"内部参数验证异常\n"
+            f"Method:{request.method}\n"
+            f"URL:{request.url}\n"
+            f"Headers:{request.headers}\n"
+            f"Message:{exc.errors()}\n"
+        )
+        logger.error(traceback.format_exc())
+        return ParameterException(result={"detail": exc.errors()})
 
     @app.exception_handler(BusinessException)
     async def business_exception_handler(request: Request, exc: BusinessException):
@@ -117,12 +117,17 @@ def register_exceptions_handler(app: FastAPI):
     @app.exception_handler(Exception)
     async def exception_handler(request: Request, exc: Exception):
         """ 全局系统异常处理器 """
-        # logger.exception(exc)
-
         if isinstance(exc, ConnectionError):
-            message = f'网络异常, {traceback.format_exc()}'
+            message = f'网络异常 --> {traceback.format_exc()}'
         else:
-            message = f'系统异常, {traceback.format_exc()}'
+            message = f'系统异常 --> {traceback.format_exc()}'
 
-        logger.error(message)
-        return InternalErrorException(result={"detail": message})
+        logger.error(
+            f"全局系统异常\n"
+            f"Method:{request.method}\n"
+            f"URL:{request.url}\n"
+            f"Headers:{request.headers}\n"
+            f"Message:{message}\n"
+        )
+
+        return InternalErrorException(result={"detail": str(exc)})

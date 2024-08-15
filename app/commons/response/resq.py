@@ -19,7 +19,6 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 class CJsonEncoder(json.JSONEncoder):
     def default(self, obj):
-        print(obj.__class__)
         # 如果对象具有keys和__getitem__属性，则返回对象的字典表示
         if hasattr(obj, 'keys') and hasattr(obj, '__getitem__'):
             return dict(obj)

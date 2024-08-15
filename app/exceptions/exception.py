@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from app.enums.exception import StatusCodeEnum
+from app.commons.response.codes import StatusCodeEnum
 
 
 class BusinessException(Exception):

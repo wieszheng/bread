@@ -11,12 +11,12 @@ from datetime import datetime
 from fastapi import Depends
 from pydantic import BaseModel
 
+from app.commons.response.codes import StatusCodeEnum
 from app.core.security import oauth2_scheme, decode_jwt_token
 from app.crud import BaseCRUD
-from app.enums.exception import StatusCodeEnum
 from app.exceptions.exception import BusinessException
 from app.models.user import UserModel
-from app.schemas.user import AddUser, UserRegisterIn
+from app.schemas.auth.user import AddUser, UserRegisterIn
 
 
 class BarModel(BaseModel):
@@ -54,12 +54,11 @@ class UserCRUD(BaseCRUD):
         # 校验用户名是否存在
         result = await cls.exists(username=user_item.username)
         if result:
-            raise BusinessException(StatusCodeEnum.USER_ERR)
-
+            raise ValueError(StatusCodeEnum.USERNAME_OR_EMAIL_IS_REGISTER.msg)
         # 校验邮箱是否存在
         result = await cls.exists(email=user_item.email)
         if result:
-            raise BusinessException(StatusCodeEnum.EMAIL_ERR)
+            raise ValueError(StatusCodeEnum.USER_EMAIL_OR_EMAIL_IS_REGISTER.msg)
 
     @classmethod
     async def user_add(cls, user_item: UserRegisterIn):

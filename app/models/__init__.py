@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Tuple
 
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, as_declarative, declared_attr
 from sqlalchemy import URL, Column
 from sqlalchemy.ext.asyncio import (create_async_engine, AsyncSession,
                                     async_sessionmaker)
@@ -47,6 +47,7 @@ class BaseOrmTable(AsyncAttrs, DeclarativeBase):
     id: Mapped[int] = mapped_column(primary_key=True, comment="主键ID")
 
     __abstract__ = True
+
     # __fields__: Tuple[Column] = [id]
 
     def __repr__(self):
@@ -105,3 +106,6 @@ class OperatorColumns(AsyncAttrs, DeclarativeBase):
 
 class BaseOrmTableWithTS(BaseOrmTable, TimestampColumns, OperatorColumns):
     __abstract__ = True
+
+
+

@@ -8,8 +8,8 @@
 """
 from fastapi import APIRouter
 
-from app.schemas.user import CurrentUserInfo, UserRegisterOut
-from app.service.user_s import UserService
+from app.schemas.auth.user import CurrentUserInfo
+from app.service.auth.user import UserService
 
 router = APIRouter(prefix="/system/user", tags=["用户接口"])
 
@@ -31,7 +31,6 @@ router.add_api_route(
 router.add_api_route(
     "/add",
     endpoint=UserService.register_user,
-    response_model=UserRegisterOut,
     methods=["post"],
     summary="添加用户"
 )
