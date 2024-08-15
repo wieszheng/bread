@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.commons.response.codes import StatusCodeEnum
 from app.commons.response.resq import Success
-from app.core.security import create_access_token
+from app.core.security import create_access_token, decrypt_rsa_password, encrypt_rsa_password
 
 from app.exceptions.exception import BusinessException
 
@@ -52,7 +52,7 @@ class UserService:
         user_info = await UserCRUD.get(username=username)
         if not user_info:
             raise ValueError(StatusCodeEnum.WRONG_USER_NAME_OR_PASSWORD.msg)
-        u_password = user_info.get("password")
+        u_password = encrypt_rsa_password(user_info["password"])
         if u_password != password:
             raise ValueError(StatusCodeEnum.WRONG_USER_NAME_OR_PASSWORD.msg)
 
