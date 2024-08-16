@@ -43,6 +43,11 @@ class AppSettings(BaseSettings):
     APP_IP_LOCATION_QUERY: bool
     APP_SAME_TIME_LOGIN: bool
 
+    # 权限 0 普通用户 1 组长 2 管理员
+    MEMBER: int
+    MANAGER: int
+    ADMIN: int
+
     # 项目日志滚动配置（日志文件超过10 MB就自动新建文件扩充）
     LOGGING_ROTATION: str = "10 MB"
     LOGGING_CONF: dict = {

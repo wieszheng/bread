@@ -7,10 +7,10 @@
 @Software : PyCharm
 """
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, Annotated
 
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, as_declarative, declared_attr
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, as_declarative, declared_attr, MappedAsDataclass
 from sqlalchemy import URL, Column
 from sqlalchemy.ext.asyncio import (create_async_engine, AsyncSession,
                                     async_sessionmaker)
@@ -43,8 +43,6 @@ async_session_maker = async_sessionmaker(
 
 class BaseOrmTable(AsyncAttrs, DeclarativeBase):
     """SQLAlchemy Base ORM Model"""
-
-    id: Mapped[int] = mapped_column(primary_key=True, comment="主键ID")
 
     __abstract__ = True
 
@@ -97,15 +95,12 @@ class OperatorColumns(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    created_by: Mapped[int] = mapped_column(default=1, nullable=False, comment="创建人")
+    created_by: Mapped[int] = mapped_column(default=0, nullable=False, comment="创建人")
 
-    updated_by: Mapped[int] = mapped_column(default=1, nullable=False, comment="更新人")
+    updated_by: Mapped[int] = mapped_column(default=0, nullable=False, comment="更新人")
 
     deleted_by: Mapped[int] = mapped_column(nullable=True, comment="删除人")
 
 
 class BaseOrmTableWithTS(BaseOrmTable, TimestampColumns, OperatorColumns):
     __abstract__ = True
-
-
-

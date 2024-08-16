@@ -6,15 +6,29 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+from datetime import datetime, timezone
 from functools import wraps
 from typing import Any, Optional, Callable, Union, Dict, Sequence, Type
 
 from loguru import logger
 from pydantic import BaseModel, ValidationError
-from sqlalchemy import ColumnElement, or_, Select, select, asc, desc, Row, Column, inspect, func, Join, BinaryExpression
+from sqlalchemy import (
+    Insert,
+    Result,
+    and_,
+    select,
+    update,
+    delete,
+    func,
+    inspect,
+    asc,
+    desc,
+    or_,
+    column, Column, Select, Row, Join,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.util import AliasedClass
-
+from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
 from app.crud.helper import JoinConfig
 from app.crud.types import ModelType, CreateSchemaType, UpdateSchemaType
 from app.exceptions.exception import DBException
@@ -212,6 +226,9 @@ def _nest_join_data(
 
 class BaseCRUD:
     __model__: Type[ModelType] = None
+    is_deleted_column: str = "is_deleted",
+    deleted_at_column: str = "deleted_at",
+    updated_at_column: str = "updated_at"
 
     _SUPPORTED_FILTERS = {
         "gt": lambda column: column.__gt__,
@@ -255,12 +272,12 @@ class BaseCRUD:
         for key, value in kwargs.items():
             if "__" in key:
                 field_name, op = key.rsplit("__", 1)
-                column = getattr(model, field_name, None)
-                if column is None:
+                column_ = getattr(model, field_name, None)
+                if column_ is None:
                     raise ValueError(f"Invalid filter column: {field_name}")
                 if op == "or":
                     or_filters = [
-                        sqlalchemy_filter(column)(or_value)
+                        sqlalchemy_filter(column_)(or_value)
                         for or_key, or_value in value.items()
                         if (
                                sqlalchemy_filter := cls._get_sqlalchemy_filter(
@@ -272,11 +289,11 @@ class BaseCRUD:
                 else:
                     sqlalchemy_filter = cls._get_sqlalchemy_filter(op, value)
                     if sqlalchemy_filter:
-                        filters.append(sqlalchemy_filter(column)(value))
+                        filters.append(sqlalchemy_filter(column_)(value))
             else:
-                column = getattr(model, key, None)
-                if column is not None:
-                    filters.append(column == value)
+                column_ = getattr(model, key, None)
+                if column_ is not None:
+                    filters.append(column_ == value)
 
         return filters
 
@@ -616,4 +633,112 @@ class BaseCRUD:
                 return nested_data
             return data_list[0]
 
+        return None
+
+    @classmethod
+    def _as_single_response(
+            cls,
+            db_row: Result,
+            schema_to_select: Optional[type[BaseModel]] = None,
+            return_as_model: bool = False,
+            one_or_none: bool = False,
+    ) -> Optional[Union[dict, BaseModel]]:
+        result: Optional[Row] = db_row.one_or_none() if one_or_none else db_row.first()
+        if result is None:  # pragma: no cover
+            return None
+        out: dict = dict(result._mapping)
+        if not return_as_model:
+            return out
+        if not schema_to_select:  # pragma: no cover
+            raise ValueError(
+                "schema_to_select must be provided when return_as_model is True."
+            )
+        return schema_to_select(**out)
+
+    @classmethod
+    def _as_multi_response(
+            cls,
+            db_row: Result,
+            schema_to_select: Optional[type[BaseModel]] = None,
+            return_as_model: bool = False,
+    ) -> dict:
+        data = [dict(row) for row in db_row.mappings()]
+
+        response: dict[str, Any] = {"data": data}
+
+        if return_as_model:
+            if not schema_to_select:  # pragma: no cover
+                raise ValueError(
+                    "schema_to_select must be provided when return_as_model is True."
+                )
+            try:
+                model_data = [schema_to_select(**row) for row in data]
+                response["data"] = model_data
+            except ValidationError as e:  # pragma: no cover
+                raise ValueError(
+                    f"Data validation error for schema {schema_to_select.__name__}: {e}"
+                )
+
+        return response
+
+    @classmethod
+    @with_session
+    async def update(
+            cls,
+            *,
+            obj: Union[UpdateSchemaType, dict[str, Any]],
+            allow_multiple: bool = False,
+            commit: bool = True,
+            return_columns: Optional[list[str]] = None,
+            schema_to_select: Optional[type[BaseModel]] = None,
+            return_as_model: bool = False,
+            one_or_none: bool = False,
+            session: AsyncSession = None,
+            **kwargs: Any,
+    ) -> Optional[Union[dict, BaseModel]]:
+
+        if not allow_multiple and (total_count := await cls.count(**kwargs)) > 1:
+            raise ValueError(
+                f"Expected exactly one record to update, found {total_count}."
+            )
+        if isinstance(obj, dict):
+            update_data = obj
+        else:
+            update_data = obj.model_dump(exclude_unset=True)
+
+        updated_at_col = getattr(cls.__model__, cls.updated_at_column, None)
+        if updated_at_col:
+            update_data[cls.updated_at_column] = datetime.now()
+
+        update_data_keys = set(update_data.keys())
+        model_columns = {column_.name for column_ in inspect(cls.__model__).c}
+        extra_fields = update_data_keys - model_columns
+        if extra_fields:
+            raise ValueError(f"Extra fields provided: {extra_fields}")
+
+        filters = cls._parse_filters(**kwargs)
+        stmt = update(cls.__model__).filter(*filters).values(update_data)
+
+        if return_as_model:
+            return_columns = [col.key for col in cls.__model__.__table__.columns]
+
+        if return_columns:
+            stmt = stmt.returning(*[column(name) for name in return_columns])
+            db_row = await session.execute(stmt)
+            if allow_multiple:
+                return cls._as_multi_response(
+                    db_row,
+                    schema_to_select=schema_to_select,
+                    return_as_model=return_as_model,
+                )
+            return cls._as_single_response(
+                db_row,
+                schema_to_select=schema_to_select,
+                return_as_model=return_as_model,
+                one_or_none=one_or_none,
+            )
+
+        await session.execute(stmt)
+        if commit:
+            await session.commit()
         return None

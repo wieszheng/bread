@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from app.commons.response.codes import StatusCodeEnum
+from app.commons.response.response_code import CustomErrorCode
 
 
 class BusinessException(Exception):
@@ -14,7 +14,7 @@ class BusinessException(Exception):
 
     __slots__ = ['err_code', 'err_code_des']
 
-    def __init__(self, result: StatusCodeEnum = None, err_code: str = "0000", err_code_des: str = ""):
+    def __init__(self, result: CustomErrorCode = None, err_code: str = "0000", err_code_des: str = ""):
         if result:
             self.err_code = result.code
             self.err_code_des = err_code_des or result.msg

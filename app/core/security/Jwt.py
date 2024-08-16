@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 """
 @Version  : Python 3.12
-@Time     : 2024/8/14 10:57
+@Time     : 2024/8/16 10:40
 @Author   : wiesZheng
 @Software : PyCharm
 """
@@ -50,37 +50,69 @@ ChinaTimeZone = pytz.timezone("Asia/Shanghai")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/system/user/login')
 
 
-async def create_access_token(payload: Dict[Any, Union[str, Any]]) -> str:
+async def create_access_token(sub: str) -> str:
     """
     根据登录信息创建当前用户token
 
-    :param payload: 用户信息
+    :param sub: 用户信息
     :return: token
     """
     current_time = datetime.now(ChinaTimeZone)
-    new_data = dict({
+    new_data = {
         "jti": current_time.strftime("%Y%m%d%H%M%f"),
         "iss": JwtConfig.JWT_ISS,
         "iat": current_time,
-        "exp": current_time + timedelta(minutes=JwtConfig.JWT_EXPIRE_MINUTES)},
-        **payload)
+        "exp": current_time + timedelta(minutes=JwtConfig.JWT_EXPIRE_MINUTES),
+        "sub": sub}
+
     # 生成并返回jwt
     return jwt.encode(new_data,
                       key=JwtConfig.JWT_SECRET_KEY,
                       algorithm=JwtConfig.JWT_ALGORITHM)
 
 
-async def decode_jwt_token(token: str) -> dict:
+async def decode_jwt_token(token: str) -> int:
     if not token:
         raise AuthException(message="用户信息身份认证失败, 请检查")
     try:
-        return jwt.decode(token, JwtConfig.JWT_SECRET_KEY, algorithms=[JwtConfig.JWT_ALGORITHM])
-
+        payload = jwt.decode(token, JwtConfig.JWT_SECRET_KEY, algorithms=[JwtConfig.JWT_ALGORITHM])
+        user_id = int(payload.get('sub'))
+        if not user_id:
+            raise AuthException(message='Token 无效')
     except (InvalidSignatureError, DecodeError):
         raise AuthException(message="无效认证，请重新登录")
 
     except ExpiredSignatureError:
-        raise AuthException()
+        raise AuthException(message="过期")
+    return user_id
+
+
+# async def get_current_user(db: AsyncSession, data: dict) -> User:
+#     """
+#     Get the current user through token
+#
+#     :param db:
+#     :param data:
+#     :return:
+#     """
+#     user_id = data.get('sub')
+#     from backend.app.admin.crud.crud_user import user_dao
+#
+#     user = await user_dao.get_with_relation(db, user_id=user_id)
+#     if not user:
+#         raise TokenError(msg='Token 无效')
+#     if not user.status:
+#         raise AuthorizationError(msg='用户已被锁定，请联系系统管理员')
+#     if user.dept_id:
+#         if not user.dept.status:
+#             raise AuthorizationError(msg='用户所属部门已锁定')
+#         if user.dept.del_flag:
+#             raise AuthorizationError(msg='用户所属部门已删除')
+#     if user.roles:
+#         role_status = [role.status for role in user.roles]
+#         if all(status == 0 for status in role_status):
+#             raise AuthorizationError(msg='用户所属角色已锁定')
+#     return user
 
 
 def generate_secret_key() -> tuple[str, str]:
@@ -95,7 +127,7 @@ def generate_secret_key() -> tuple[str, str]:
     return private_key.decode('utf8'), public_key.decode('utf8')
 
 
-def encrypt_rsa_password(password: str) -> bytes | str:
+async def encrypt_rsa_password(password: str) -> bytes | str:
     """
     密码加密
     :param password:
@@ -111,7 +143,7 @@ def encrypt_rsa_password(password: str) -> bytes | str:
         return password
 
 
-def decrypt_rsa_password(password) -> str:
+async def decrypt_rsa_password(password) -> str:
     """
     密码解密
     :param password:
@@ -125,10 +157,3 @@ def decrypt_rsa_password(password) -> str:
     except Exception as err:
         print(err)
         return password
-
-
-if __name__ == '__main__':
-    print(encrypt_rsa_password('string'))
-    print(decrypt_rsa_password('GlOFM7ANJQn8T2G8AL6uLNjDi9wmW5deyJk/OUyyNPO2XOGaZswv9M9g98Ds'
-                               'ZKBRpcRTdpCZYwGvYbzyNYpUlItILQV/M5vr3MGAzUjuyiAaPLPqg712GJpu'
-                               '1RUSNYN6eYbAoNvd0eD0nrqJDX4pYvDHHfUDFck+noEv3NJiM1k='))

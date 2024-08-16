@@ -21,6 +21,7 @@ class UserModel(BaseOrmTableWithTS):
     """
     __tablename__ = "bread_user"
 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, comment="主键ID")
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False,
                                           comment="用户名，用于登录")
     nickname: Mapped[str] = mapped_column(String(50), index=True, comment="昵称，用于显示")
@@ -29,5 +30,5 @@ class UserModel(BaseOrmTableWithTS):
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, comment="电子邮箱，唯一")
     avatar: Mapped[Optional[str]] = mapped_column(String(255), comment="头像链接或路径")
     role: Mapped[int] = mapped_column(default=0, comment="0: 普通用户 1: 组长 2: 超级管理员")
-    last_login_at: Mapped[datetime] = mapped_column(DateTime, nullable=True, comment="最后登录时间")
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime, comment="最后登录时间")
     is_valid: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, comment="账户是否有效，默认为True")

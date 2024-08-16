@@ -15,9 +15,13 @@ from fastapi.exceptions import RequestValidationError
 from loguru import logger
 from pydantic import ValidationError
 
-from app.commons.response.resq import (MethodNotAllowedException, LimiterResException, InternalErrorException, NotfoundException,
-                                       BadRequestException, OtherException, ParameterException, BusinessError,
-                                       InvalidTokenException, ForbiddenException)
+from app.commons.response.response_code import CustomResponseCode
+from app.commons.response.response_schema import (MethodNotAllowedException, LimiterResException,
+                                                  InternalErrorException, NotfoundException,
+                                                  BadRequestException, OtherException, ParameterException,
+                                                  BusinessError,
+                                                  InvalidTokenException, ForbiddenException, ApiResponse)
+from app.commons.schema import CUSTOM_VALIDATION_ERROR_MESSAGES
 
 from app.exceptions.exception import BusinessException, AuthException, PermissionException, DBException
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -56,19 +60,15 @@ def register_exceptions_handler(app: FastAPI):
             f"Code:{exc.status_code}\n"
             f"Message:{exc.detail}\n"
         )
-        match exc.status_code:
-            case 405:
-                return MethodNotAllowedException()
-            case 404:
-                return NotfoundException()
-            case 429:
-                return LimiterResException()
-            case 500:
-                return InternalErrorException()
-            case 400:
-                return BadRequestException(message=exc.detail)
-            case _:
-                return OtherException(message=str(exc.detail))
+
+        exc_msg = CustomResponseCode.use_code_get_enum_msg(exc.status_code)
+        return ApiResponse(
+            http_status_code=exc.status_code,
+            result={},
+            message=exc_msg,
+            api_code=exc.status_code,
+            success=False,
+        )
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -81,10 +81,14 @@ def register_exceptions_handler(app: FastAPI):
             f"Message:{exc.errors()}\n"
         )
         logger.error(traceback.format_exc())
-        message = '.'.join([f'{".".join(map(lambda x: str(x), error.get("loc")))}:{error.get("msg")};'
+        message = '.'.join([f'{".".join(map(lambda x: str(x), error.get("loc")))}:'
+                            f'{CUSTOM_VALIDATION_ERROR_MESSAGES.get(error.get("type")), error.get("msg")};'
                             for error in exc.errors()])
 
-        return ParameterException(result={"detail": message, "body": exc.body})
+        return ParameterException(
+            message="请求参数校验错误,请检查提交的参数信息",
+            result={"detail": message, "body": exc.body}
+        )
 
     @app.exception_handler(ValidationError)
     async def inner_validation_exception_handler(request: Request, exc: ValidationError):
@@ -96,8 +100,15 @@ def register_exceptions_handler(app: FastAPI):
             f"Headers:{request.headers}\n"
             f"Message:{exc.errors()}\n"
         )
+        message = '.'.join([f'{".".join(map(lambda x: str(x), error.get("loc")))}:'
+                            f'{CUSTOM_VALIDATION_ERROR_MESSAGES.get(error.get("type")), error.get("msg")};'
+                            for error in exc.errors()])
         logger.error(traceback.format_exc())
-        return ParameterException(result={"detail": exc.errors()})
+
+        return ParameterException(
+            message="内部参数校验错误,请检查提交的参数信息",
+            result={"detail": message}
+        )
 
     @app.exception_handler(BusinessException)
     async def business_exception_handler(request: Request, exc: BusinessException):

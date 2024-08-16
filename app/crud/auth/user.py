@@ -6,27 +6,17 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import Depends
 from pydantic import BaseModel
 
-from app.commons.response.codes import StatusCodeEnum
-from app.core.security import oauth2_scheme, decode_jwt_token
+from app.commons.response.response_code import CustomErrorCode
+from app.core.security.Jwt import oauth2_scheme, decode_jwt_token
 from app.crud import BaseCRUD
 from app.exceptions.exception import BusinessException
 from app.models.user import UserModel
-from app.schemas.auth.user import AddUser, UserRegisterIn
-
-
-class BarModel(BaseModel):
-    whatever: int
-
-
-class FooBarModel(BaseModel):
-    banana: float
-    foo: str
-    bar: BarModel
+from app.schemas.auth.user import RegisterUserParam
 
 
 class UserCRUD(BaseCRUD):
@@ -49,28 +39,36 @@ class UserCRUD(BaseCRUD):
     #     return user
 
     @classmethod
-    async def verify_user_register_info(cls, user_item: UserRegisterIn):
+    async def update_user_role(cls, user_id: int, role: int = 2):
+        res = await cls.exists(id=user_id)
+        if res:
+            await cls.update(obj={"role": role}, id=user_id)
+
+    @classmethod
+    async def update_login_time(cls, user_id: int):
+        res = await cls.exists(id=user_id)
+        if res:
+            return await cls.update(obj={"last_login_at": datetime.now()}, id=user_id)
+
+    @classmethod
+    async def verify_user_register_info(cls, user_item: RegisterUserParam):
         """ 校验用户注册信息 """
         # 校验用户名是否存在
         result = await cls.exists(username=user_item.username)
         if result:
-            raise ValueError(StatusCodeEnum.USERNAME_OR_EMAIL_IS_REGISTER.msg)
+            raise ValueError(CustomErrorCode.USERNAME_OR_EMAIL_IS_REGISTER.msg)
         # 校验邮箱是否存在
         result = await cls.exists(email=user_item.email)
         if result:
-            raise ValueError(StatusCodeEnum.USER_EMAIL_OR_EMAIL_IS_REGISTER.msg)
+            raise ValueError(CustomErrorCode.USER_EMAIL_OR_EMAIL_IS_REGISTER.msg)
 
     @classmethod
-    async def user_add(cls, user_item: UserRegisterIn):
+    async def user_add(cls, user_item: RegisterUserParam):
         await cls.verify_user_register_info(user_item)
-        info = {}
+        user = await cls.create(obj=user_item)
         # 创建注册用户
-        if await cls.count() == 0:
-            info["role"] = 2
-        info["last_login_at"] = datetime.now()
-        info.update(user_item.model_dump())
-        user = AddUser.model_validate(info)
-        user = await cls.create(obj=user)
+        if await cls.count() == 1:
+            user = await cls.update_user_role(user_id=user["id"])
         current_user = user.to_dict("password")
         return current_user
 

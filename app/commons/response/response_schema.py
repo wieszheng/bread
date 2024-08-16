@@ -10,11 +10,107 @@ import datetime
 import decimal
 import inspect
 import json
-import typing
+from typing import Any, Optional, Dict, TypeVar, Callable
+from fastapi import Response
 from functools import wraps
-
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from sqlalchemy.ext.declarative import DeclarativeMeta
+
+from app.commons.response.response_code import CustomResponseCode, CustomResponse
+
+
+class ResponseModel(BaseModel):
+    """
+    统一返回模型
+
+    E.g. ::
+
+        @router.get('/test', response_model=ResponseModel)
+        def test():
+            return ResponseModel(data={'test': 'test'})
+
+
+        @router.get('/test')
+        def test() -> ResponseModel:
+            return ResponseModel(data={'test': 'test'})
+
+
+        @router.get('/test')
+        def test() -> ResponseModel:
+            res = CustomResponseCode.HTTP_200
+            return ResponseModel(code=res.code, msg=res.msg, data={'test': 'test'})
+    """
+
+    class Config:
+        # 自动将datetime字段转换为字符串
+        json_encoders = {datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")}
+
+    code: int = CustomResponseCode.HTTP_200.code
+    msg: str = CustomResponseCode.HTTP_200.msg
+    data: Any | None = None
+
+
+class ResponseBase:
+    """
+    统一返回方法
+
+    .. tip::
+
+        此类中的方法将返回 ResponseModel 模型，作为一种编码风格而存在；
+
+    E.g. ::
+
+        @router.get('/test')
+        def test() -> ResponseModel:
+            return await response_base.success(data={'test': 'test'})
+    """
+
+    @staticmethod
+    async def __response(*, res: CustomResponseCode | CustomResponse = None, data: Any | None = None) -> ResponseModel:
+        """
+        请求成功返回通用方法
+
+        :param res: 返回信息
+        :param data: 返回数据
+        :return:
+        """
+        return ResponseModel(code=res.code, msg=res.msg, data=data)
+
+    async def success(
+            self,
+            *,
+            res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
+            data: Any | None = None,
+    ) -> ResponseModel:
+        return await self.__response(res=res, data=data)
+
+    async def fail(
+            self,
+            *,
+            res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
+            data: Any = None,
+    ) -> ResponseModel:
+        return await self.__response(res=res, data=data)
+
+    @staticmethod
+    async def fast_success(
+            *,
+            res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
+            data: Any | None = None,
+    ) -> Response:
+        """
+        此方法是为了提高接口响应速度而创建的，如果返回数据无需进行 pydantic 解析和验证，则推荐使用，相反，请不要使用！
+
+        .. warning::
+
+            使用此返回方法时，不要指定接口参数 response_model，也不要在接口函数后添加箭头返回类型
+
+        :param res:
+        :param data:
+        :return:
+        """
+        return ApiResponse(api_code=res.code, message=res.msg, result=data)
 
 
 class CJsonEncoder(json.JSONEncoder):
@@ -65,12 +161,12 @@ class ApiResponse(JSONResponse):
     api_code = 200
     success = True
     message = 'success'
-    result: typing.Optional[typing.Dict[str, typing.Any]] = None  # 结果可以是{} 或 []
+    result: Optional[Dict[str, Any]] = None  # 结果可以是{} 或 []
 
     def __init__(self, success=None, http_status_code=None, api_code=None, result=None, message=None, **kwargs):
         self.message = message or self.message
         self.api_code = api_code or self.api_code
-        self.success = success or self.success
+        self.success = success and self.success
         self.http_status_code = http_status_code or self.http_status_code
         self.result = result or self.result
 
@@ -86,7 +182,7 @@ class ApiResponse(JSONResponse):
                                           media_type='application/json;charset=utf-8')
 
     # 这个render会自动调用，如果这里需要特殊的处理的话，可以重写这个地方
-    def render(self, content: typing.Any) -> bytes:
+    def render(self, content: Any) -> bytes:
         return json.dumps(
             content,
             ensure_ascii=False,
@@ -130,7 +226,7 @@ class LimiterResException(ApiResponse):
 
 
 class ParameterException(ApiResponse):
-    http_status_code = 400
+    http_status_code = 422
     result = {}
     message = '参数校验错误,请检查提交的参数信息'
     api_code = 10031
@@ -228,10 +324,10 @@ class BusinessError(ApiResponse):
     success = False
 
 
-RT = typing.TypeVar('RT')
+RT = TypeVar('RT')
 
 
-def unified_resp(func: typing.Callable[..., RT]):
+def unified_resp(func: Callable[..., RT]):
     @wraps(func)
     async def wrapper(*args, **kwargs) -> RT:
         if inspect.iscoroutinefunction(func):
