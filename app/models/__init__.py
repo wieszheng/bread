@@ -96,11 +96,11 @@ class TimestampColumns(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
     created_at: Mapped[datetime] = mapped_column(
-        default=datetime.now, nullable=False, comment="创建时间"
+        default=datetime.now, comment="创建时间"
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        default=datetime.now, nullable=False, onupdate=datetime.now, comment="更新时间"
+        default=datetime.now, onupdate=datetime.now, comment="更新时间"
     )
 
     deleted_at: Mapped[datetime] = mapped_column(nullable=True, comment="删除时间")
@@ -111,11 +111,9 @@ class OperatorColumns(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    created_by: Mapped[int] = mapped_column(default=0, nullable=False, comment="创建人")
+    created_by: Mapped[int] = mapped_column(nullable=True, comment="创建人")
 
-    updated_by: Mapped[int] = mapped_column(default=0, nullable=False, comment="更新人")
-
-    deleted_by: Mapped[int] = mapped_column(nullable=True, comment="删除人")
+    updated_by: Mapped[int] = mapped_column(nullable=True, comment="更新人")
 
 
 class BaseOrmTableWithTS(BaseOrmTable, TimestampColumns, OperatorColumns):

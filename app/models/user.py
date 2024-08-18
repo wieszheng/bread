@@ -26,27 +26,27 @@ class UserModel(BaseOrmTableWithTS):
         primary_key=True, autoincrement=True, comment="主键ID"
     )
     username: Mapped[str] = mapped_column(
-        String(50), unique=True, index=True, nullable=False, comment="用户名，用于登录"
+        String(50), unique=True, index=True, comment="用户名，用于登录"
     )
     nickname: Mapped[str] = mapped_column(
         String(50), index=True, comment="昵称，用于显示"
     )
     password: Mapped[str] = mapped_column(
-        String(180), nullable=False, comment="密码，存储为哈希值"
+        String(180), comment="密码，存储为哈希值"
     )
-    phone: Mapped[str] = mapped_column(
-        String(11), unique=True, nullable=True, comment="手机号码，唯一"
+    phone: Mapped[Optional[str]] = mapped_column(
+        String(11), unique=True, comment="手机号码，唯一"
     )
     email: Mapped[str] = mapped_column(
-        String(100), unique=True, nullable=False, comment="电子邮箱，唯一"
+        String(100), unique=True, comment="电子邮箱，唯一"
     )
     avatar: Mapped[Optional[str]] = mapped_column(String(255), comment="头像链接或路径")
     role: Mapped[int] = mapped_column(
         default=0, comment="0: 普通用户 1: 组长 2: 超级管理员"
     )
-    last_login_at: Mapped[datetime | None] = mapped_column(
+    last_login_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime, comment="最后登录时间"
     )
     is_valid: Mapped[bool] = mapped_column(
-        Boolean, default=True, nullable=False, comment="账户是否有效，默认为True"
+        Boolean, default=True, comment="账户是否有效，默认为True"
     )

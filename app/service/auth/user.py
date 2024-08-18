@@ -70,7 +70,7 @@ class UserService:
             raise CustomException(CustomErrorCode.WRONG_USER_NAME_OR_PASSWORD)
         elif not await verify_psw(password, current_user["password"]):
             raise CustomException(CustomErrorCode.WRONG_USER_NAME_OR_PASSWORD)
-        elif current_user["is_valid"]:
+        elif not current_user["is_valid"]:
             raise CustomException(CustomErrorCode.USER_ACCOUNT_LOCKED)
 
         access_token = await create_access_token(current_user["id"])
