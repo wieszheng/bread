@@ -24,6 +24,8 @@ def add_cors_middleware(_app: FastAPI):
         allow_origins=origins,  # 允许的来源，可以是字符串、字符串列表，或通配符 "*"
         allow_credentials=True,  # 是否允许携带凭证（例如，使用 HTTP 认证、Cookie 等）
         allow_methods=["*"],  # 允许的 HTTP 方法，可以是字符串、字符串列表，或通配符 "*"
-        allow_headers=["*"],  # 允许的 HTTP 头信息，可以是字符串、字符串列表，或通配符 "*"
+        allow_headers=[
+            "*"
+        ],  # 允许的 HTTP 头信息，可以是字符串、字符串列表，或通配符 "*"
         expose_headers=["*"],  # 允许前端访问的额外响应头，可以是字符串、字符串列表
     )

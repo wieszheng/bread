@@ -51,6 +51,15 @@
 docker-compose -f docker-compose.yml up -d
 ```
 
+#### 🍰 提交规范
+
+```shell
+black . # 格式化代码
+
+git commit -m "feat: 添加新功能"
+git push origin main
+```
+
 #### 🔐 许可证
 
 [`MIT`](LICENSE)

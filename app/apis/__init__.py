@@ -8,7 +8,6 @@
 """
 
 
-
 # class Permission:
 #     def __init__(self, role: int = Settings.MEMBER):
 #         self.role = role
@@ -31,4 +30,3 @@
 #             raise AppExceptionNew(ExceptionEnum.InvalidToken_ERROR)
 #         user_info = model_to_dict(user, "password")
 #         return user_info
-

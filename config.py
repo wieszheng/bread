@@ -18,7 +18,7 @@ from pydantic_settings import BaseSettings
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
-LOG_DIR = os.path.join(ROOT, 'logs')
+LOG_DIR = os.path.join(ROOT, "logs")
 if not os.path.exists(LOG_DIR):
     os.mkdir(LOG_DIR)
 
@@ -33,6 +33,7 @@ class AppSettings(BaseSettings):
     """
     应用配置
     """
+
     APP_ENV: str
     APP_NAME: str
     APP_ROOT_PATH: str
@@ -48,22 +49,26 @@ class AppSettings(BaseSettings):
     MANAGER: int
     ADMIN: int
 
+    # 密码加密配置
+    BCRYPT_ROUNDS: int  # bcrypt迭代次数,越大耗时越长
+    SALT: str
+
     # 项目日志滚动配置（日志文件超过10 MB就自动新建文件扩充）
     LOGGING_ROTATION: str = "10 MB"
     LOGGING_CONF: dict = {
-        'server_handler': {
-            'file': SERVER_LOG_FILE,
-            'level': 'INFO',
-            'rotation': LOGGING_ROTATION,
-            'backtrace': False,
-            'diagnose': False,
+        "server_handler": {
+            "file": SERVER_LOG_FILE,
+            "level": "INFO",
+            "rotation": LOGGING_ROTATION,
+            "backtrace": False,
+            "diagnose": False,
         },
-        'error_handler': {
-            'file': ERROR_LOG_FILE,
-            'level': 'ERROR',
-            'rotation': LOGGING_ROTATION,
-            'backtrace': True,
-            'diagnose': True,
+        "error_handler": {
+            "file": ERROR_LOG_FILE,
+            "level": "ERROR",
+            "rotation": LOGGING_ROTATION,
+            "backtrace": True,
+            "diagnose": True,
         },
     }
 
@@ -93,6 +98,7 @@ class JwtSettings(BaseSettings):
     """
     Jwt配置
     """
+
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
     JWT_EXPIRE_MINUTES: int
@@ -104,6 +110,7 @@ class DataBaseSettings(BaseSettings):
     """
     数据库配置
     """
+
     MYSQL_HOST: str
     MYSQL_PORT: int
     MYSQL_PROTOCOL: str
@@ -121,6 +128,7 @@ class RedisSettings(BaseSettings):
     """
     Redis配置
     """
+
     REDIS_HOST: str
     REDIS_PORT: int
     REDIS_USERNAME: str
@@ -132,6 +140,7 @@ class MinioSettings(BaseSettings):
     """
     Minio配置
     """
+
     MINIO_HOST: str
     MINIO_PORT: int
     MINIO_ACCESS_KEY: str
@@ -195,19 +204,19 @@ class GetConfig:
         """
         解析命令行参数
         """
-        if 'uvicorn' in sys.argv[0]:
+        if "uvicorn" in sys.argv[0]:
             pass
         else:
-            parser = argparse.ArgumentParser(description='命令行参数')
-            parser.add_argument('--env', type=str, default='', help='运行环境')
+            parser = argparse.ArgumentParser(description="命令行参数")
+            parser.add_argument("--env", type=str, default="", help="运行环境")
 
             args, unknown = parser.parse_known_args()
-            os.environ['APP_ENV'] = args.env if args.env else 'dev'
+            os.environ["APP_ENV"] = args.env if args.env else "dev"
 
-        run_env = os.environ.get('APP_ENV', '')
-        env_file = '.env.dev'
-        if run_env != '':
-            env_file = f'.env.{run_env}'
+        run_env = os.environ.get("APP_ENV", "")
+        env_file = ".env.dev"
+        if run_env != "":
+            env_file = f".env.{run_env}"
         # 加载配置
         load_dotenv(os.path.join(ROOT, "conf", env_file))
 

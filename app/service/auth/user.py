@@ -7,40 +7,56 @@
 @Software : PyCharm
 """
 
-from fastapi import Request, Depends
-
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import HTTPAuthorizationCredentials
+from typing_extensions import Annotated
 
 from app.commons.response.response_code import CustomErrorCode
-from app.commons.response.response_schema import Success
-from app.core.security.Jwt import create_access_token, decrypt_rsa_password, encrypt_rsa_password
+from app.core.security import Jwt
 
-from app.exceptions.exception import BusinessException
+from app.core.security.Jwt import create_access_token, DependsJwtAuth
 
-from app.commons.response.response_schema import unified_resp
+from app.commons.response.response_schema import ResponseBase, ResponseModel
+from app.core.security.password import verify_psw
 from app.crud.auth.user import UserCRUD
-from app.schemas.auth.user import RegisterUserParam, UserLogin, UserTokenIn, UserIn, AuthLoginParam
+from app.exceptions.errors import CustomException
+from app.schemas.auth.user import (
+    RegisterUserParam,
+    AuthLoginParam,
+    GetCurrentUserInfoDetail,
+    GetUserInfoNoRelationDetail,
+)
 
 
 class UserService:
 
-    @classmethod
-    @unified_resp
-    async def register_user(cls, user_item: RegisterUserParam):
+    @staticmethod
+    async def register_user(user_item: RegisterUserParam) -> ResponseModel:
         """用户注册"""
-        user_item.password = await encrypt_rsa_password(user_item.password)
-        user = await UserCRUD.user_add(user_item)
-        access_token = await create_access_token(user)
-        return {'user_info': user, 'access_token': access_token, 'token_type': 'Bearer'}
-
-    @classmethod
-    @unified_resp
-    async def get_current_user_info(cls, token: str = Depends(UserCRUD.get_current_user)):
-        return token
+        current_user = await UserCRUD.user_add(user_item)
+        access_token = await create_access_token(current_user.id)
+        data = GetUserInfoNoRelationDetail.model_validate(current_user).model_dump()
+        result = {"data": data, "access_token": access_token, "token_type": "Bearer"}
+        return await ResponseBase.success(result=result)
 
     @staticmethod
-    @unified_resp
-    async def login(params: AuthLoginParam):
+    async def get_current_user_info(
+        credentials: Annotated[HTTPAuthorizationCredentials, DependsJwtAuth]
+    ) -> ResponseModel:
+        # token = request.headers.get('Authorization')
+        # if not token:
+        #     return
+        # scheme, token = get_authorization_scheme_param(token)
+        if credentials.scheme.lower() != "bearer":
+            return await ResponseBase.fail()
+
+        sub = await Jwt.decode_jwt_token(credentials.credentials)
+        current_user = await Jwt.get_current_user(sub)
+        data = GetCurrentUserInfoDetail.model_validate(current_user).model_dump()
+
+        return await ResponseBase.success(result=data)
+
+    @staticmethod
+    async def login(params: AuthLoginParam) -> ResponseModel:
         """
         登录
         :return:
@@ -48,19 +64,21 @@ class UserService:
         username = params.username
         password = params.password
         if not username and not password:
-            raise ValueError(CustomErrorCode.PARTNER_CODE_PARAMS_FAIL.msg)
-        user_info = await UserCRUD.get(username=username)
-        if not user_info:
-            raise ValueError(CustomErrorCode.WRONG_USER_NAME_OR_PASSWORD.msg)
-        u_password = await decrypt_rsa_password(user_info["password"])
-        if u_password != password:
-            raise ValueError(CustomErrorCode.WRONG_USER_NAME_OR_PASSWORD.msg)
+            raise CustomException(CustomErrorCode.PARTNER_CODE_PARAMS_FAIL)
+        current_user = await UserCRUD.get(username=username)
+        if not current_user:
+            raise CustomException(CustomErrorCode.WRONG_USER_NAME_OR_PASSWORD)
+        elif not await verify_psw(password, current_user["password"]):
+            raise CustomException(CustomErrorCode.WRONG_USER_NAME_OR_PASSWORD)
+        elif current_user["is_valid"]:
+            raise CustomException(CustomErrorCode.USER_ACCOUNT_LOCKED)
 
-        access_token = await create_access_token(user_info["id"])
-        await UserCRUD.update_login_time(user_info["id"])
-
-        token_user_info = UserTokenIn.model_validate({"data": user_info,
-                                                      'access_token': access_token,
-                                                      'token_type': 'Bearer'})
-
-        return token_user_info.model_dump()
+        access_token = await create_access_token(current_user["id"])
+        await UserCRUD.update_login_time(current_user["id"])
+        data = GetUserInfoNoRelationDetail.model_validate(current_user).model_dump()
+        result = {
+            "data": data,
+            "access_token": access_token,
+            "token_type": "Bearer",
+        }
+        return await ResponseBase.success(result=result)

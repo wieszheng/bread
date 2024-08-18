@@ -9,12 +9,15 @@
 from datetime import datetime
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field, field_validator, EmailStr
+from pydantic import BaseModel, Field, field_validator, EmailStr, ConfigDict
+from pydantic_extra_types.phone_numbers import PhoneNumber
+
+from app.commons.enums import RoleType
 
 
 class AuthSchemaBase(BaseModel):
-    username: str = Field(..., description='用户名')
-    password: str = Field(..., description='密码')
+    username: str = Field(..., description="用户名")
+    password: str = Field(..., description="密码")
 
     @field_validator("username")
     def validate_username(cls, value: str):
@@ -28,10 +31,12 @@ class AuthLoginParam(AuthSchemaBase):
 
 
 class RegisterUserParam(AuthSchemaBase):
-    """ 用户注册入参 """
+    """用户注册入参"""
 
     nickname: str = Field(..., title="姓名", description="必传")
-    email: EmailStr = Field(..., title="邮箱号", examples=["user@qq.com"], description="必传")
+    email: EmailStr = Field(
+        ..., title="邮箱号", examples=["user@qq.com"], description="必传"
+    )
 
     @field_validator("email")
     def validate_email(cls, value: str):
@@ -40,38 +45,44 @@ class RegisterUserParam(AuthSchemaBase):
         return value
 
 
-class UserLogin(BaseModel):
-    username: str = Field(..., description='用户名')
-    password: str = Field(..., description='密码')
+class CustomPhoneNumber(PhoneNumber):
+    default_region_code = "CN"
 
 
-class UserIn(BaseModel):
-    id: int = Field(None, description='id')
-    avatar: Optional[str] = Field(None, description='头像')
-    username: str = Field(None, description='用户名称')
-    nickname: str = Field(None, description='用户昵称')
-    role: int = Field(None, description='权限')
-    last_login_at: Optional[datetime] = Field(None, description='登录时间')
-
-
-class UserTokenIn(BaseModel):
-    """
-    用户登录返回信息
-    """
-    data: UserIn
-    access_token: str = Field(None, description='令牌token')
-    token_type: str = Field(None, description='令牌类型')
-
-
-class UserLoginIn(BaseModel):
+class UserInfoSchemaBase(BaseModel):
     username: str
-    password: str
+    nickname: str
+    email: EmailStr = Field(..., example="user@example.com")
+    phone: CustomPhoneNumber | None = None
 
 
-class CurrentUserInfo(BaseModel):
-    """
-    数据库返回当前用户信息
-    """
-    username: Optional[str]
-    nickname: Optional[str]
-    password: Optional[str]
+class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    avatar: str | None = None
+    role: RoleType = Field(default=RoleType.MEMBER)
+    is_valid: bool
+    last_login_at: datetime | None = None
+
+
+class GetCurrentUserInfoDetail(GetUserInfoNoRelationDetail):
+    model_config = ConfigDict(from_attributes=True)
+
+    created_at: datetime
+
+
+class GetUserInfoNoRelationDetail(GetUserInfoNoRelationDetail):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CurrentUserIns(GetUserInfoListDetails):
+    model_config = ConfigDict(from_attributes=True)
+
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    created_by: int | None = None

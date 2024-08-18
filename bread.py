@@ -11,9 +11,11 @@ import uvicorn
 from config import AppConfig
 
 if __name__ == "__main__":
-    uvicorn.run("main:app",
-                host=AppConfig.APP_HOST,
-                port=AppConfig.APP_PORT,
-                reload=AppConfig.APP_RELOAD,
-                forwarded_allow_ips="*",
-                access_log=False)
+    uvicorn.run(
+        "main:app",
+        host=AppConfig.APP_HOST,
+        port=AppConfig.APP_PORT,
+        reload=AppConfig.APP_RELOAD,
+        forwarded_allow_ips="*",
+        access_log=False,
+    )

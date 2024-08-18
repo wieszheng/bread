@@ -24,12 +24,12 @@ class CustomCodeBase(Enum):
 
     @property
     def code(self) -> int:
-        """ 获取错误码 """
+        """获取错误码"""
         return self.value[0]
 
     @property
     def msg(self) -> str:
-        """ 获取错误码码信息 """
+        """获取错误码码信息"""
         return self.value[1]
 
     @classmethod
@@ -57,27 +57,27 @@ class CustomCodeBase(Enum):
 class CustomResponseCode(CustomCodeBase):
     """响应状态码"""
 
-    HTTP_200 = (200, '请求成功')
-    HTTP_201 = (201, '新建请求成功')
-    HTTP_202 = (202, '请求已接受，但处理尚未完成')
-    HTTP_204 = (204, '请求成功，但没有返回内容')
-    HTTP_400 = (400, '错误的请求')
-    HTTP_401 = (401, '未经许可授权')
-    HTTP_403 = (403, '失败！当前访问没有权限，或操作的数据没权限!')
-    HTTP_404 = (404, '请求的地址不存在')
-    HTTP_405 = (405, '不允许使用此方法提交访问')
-    HTTP_410 = (410, '请求的资源已永久删除')
-    HTTP_422 = (422, '请求参数非法')
-    HTTP_425 = (425, '无法执行请求，由于服务器无法满足要求')
-    HTTP_429 = (429, '请求过多，服务器限制')
-    HTTP_500 = (500, '服务器内部错误')
-    HTTP_502 = (502, '网关错误')
-    HTTP_503 = (503, '服务器暂时无法处理请求')
-    HTTP_504 = (504, '网关超时')
+    HTTP_200 = (200, "请求成功")
+    HTTP_201 = (201, "新建请求成功")
+    HTTP_202 = (202, "请求已接受，但处理尚未完成")
+    HTTP_204 = (204, "请求成功，但没有返回内容")
+    HTTP_400 = (400, "错误的请求")
+    HTTP_401 = (401, "未经许可授权")
+    HTTP_403 = (403, "失败！当前访问没有权限，或操作的数据没权限!")
+    HTTP_404 = (404, "请求的地址不存在")
+    HTTP_405 = (405, "不允许使用此方法提交访问")
+    HTTP_410 = (410, "请求的资源已永久删除")
+    HTTP_422 = (422, "请求参数非法")
+    HTTP_425 = (425, "无法执行请求，由于服务器无法满足要求")
+    HTTP_429 = (429, "请求过多，服务器限制")
+    HTTP_500 = (500, "服务器内部错误")
+    HTTP_502 = (502, "网关错误")
+    HTTP_503 = (503, "服务器暂时无法处理请求")
+    HTTP_504 = (504, "网关超时")
 
 
 class CustomErrorCode(CustomCodeBase):
-    """ 错误码枚举类 """
+    """错误码枚举类"""
 
     # 业务状态码
     PARTNER_CODE_OK = (0, "OK")
@@ -86,13 +86,17 @@ class CustomErrorCode(CustomCodeBase):
     # 10000 - 11000 账号体系
     WRONG_USER_NAME_OR_PASSWORD = (10001, "账号或者密码错误！😱")  # 账号或密码错误
     PARTNER_CODE_EMPLOYEE_FAIL = (10002, "账号错误！")  # 账号错误
-    WRONG_USER_NAME_OR_PASSWORD_LOCK = (10003, "密码输入错误超过次数，请5分钟后再登录！😭")
+    WRONG_USER_NAME_OR_PASSWORD_LOCK = (
+        10003,
+        "密码输入错误超过次数，请5分钟后再登录！😭",
+    )
     USERNAME_OR_EMAIL_IS_REGISTER = (10004, "用户名已被注册")
     USER_EMAIL_OR_EMAIL_IS_REGISTER = (10004, "邮箱已被注册")
     USER_ID_IS_NULL = (10005, "用户id不能为空")
     PASSWORD_TWICE_IS_NOT_AGREEMENT = (10006, "两次输入的密码不一致")
     NEW_PWD_NO_OLD_PWD_EQUAL = (10007, "新密码不能与旧密码相同")
     OLD_PASSWORD_ERROR = (10008, "旧密码错误")
+    USER_ACCOUNT_LOCKED = (10009, "用户账号被锁定，请联系管理员 😭")
 
     # 用户状态 验证  11000 - 12000
     PARTNER_CODE_TOKEN_EXPIRED_FAIL = (11000, "用户信息以已过期 😂")  # token已过期
@@ -105,7 +109,10 @@ class CustomErrorCode(CustomCodeBase):
     PROJECT_NAME_EXIST = (13001, "项目名已存在")  # 项目名以存在
 
     # module 模块 14000 - 15000
-    MODULE_HAS_CASE_ASSOCIATION = (14000, " 模块有用例关联, 请删除对于模块下的用例")  # 模块有用例关联
+    MODULE_HAS_CASE_ASSOCIATION = (
+        14000,
+        " 模块有用例关联, 请删除对于模块下的用例",
+    )  # 模块有用例关联
     MODULE_NAME_EXIST = (14001, "模块名已存在")  # 模块名以存在
 
 

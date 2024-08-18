@@ -20,7 +20,7 @@ from app.models import async_engine, BaseOrmTable
 
 def init_logging(logging_conf: dict):
     for log_handler, log_conf in logging_conf.items():
-        log_file = log_conf.pop('file', None)
+        log_file = log_conf.pop("file", None)
         logger.add(log_file, **log_conf)
     logger.info("setup logging success")
 
@@ -38,7 +38,7 @@ async def init_create_table():
 async def lifespan(app: FastAPI):
     # Load the ML model
     logger.info(f"{AppConfig.APP_NAME} 开始启动")
-    logger.success(text2art(AppConfig.APP_NAME, font='block', chr_ignore=True))
+    logger.success(text2art(AppConfig.APP_NAME, font="block", chr_ignore=True))
     await init_create_table()
     await register_routers(app)
     logger.info(f"{AppConfig.APP_NAME} 启动成功")

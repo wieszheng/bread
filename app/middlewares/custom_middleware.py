@@ -22,9 +22,13 @@ def add_custom_middleware(app: FastAPI):
         start_time = time.perf_counter()
         request.state.traceid = uuid.uuid4()
         # 打印请求信息
-        logger.info(f"--> {request.state.traceid} {request.method} {request.url.path} {request.client.host}")
+        logger.info(
+            f"--> {request.state.traceid} {request.method} {request.url.path} {request.client.host}"
+        )
         if request.query_params:
-            logger.info(f"--> {request.state.traceid} Query Params: {request.query_params}")
+            logger.info(
+                f"--> {request.state.traceid} Query Params: {request.query_params}"
+            )
 
         if "application/json" in request.headers.get("Content-Type", ""):
             # await set_body(request)
@@ -42,7 +46,8 @@ def add_custom_middleware(app: FastAPI):
         process_time = time.perf_counter() - start_time
         response.headers["X-Response-Time"] = f"{process_time:.6f}s"
         logger.info(
-            f"<-- {request.state.traceid} {response.status_code} {request.url.path} (took: {process_time:.6f}s)\n")
+            f"<-- {request.state.traceid} {response.status_code} {request.url.path} (took: {process_time:.6f}s)\n"
+        )
 
         return response
 

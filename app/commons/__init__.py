@@ -15,7 +15,8 @@ T = TypeVar("T")
 
 
 class SingletonMetaCls(type):
-    """ 单例元类 """
+    """单例元类"""
+
     _instance_lock = threading.Lock()
 
     def __init__(cls, *args, **kwargs):
