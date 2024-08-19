@@ -33,7 +33,7 @@ async def custom_swagger_ui_html():
         title=AppConfig.APP_NAME + " - Swagger UI",
         swagger_js_url="/static/swagger_ui/swagger-ui-bundle.js",
         swagger_css_url="/static/swagger_ui/swagger-ui.css",
-        swagger_favicon_url="/static/favicon.png",
+        swagger_favicon_url="/static/favicon.ico",
     )
 
 
@@ -43,7 +43,7 @@ async def custom_redoc_html():
         openapi_url="/openapi.json",
         title=AppConfig.APP_NAME + " - ReDoc",
         redoc_js_url="/static/redoc_ui/redoc.standalone.js",
-        redoc_favicon_url="/static/favicon.png",
+        redoc_favicon_url="/static/favicon.ico",
     )
 
 

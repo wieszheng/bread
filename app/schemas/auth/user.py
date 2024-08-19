@@ -7,12 +7,13 @@
 @Software : PyCharm
 """
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator, EmailStr, ConfigDict
+from pydantic import BaseModel, Field, field_validator, EmailStr, ConfigDict, HttpUrl
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from app.commons.enums import RoleType
+from app.commons.response.response_schema import ListPageRequestModel
 
 
 class AuthSchemaBase(BaseModel):
@@ -86,3 +87,24 @@ class CurrentUserIns(GetUserInfoListDetails):
     created_at: datetime | None = None
     updated_at: datetime | None = None
     created_by: int | None = None
+
+
+class ResetPasswordParam(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: str
+
+
+class AvatarParam(BaseModel):
+    url: HttpUrl = Field(..., description="头像 http 地址")
+
+
+class RentalDemandListQuery(BaseModel):
+    username: Optional[str] = Field(default=None, description="用户账号")
+    nickname: Optional[str] = Field(default=None, description="用户昵称")
+
+
+class UserRentalDemandListIn(ListPageRequestModel):
+    query_params: Optional[RentalDemandListQuery] = Field(
+        default={}, description="房源列表查询参数"
+    )

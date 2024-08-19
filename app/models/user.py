@@ -31,9 +31,7 @@ class UserModel(BaseOrmTableWithTS):
     nickname: Mapped[str] = mapped_column(
         String(50), index=True, comment="昵称，用于显示"
     )
-    password: Mapped[str] = mapped_column(
-        String(180), comment="密码，存储为哈希值"
-    )
+    password: Mapped[str] = mapped_column(String(180), comment="密码，存储为哈希值")
     phone: Mapped[Optional[str]] = mapped_column(
         String(11), unique=True, comment="手机号码，唯一"
     )

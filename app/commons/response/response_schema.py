@@ -10,12 +10,10 @@ import datetime
 import decimal
 import inspect
 import json
-from typing import Any, Optional, Dict, TypeVar, Callable
-from fastapi import Response
+from typing import Any, Optional, Dict, TypeVar, Callable, List
 from functools import wraps
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict
-from pydantic.alias_generators import to_camel
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from app.commons.response.response_code import CustomResponseCode, CustomResponse
@@ -34,6 +32,30 @@ class ResponseModel(BaseModel):
     code: int = CustomResponseCode.HTTP_200.code
     message: str = CustomResponseCode.HTTP_200.msg
     result: Optional[Dict[str, Any]] = None
+
+
+class ListPageRequestModel(BaseModel):
+    """分页请求模型"""
+
+    offset: int = Field(default=0, ge=0, description="分页偏移量")
+    limit: int = Field(default=10, gt=0, description="每页显示数量")
+    query_params: Optional[dict] = Field(default={}, description="查询参数")
+    orderings: Optional[List[str]] = Field(default=["id"], description="排序字段")
+
+
+class ListResponseDataModel(BaseModel):
+    """分页列表响应data模型"""
+
+    total: int = Field(default=0, description="数据总数量")
+    data_list: list = Field(default=[], description="数据列表")
+    has_more: bool = Field(default=False, description="是否有下一页")
+    next_offset: int = Field(default=0, description="offset下次起步")
+
+
+class ListResponseModel(ResponseModel):
+    """分页列表响应统一返回"""
+
+    result: ListResponseDataModel
 
 
 class ResponseBase:

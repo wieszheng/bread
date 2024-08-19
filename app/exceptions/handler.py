@@ -15,24 +15,18 @@ from fastapi.exceptions import RequestValidationError
 from loguru import logger
 from pydantic import ValidationError
 
-from app.commons.response.response_code import CustomResponseCode, StandardResponseCode
+from app.commons.response.response_code import CustomResponseCode
 from app.commons.response.response_schema import (
-    MethodNotAllowedException,
-    LimiterResException,
     InternalErrorException,
-    NotfoundException,
-    BadRequestException,
-    OtherException,
     ParameterException,
     CustomError,
     InvalidTokenException,
-    ForbiddenException,
     ApiResponse,
-    UnauthorizedException,
+    ForbiddenException,
 )
 from app.commons.schema import CUSTOM_VALIDATION_ERROR_MESSAGES
 
-from app.exceptions.errors import TokenError, CustomException
+from app.exceptions.errors import TokenError, CustomException, AuthorizationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
@@ -40,6 +34,20 @@ def register_exceptions_handler(app: FastAPI):
     """
     全局异常处理
     """
+
+    @app.exception_handler(AuthorizationError)
+    async def authorization_exception_handler(
+        request: Request, exc: AuthorizationError
+    ):
+        logger.error(
+            f"权限操作异常\n"
+            f"Method:{request.method}\n"
+            f"URL:{request.url}\n"
+            f"Headers:{request.headers}\n"
+            f"Message:{str(exc)}\n"
+        )
+        logger.error(traceback.format_exc())
+        return ForbiddenException(message=str(exc))
 
     @app.exception_handler(TokenError)
     async def token_exception_handler(request: Request, exc: TokenError):

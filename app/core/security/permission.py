@@ -25,7 +25,7 @@ class RequestPermission:
 
     async def __call__(self, request: Request):
         if AppConfig.ADMIN == 2:
-            if not isinstance(self.role, str):
+            if not isinstance(self.role, int):
                 raise Exception
             # 附加权限标识
             request.state.permission = self.role

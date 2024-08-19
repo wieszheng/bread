@@ -298,7 +298,8 @@ class BaseCRUD:
             else:
                 column_ = getattr(model, key, None)
                 if column_ is not None:
-                    filters.append(column_ == value)
+                    if value is not None:
+                        filters.append(column_ == value)
 
         return filters
 

@@ -87,7 +87,7 @@ async def get_current_user(pk: int):
     user = await UserCRUD.get(id=pk)
     if not user:
         raise TokenError("很久没操作，令牌失效")
-    if user["is_valid"]:
+    if not user["is_valid"]:
         raise AuthorizationError("用户已被锁定，请联系系统管理员")
 
     return user

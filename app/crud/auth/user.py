@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+import asyncio
 from datetime import datetime
 
 from app.commons.response.response_code import CustomErrorCode
@@ -14,7 +15,7 @@ from app.core.security.password import hash_psw
 from app.crud import BaseCRUD
 from app.exceptions.errors import CustomException
 from app.models.user import UserModel
-from app.schemas.auth.user import RegisterUserParam
+from app.schemas.auth.user import RegisterUserParam, AvatarParam
 
 
 class UserCRUD(BaseCRUD):
@@ -34,13 +35,13 @@ class UserCRUD(BaseCRUD):
 
     @classmethod
     async def user_add(cls, user_item: RegisterUserParam):
-        # 校验用户名是否存在
-        result = await cls.exists(username=user_item.username)
-        if result:
+        # 校验用户名、邮箱是否存在
+        result_name, result_email = await asyncio.gather(
+            cls.exists(username=user_item.username), cls.exists(email=user_item.email)
+        )
+        if result_name:
             raise CustomException(CustomErrorCode.USERNAME_OR_EMAIL_IS_REGISTER)
-        # 校验邮箱是否存在
-        result = await cls.exists(email=user_item.email)
-        if result:
+        if result_email:
             raise CustomException(CustomErrorCode.USER_EMAIL_OR_EMAIL_IS_REGISTER)
 
         user_item.password = await hash_psw(user_item.password)
@@ -50,3 +51,33 @@ class UserCRUD(BaseCRUD):
             await cls.update_user_role(user_id=current_user.id)
 
         return current_user
+
+    @classmethod
+    async def reset_password(cls, user_id: int, new_password: str):
+        await cls.update(obj={"password": await hash_psw(new_password)}, id=user_id)
+        return ""
+
+    @classmethod
+    async def update_avatar(cls, username: str, avatar: AvatarParam):
+        await cls.update(obj={"avatar": avatar.url}, username=username)
+        return ""
+
+    @classmethod
+    async def get_list(
+        cls,
+        limit: int = 10,
+        offset: int = 1,
+        filter_params: dict = None,
+        orderings: list[str] = None,
+    ):
+        if not orderings:
+            orderings = ["id"]
+        if not filter_params:
+            filter_params = {}
+        return await cls.get_multi(
+            limit=limit,
+            offset=offset,
+            sort_columns=orderings,
+            sort_orders=["desc"],
+            **filter_params
+        )
