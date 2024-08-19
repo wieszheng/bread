@@ -39,3 +39,16 @@ class JoinConfig(BaseModel):
         if value not in valid_join_types:
             raise ValueError(f"Unsupported join type: {value}")
         return value
+
+
+def compute_offset(page: int, items_per_page: int) -> int:
+    """
+    根据给定的页码和每页的项目数计算分页的偏移量。偏移量表示给定页面上的项目在数据集中的起点
+
+    Args:
+        page：当前页码。页码应从 1 开始。items_per_page：每个页面上要显示的项目数
+    Returns:
+        计算出的偏移量
+
+    """
+    return (page - 1) * items_per_page

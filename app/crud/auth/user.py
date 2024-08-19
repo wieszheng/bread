@@ -13,6 +13,7 @@ from app.commons.response.response_code import CustomErrorCode
 
 from app.core.security.password import hash_psw
 from app.crud import BaseCRUD
+from app.crud.helper import compute_offset
 from app.exceptions.errors import CustomException
 from app.models.user import UserModel
 from app.schemas.auth.user import RegisterUserParam, AvatarParam
@@ -64,11 +65,11 @@ class UserCRUD(BaseCRUD):
 
     @classmethod
     async def get_list(
-        cls,
-        limit: int = 10,
-        offset: int = 1,
-        filter_params: dict = None,
-        orderings: list[str] = None,
+            cls,
+            limit: int = 10,
+            offset: int = 1,
+            filter_params: dict = None,
+            orderings: list[str] = None,
     ):
         if not orderings:
             orderings = ["id"]
@@ -76,7 +77,7 @@ class UserCRUD(BaseCRUD):
             filter_params = {}
         return await cls.get_multi(
             limit=limit,
-            offset=offset,
+            offset=compute_offset(offset, limit),
             sort_columns=orderings,
             sort_orders=["desc"],
             **filter_params
