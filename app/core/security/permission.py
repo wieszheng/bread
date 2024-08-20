@@ -8,8 +8,7 @@
 """
 from fastapi import Request
 
-from app.exceptions.errors import AuthorizationError
-from config import settings
+from app.exceptions.errors import PermissionException
 
 
 class RequestPermission:
@@ -24,4 +23,4 @@ class RequestPermission:
     async def __call__(self, request: Request):
         user_role = request.user.role
         if user_role < self.role:
-            raise AuthorizationError('对不起, 你没有足够的权限')
+            raise PermissionException("对不起, 你没有足够的权限")

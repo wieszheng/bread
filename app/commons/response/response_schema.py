@@ -16,7 +16,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
-from app.commons.response.response_code import CustomResponseCode, CustomResponse
+from app.commons.response.response_code import CustomResponseCode
 
 
 class ResponseModel(BaseModel):
@@ -76,7 +76,7 @@ class ResponseBase:
     @staticmethod
     async def __response(
         *,
-        res: CustomResponseCode | CustomResponse = None,
+        res: CustomResponseCode = None,
         result: Optional[Dict[str, Any]] = None,
         success: bool = False,
     ) -> ResponseModel:
@@ -93,7 +93,7 @@ class ResponseBase:
     async def success(
         cls,
         *,
-        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_200,
+        res: CustomResponseCode = CustomResponseCode.HTTP_200,
         result: Optional[Dict[str, Any]] = None,
     ) -> ResponseModel:
         return await cls.__response(res=res, result=result, success=True)
@@ -102,7 +102,7 @@ class ResponseBase:
     async def fail(
         cls,
         *,
-        res: CustomResponseCode | CustomResponse = CustomResponseCode.HTTP_400,
+        res: CustomResponseCode = CustomResponseCode.HTTP_400,
         result: Optional[Dict[str, Any]] = None,
     ) -> ResponseModel:
         return await cls.__response(res=res, result=result)

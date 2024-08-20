@@ -117,16 +117,6 @@ class CustomErrorCode(CustomCodeBase):
     MODULE_NAME_EXIST = (14001, "模块名已存在")  # 模块名以存在
 
 
-@dataclasses.dataclass
-class CustomResponse:
-    """
-    提供开放式响应状态码，而不是枚举，如果你想自定义响应信息，这可能很有用
-    """
-
-    code: int
-    msg: str
-
-
 class StandardResponseCode:
     """标准响应状态码"""
 

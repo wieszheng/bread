@@ -7,14 +7,12 @@
 @Software : PyCharm
 """
 from datetime import datetime
-from typing import Tuple, Annotated
 
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     mapped_column,
-
     MappedAsDataclass,
 )
 from sqlalchemy import URL
@@ -52,8 +50,6 @@ class Base(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    # __fields__: Tuple[Column] = [id]
-
     def __repr__(self):
         return str(self.to_dict())
 
@@ -61,6 +57,7 @@ class Base(AsyncAttrs, DeclarativeBase):
         """
         数据库模型转成字典
         Args:
+            ignore (list): 屏蔽字段，建议使用BaseModel
             alias_dict: 字段别名字典
                 eg: {"id": "user_id"}, 把id名称替换成 user_id
             exclude_none: 默认排查None值
@@ -104,8 +101,12 @@ class TimestampMixin(AsyncAttrs, DeclarativeBase):
 
 
 class SoftDeleteMixin(AsyncAttrs, DeclarativeBase):
-    deleted_at: Mapped[datetime | None] = mapped_column(default=None, comment="删除时间")
-    is_deleted: Mapped[bool] = mapped_column(default=False, index=True, comment="是否删除")
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        default=None, comment="删除时间"
+    )
+    is_deleted: Mapped[bool] = mapped_column(
+        default=False, index=True, comment="是否删除"
+    )
 
 
 class OperatorMixin(AsyncAttrs, DeclarativeBase):
@@ -113,10 +114,10 @@ class OperatorMixin(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    created_by: Mapped[int] = mapped_column(nullable=True, comment="创建人")
+    created_by: Mapped[int | None] = mapped_column(default=None, comment="创建人")
 
-    updated_by: Mapped[int] = mapped_column(nullable=True, comment="更新人")
+    updated_by: Mapped[int | None] = mapped_column(default=None, comment="更新人")
 
 
-class BaseOrmTableWithTS(Base, TimestampMixin, SoftDeleteMixin, OperatorMixin):
+class BaseModel(Base, TimestampMixin, SoftDeleteMixin, OperatorMixin):
     __abstract__ = True

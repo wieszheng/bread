@@ -19,6 +19,7 @@ from starlette.authentication import (
     AuthenticationError,
 )
 
+from app.commons.response.response_code import StandardResponseCode
 from app.commons.response.response_schema import ApiResponse
 from app.core.security import Jwt
 from app.exceptions.errors import TokenError
@@ -32,11 +33,11 @@ class _AuthenticationError(AuthenticationError):
         self,
         *,
         code: int = None,
-        msg: str = None,
+        message: str = None,
         headers: dict[str, Any] | None = None
     ):
         self.code = code
-        self.msg = msg
+        self.message = message
         self.headers = headers
 
 
@@ -50,7 +51,10 @@ class JwtAuthMiddleware(AuthenticationBackend):
         """覆盖内部认证错误处理"""
 
         return ApiResponse(
-            http_status_code=exc.code, api_code=exc.code, message=exc.msg
+            http_status_code=StandardResponseCode.HTTP_401,
+            success=False,
+            code=StandardResponseCode.HTTP_401,
+            message=exc.message,
         )
 
     async def authenticate(
@@ -63,8 +67,19 @@ class JwtAuthMiddleware(AuthenticationBackend):
         scheme, token = get_authorization_scheme_param(token)
         if scheme.lower() != "bearer":
             return
-        sub = await Jwt.decode_jwt_token(token)
-        current_user = await Jwt.get_current_user(sub)
-        user = CurrentUserIns.model_validate(current_user)
+        try:
+            sub = await Jwt.decode_jwt_token(token)
+            current_user = await Jwt.get_current_user(sub)
+            user = CurrentUserIns.model_validate(current_user)
+        except TokenError as exc:
+            raise _AuthenticationError(
+                message=exc.message, headers={"WWW-Authenticate": "Bearer"}
+            )
+        except Exception as e:
+            logger.exception(e)
+            raise _AuthenticationError(
+                code=getattr(e, "code", 500),
+                message=getattr(e, "message", "Internal Server Error"),
+            )
 
         return AuthCredentials(["authenticated"]), user

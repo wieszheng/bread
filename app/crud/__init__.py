@@ -77,12 +77,12 @@ def with_session(method):
 
 
 def _extract_matching_columns_from_schema(
-        model: Union[ModelType, AliasedClass],
-        schema: Optional[type[BaseModel]],
-        prefix: Optional[str] = None,
-        alias: Optional[AliasedClass] = None,
-        use_temporary_prefix: Optional[bool] = False,
-        temp_prefix: Optional[str] = "joined__",
+    model: Union[ModelType, AliasedClass],
+    schema: Optional[type[BaseModel]],
+    prefix: Optional[str] = None,
+    alias: Optional[AliasedClass] = None,
+    use_temporary_prefix: Optional[bool] = False,
+    temp_prefix: Optional[str] = "joined__",
 ) -> list[Any]:
     if not hasattr(model, "__table__"):  # pragma: no cover
         raise AttributeError(f"{model.__name__} does not have a '__table__' attribute.")
@@ -120,14 +120,14 @@ def _extract_matching_columns_from_schema(
 
 
 def _get_primary_key(
-        model: ModelType,
+    model: ModelType,
 ) -> Union[str, None]:  # pragma: no cover
     key: Optional[str] = _get_primary_keys(model)[0].name
     return key
 
 
 def _get_primary_keys(
-        model: ModelType,
+    model: ModelType,
 ) -> Sequence[Column]:
     """Get the primary key of a SQLAlchemy model."""
     inspector_result = inspect(model)
@@ -158,10 +158,10 @@ def _handle_one_to_one(nested_data, nested_key, nested_field, value):
 
 
 def _nest_join_data(
-        data: dict,
-        join_definitions: list[JoinConfig],
-        temp_prefix: str = "joined__",
-        nested_data: Optional[dict[str, Any]] = None,
+    data: dict,
+    join_definitions: list[JoinConfig],
+    temp_prefix: str = "joined__",
+    nested_data: Optional[dict[str, Any]] = None,
 ) -> dict:
     if nested_data is None:
         nested_data = {}
@@ -176,7 +176,7 @@ def _nest_join_data(
                 nested_key = (
                     join_prefix.rstrip("_") if join_prefix else join.model.__tablename__
                 )
-                nested_field = key[len(full_prefix):]
+                nested_field = key[len(full_prefix) :]
 
                 if join.relationship_type == "one-to-many":
                     nested_data = _handle_one_to_many(
@@ -192,7 +192,7 @@ def _nest_join_data(
 
         if not nested:
             stripped_key = (
-                key[len(temp_prefix):]
+                key[len(temp_prefix) :]
                 if isinstance(key, str) and key.startswith(temp_prefix)
                 else key
             )
@@ -214,14 +214,14 @@ def _nest_join_data(
         if join.relationship_type == "one-to-many" and nested_key in nested_data:
             if isinstance(nested_data.get(nested_key, []), list):
                 if any(
-                        item[join_primary_key] is None for item in nested_data[nested_key]
+                    item[join_primary_key] is None for item in nested_data[nested_key]
                 ):
                     nested_data[nested_key] = []
 
         if nested_key in nested_data and isinstance(nested_data[nested_key], dict):
             if (
-                    join_primary_key in nested_data[nested_key]
-                    and nested_data[nested_key][join_primary_key] is None
+                join_primary_key in nested_data[nested_key]
+                and nested_data[nested_key][join_primary_key] is None
             ):
                 nested_data[nested_key] = None
 
@@ -258,9 +258,9 @@ class BaseCRUD:
 
     @classmethod
     def _get_sqlalchemy_filter(
-            cls,
-            operator: str,
-            value: Any,
+        cls,
+        operator: str,
+        value: Any,
     ) -> Optional[Callable[[str], Callable]]:
         if operator in {"in", "not_in", "between"}:
             if not isinstance(value, (tuple, list, set)):
@@ -269,7 +269,7 @@ class BaseCRUD:
 
     @classmethod
     def _parse_filters(
-            cls, model: Optional[Union[type[ModelType], AliasedClass]] = None, **kwargs
+        cls, model: Optional[Union[type[ModelType], AliasedClass]] = None, **kwargs
     ) -> list[ColumnElement]:
         model = model or cls.__model__
         filters = []
@@ -285,11 +285,11 @@ class BaseCRUD:
                         sqlalchemy_filter(column_)(or_value)
                         for or_key, or_value in value.items()
                         if (
-                               sqlalchemy_filter := cls._get_sqlalchemy_filter(
-                                   or_key, value
-                               )
-                           )
-                           is not None
+                            sqlalchemy_filter := cls._get_sqlalchemy_filter(
+                                or_key, value
+                            )
+                        )
+                        is not None
                     ]
                     filters.append(or_(*or_filters))
                 else:
@@ -306,10 +306,10 @@ class BaseCRUD:
 
     @classmethod
     def _apply_sorting(
-            cls,
-            stmt: Select,
-            sort_columns: Union[str, list[str]],
-            sort_orders: Optional[Union[str, list[str]]] = None,
+        cls,
+        stmt: Select,
+        sort_columns: Union[str, list[str]],
+        sort_orders: Optional[Union[str, list[str]]] = None,
     ) -> Select:
 
         if sort_orders and not sort_columns:
@@ -349,10 +349,10 @@ class BaseCRUD:
 
     @classmethod
     def _prepare_and_apply_joins(
-            cls,
-            stmt: Select,
-            joins_config: list[JoinConfig],
-            use_temporary_prefix: bool = False,
+        cls,
+        stmt: Select,
+        joins_config: list[JoinConfig],
+        use_temporary_prefix: bool = False,
     ):
 
         for join in joins_config:
@@ -382,7 +382,7 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def create(
-            cls, *, obj: CreateSchemaType, commit: bool = True, session: AsyncSession = None
+        cls, *, obj: CreateSchemaType, commit: bool = True, session: AsyncSession = None
     ) -> ModelType:
 
         object_dict = obj.model_dump()
@@ -394,12 +394,12 @@ class BaseCRUD:
 
     @classmethod
     async def select(
-            cls,
-            *,
-            schema_to_select: Optional[type[BaseModel]] = None,
-            sort_columns: Optional[Union[str, list[str]]] = None,
-            sort_orders: Optional[Union[str, list[str]]] = None,
-            **kwargs: Any,
+        cls,
+        *,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        sort_columns: Optional[Union[str, list[str]]] = None,
+        sort_orders: Optional[Union[str, list[str]]] = None,
+        **kwargs: Any,
     ) -> Select:
         to_select = _extract_matching_columns_from_schema(
             model=cls.__model__, schema=schema_to_select
@@ -414,13 +414,13 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def get(
-            cls,
-            *,
-            schema_to_select: Optional[type[BaseModel]] = None,
-            return_as_model: bool = False,
-            one_or_none: bool = False,
-            session: AsyncSession = None,
-            **kwargs: Any,
+        cls,
+        *,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        return_as_model: bool = False,
+        one_or_none: bool = False,
+        session: AsyncSession = None,
+        **kwargs: Any,
     ) -> Optional[Union[dict, BaseModel]]:
         stmt = await cls.select(schema_to_select=schema_to_select, **kwargs)
 
@@ -446,11 +446,11 @@ class BaseCRUD:
 
     @classmethod
     async def upsert(
-            cls,
-            *,
-            instance: Union[UpdateSchemaType, CreateSchemaType],
-            schema_to_select: Optional[type[BaseModel]] = None,
-            return_as_model: bool = False,
+        cls,
+        *,
+        instance: Union[UpdateSchemaType, CreateSchemaType],
+        schema_to_select: Optional[type[BaseModel]] = None,
+        return_as_model: bool = False,
     ) -> Union[BaseModel, Dict[str, Any], None]:
         _pks = cls._get_pk_dict(instance)
         schema_to_select = schema_to_select or type(instance)
@@ -486,10 +486,10 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def count(
-            cls,
-            *,
-            session: AsyncSession = None,
-            **kwargs: Any,
+        cls,
+        *,
+        session: AsyncSession = None,
+        **kwargs: Any,
     ) -> int:
         filters = cls._parse_filters(**kwargs)
         if filters:
@@ -505,17 +505,17 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def get_multi(
-            cls,
-            *,
-            offset: int = 0,
-            limit: Optional[int] = 100,
-            schema_to_select: Optional[type[BaseModel]] = None,
-            sort_columns: Optional[Union[str, list[str]]] = None,
-            sort_orders: Optional[Union[str, list[str]]] = None,
-            return_as_model: bool = False,
-            return_total_count: bool = True,
-            session: AsyncSession = None,
-            **kwargs: Any,
+        cls,
+        *,
+        offset: int = 0,
+        limit: Optional[int] = 100,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        sort_columns: Optional[Union[str, list[str]]] = None,
+        sort_orders: Optional[Union[str, list[str]]] = None,
+        return_as_model: bool = False,
+        return_total_count: bool = True,
+        session: AsyncSession = None,
+        **kwargs: Any,
     ) -> dict[str, Any]:
 
         if (limit is not None and limit < 0) or offset < 0:
@@ -560,25 +560,25 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def get_joined(
-            cls,
-            *,
-            schema_to_select: Optional[type[BaseModel]] = None,
-            join_model: Optional[ModelType] = None,
-            join_on: Optional[Union[Join, BinaryExpression]] = None,
-            join_prefix: Optional[str] = None,
-            join_schema_to_select: Optional[type[BaseModel]] = None,
-            join_type: str = "left",
-            alias: Optional[AliasedClass] = None,
-            join_filters: Optional[dict] = None,
-            joins_config: Optional[list[JoinConfig]] = None,
-            nest_joins: bool = False,
-            relationship_type: Optional[str] = None,
-            session: AsyncSession = None,
-            **kwargs: Any,
+        cls,
+        *,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        join_model: Optional[ModelType] = None,
+        join_on: Optional[Union[Join, BinaryExpression]] = None,
+        join_prefix: Optional[str] = None,
+        join_schema_to_select: Optional[type[BaseModel]] = None,
+        join_type: str = "left",
+        alias: Optional[AliasedClass] = None,
+        join_filters: Optional[dict] = None,
+        joins_config: Optional[list[JoinConfig]] = None,
+        nest_joins: bool = False,
+        relationship_type: Optional[str] = None,
+        session: AsyncSession = None,
+        **kwargs: Any,
     ) -> Optional[dict[str, Any]]:
 
         if joins_config and (
-                join_model or join_prefix or join_on or join_schema_to_select or alias
+            join_model or join_prefix or join_on or join_schema_to_select or alias
         ):
             raise ValueError(
                 "Cannot use both single join parameters and joins_config simultaneously."
@@ -645,11 +645,11 @@ class BaseCRUD:
 
     @classmethod
     def _as_single_response(
-            cls,
-            db_row: Result,
-            schema_to_select: Optional[type[BaseModel]] = None,
-            return_as_model: bool = False,
-            one_or_none: bool = False,
+        cls,
+        db_row: Result,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        return_as_model: bool = False,
+        one_or_none: bool = False,
     ) -> Optional[Union[dict, BaseModel]]:
         result: Optional[Row] = db_row.one_or_none() if one_or_none else db_row.first()
         if result is None:  # pragma: no cover
@@ -665,10 +665,10 @@ class BaseCRUD:
 
     @classmethod
     def _as_multi_response(
-            cls,
-            db_row: Result,
-            schema_to_select: Optional[type[BaseModel]] = None,
-            return_as_model: bool = False,
+        cls,
+        db_row: Result,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        return_as_model: bool = False,
     ) -> dict:
         data = [dict(row) for row in db_row.mappings()]
 
@@ -692,17 +692,17 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def update(
-            cls,
-            *,
-            obj: Union[UpdateSchemaType, dict[str, Any]],
-            allow_multiple: bool = False,
-            commit: bool = True,
-            return_columns: Optional[list[str]] = None,
-            schema_to_select: Optional[type[BaseModel]] = None,
-            return_as_model: bool = False,
-            one_or_none: bool = False,
-            session: AsyncSession = None,
-            **kwargs: Any,
+        cls,
+        *,
+        obj: Union[UpdateSchemaType, dict[str, Any]],
+        allow_multiple: bool = False,
+        commit: bool = True,
+        return_columns: Optional[list[str]] = None,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        return_as_model: bool = False,
+        one_or_none: bool = False,
+        session: AsyncSession = None,
+        **kwargs: Any,
     ) -> Optional[Union[dict, BaseModel]]:
 
         if not allow_multiple and (total_count := await cls.count(**kwargs)) > 1:
@@ -754,11 +754,11 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def db_delete(
-            cls,
-            allow_multiple: bool = False,
-            commit: bool = True,
-            session: AsyncSession = None,
-            **kwargs: Any,
+        cls,
+        allow_multiple: bool = False,
+        commit: bool = True,
+        session: AsyncSession = None,
+        **kwargs: Any,
     ) -> None:
         if not allow_multiple and (total_count := await cls.count(**kwargs)) > 1:
             raise ValueError(
@@ -774,17 +774,17 @@ class BaseCRUD:
     @classmethod
     @with_session
     async def delete(
-            cls,
-            db_row: Optional[Row] = None,
-            allow_multiple: bool = False,
-            commit: bool = True,
-            session: AsyncSession = None,
-            **kwargs: Any
+        cls,
+        db_row: Optional[Row] = None,
+        allow_multiple: bool = False,
+        commit: bool = True,
+        session: AsyncSession = None,
+        **kwargs: Any,
     ) -> None:
         filters = cls._parse_filters(**kwargs)
         if db_row:
             if hasattr(db_row, cls.is_deleted_column) and hasattr(
-                    db_row, cls.deleted_at_column
+                db_row, cls.deleted_at_column
             ):
                 setattr(db_row, cls.is_deleted_column, True)
                 setattr(db_row, cls.deleted_at_column, datetime.now())
@@ -804,7 +804,9 @@ class BaseCRUD:
                 f"Expected exactly one record to delete, found {total_count}."
             )
         logger.debug([col.key for col in cls.__model__.__table__.columns])
-        if cls.is_deleted_column in [col.key for col in cls.__model__.__table__.columns]:
+        if cls.is_deleted_column in [
+            col.key for col in cls.__model__.__table__.columns
+        ]:
             update_stmt = (
                 update(cls.__model__)
                 .filter(*filters)

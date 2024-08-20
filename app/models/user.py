@@ -12,15 +12,15 @@ from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime, Boolean
 
-from app.models import BaseOrmTableWithTS
+from app.models import BaseModel
 
 
-class UserModel(BaseOrmTableWithTS):
+class UserModel(BaseModel):
     """
     用户信息表
     """
 
-    __tablename__ = "bread_user"
+    __tablename__ = "sys_user"
 
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, comment="主键ID"
@@ -33,7 +33,7 @@ class UserModel(BaseOrmTableWithTS):
     )
     password: Mapped[str] = mapped_column(String(180), comment="密码，存储为哈希值")
     phone: Mapped[Optional[str]] = mapped_column(
-        String(11), unique=True, comment="手机号码，唯一"
+        String(21), unique=True, comment="手机号码，唯一"
     )
     email: Mapped[str] = mapped_column(
         String(100), unique=True, comment="电子邮箱，唯一"

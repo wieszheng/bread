@@ -31,30 +31,25 @@ class CustomException(Exception):
         super().__init__(self)
 
 
+class AuthorizationException(Exception):
+    def __init__(self, message: str = "身份无效") -> None:
+        self.message = message
+        super().__init__(self.message)
+
+
+class PermissionException(Exception):
+    def __init__(self, message: str = "请求权限不足") -> None:
+        self.message = message
+        super().__init__(self.message)
+
+
 class DBError(Exception):
-    pass
-
-
-class HTTPError(HTTPException):
-    def __init__(
-        self, *, code: int, msg: Any = None, headers: dict[str, Any] | None = None
-    ):
-        super().__init__(status_code=code, detail=msg, headers=headers)
-
-
-class ForbiddenError(Exception):
-    pass
-
-
-class NotFoundError(Exception):
-    pass
-
-
-class AuthorizationError(Exception):
-    pass
+    def __init__(self, message: str = "") -> None:
+        self.message = message
+        super().__init__(self.message)
 
 
 class TokenError(Exception):
-    pass
-    # def __init__(self, *, msg: str = 'Not Authenticated', headers: dict[str, Any] | None = None):
-    #     super().__init__(detail=msg, headers=headers or {'WWW-Authenticate': 'Bearer'})
+    def __init__(self, message: str = "") -> None:
+        self.message = message
+        super().__init__(self.message)

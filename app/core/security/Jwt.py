@@ -15,7 +15,7 @@ from fastapi import Depends
 from fastapi.security import HTTPBearer
 from jwt import InvalidSignatureError, DecodeError, ExpiredSignatureError
 
-from app.exceptions.errors import TokenError, AuthorizationError
+from app.exceptions.errors import AuthorizationException, TokenError
 from config import settings
 
 # 设置时区
@@ -67,11 +67,13 @@ async def decode_jwt_token(token: str) -> int:
         )
         user_id = int(payload.get("sub"))
         if not user_id:
-            raise TokenError("非法操作，令牌无效")
-    except (InvalidSignatureError, DecodeError):
-        raise TokenError("非法操作，令牌无效")
+            raise TokenError(message="非法Token，请检查提交信息")
+    except InvalidSignatureError:
+        raise TokenError(message="很久没操作，令牌Token失效")
     except ExpiredSignatureError:
-        raise TokenError("很久没操作，令牌过期")
+        raise TokenError(message="很久没操作，令牌Token过期")
+    except DecodeError:
+        raise TokenError(message="非法Token，请检查提交信息")
     return user_id
 
 
@@ -86,8 +88,8 @@ async def get_current_user(pk: int):
 
     user = await UserCRUD.get(id=pk)
     if not user:
-        raise TokenError("很久没操作，令牌失效")
+        raise TokenError(message="非法Token，请检查提交信息")
     if not user["is_valid"]:
-        raise AuthorizationError("用户已被锁定，请联系系统管理员")
+        raise AuthorizationException(message="用户已被锁定，请联系系统管理员")
 
     return user

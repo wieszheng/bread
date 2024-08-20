@@ -160,7 +160,7 @@ class MinioSettings(BaseSettings):
 @lru_cache()
 def get_env_file() -> str:
     """
-     .env 文件路径
+    .env 文件路径
     """
     run_env = os.environ.get("APP_ENV", "")
     env_file = ".env.dev"

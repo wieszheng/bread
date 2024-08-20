@@ -16,7 +16,7 @@ from app.core.security.Jwt import create_access_token
 from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.core.security.password import verify_psw
 from app.crud.auth.user import UserCRUD
-from app.exceptions.errors import CustomException, AuthorizationError
+from app.exceptions.errors import CustomException, PermissionException
 from app.schemas.auth.user import (
     RegisterUserParam,
     AuthLoginParam,
@@ -24,7 +24,8 @@ from app.schemas.auth.user import (
     GetUserInfoNoRelationDetail,
     ResetPasswordParam,
     AvatarParam,
-    UserRentalDemandListIn, UpdateUserParam,
+    UserRentalDemandListIn,
+    UpdateUserParam,
 )
 
 
@@ -102,7 +103,7 @@ class UserService:
 
     @staticmethod
     async def password_reset(
-            request: Request, obj: ResetPasswordParam
+        request: Request, obj: ResetPasswordParam
     ) -> ResponseModel:
         if obj.new_password == obj.old_password:
             raise CustomException(CustomErrorCode.NEW_PWD_NO_OLD_PWD_EQUAL)
@@ -121,11 +122,11 @@ class UserService:
 
     @staticmethod
     async def update_avatar(
-            request: Request, username: Annotated[str, Path(...)], avatar: AvatarParam
+        request: Request, username: Annotated[str, Path(...)], avatar: AvatarParam
     ) -> ResponseModel:
         if request.user.role < 2:
             if request.user.username != username:
-                raise AuthorizationError("不可操作,暂无权限！")
+                raise PermissionException("不可操作,暂无权限！")
         input_user = await UserCRUD.exists(username=username)
         if not input_user:
             raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
@@ -134,11 +135,7 @@ class UserService:
 
     @staticmethod
     async def get_pagination_users(obj: UserRentalDemandListIn) -> ResponseModel:
-        query_params = (
-            obj.query_params.dict()
-            if obj.query_params
-            else {}
-        )
+        query_params = obj.query_params.dict() if obj.query_params else {}
         query_params = {k: v for k, v in query_params.items()}
 
         result = await UserCRUD.get_list(
@@ -154,12 +151,14 @@ class UserService:
         )
 
     @staticmethod
-    async def delete_user(request: Request, userId: Annotated[int, Path(...)]) -> ResponseModel:
+    async def delete_user(
+        request: Request, userId: Annotated[int, Path(...)]
+    ) -> ResponseModel:
         if request.user.role < 2:
             if request.user.id != userId:
-                raise AuthorizationError("不可操作,暂无权限！")
+                raise PermissionException("不可操作,暂无权限！")
         elif request.user.id == userId:
-            raise AuthorizationError("不可操作管理员信息！")
+            raise PermissionException("不可操作管理员信息！")
 
         input_user = await UserCRUD.exists(id=userId)
         if not input_user:
@@ -175,9 +174,9 @@ class UserService:
 
     @staticmethod
     async def update_user(
-            request: Request,
-            username: Annotated[str, Path(...)],
-            obj: UpdateUserParam,
+        request: Request,
+        username: Annotated[str, Path(...)],
+        obj: UpdateUserParam,
     ) -> ResponseModel:
         if request.user.username != username:
             raise CustomException(CustomErrorCode.YOU_INFO)

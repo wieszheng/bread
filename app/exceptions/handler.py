@@ -15,18 +15,15 @@ from fastapi.exceptions import RequestValidationError
 from loguru import logger
 from pydantic import ValidationError
 
-from app.commons.response.response_code import CustomResponseCode
-from app.commons.response.response_schema import (
-    InternalErrorException,
-    ParameterException,
-    CustomError,
-    InvalidTokenException,
-    ApiResponse,
-    ForbiddenException,
-)
+from app.commons.response.response_code import CustomResponseCode, StandardResponseCode
+from app.commons.response.response_schema import ApiResponse
 from app.commons.schema import CUSTOM_VALIDATION_ERROR_MESSAGES
 
-from app.exceptions.errors import TokenError, CustomException, AuthorizationError
+from app.exceptions.errors import (
+    CustomException,
+    AuthorizationException,
+    PermissionException,
+)
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
@@ -35,31 +32,43 @@ def register_exceptions_handler(app: FastAPI):
     全局异常处理
     """
 
-    @app.exception_handler(AuthorizationError)
+    @app.exception_handler(AuthorizationException)
     async def authorization_exception_handler(
-        request: Request, exc: AuthorizationError
+        request: Request, exc: AuthorizationException
     ):
-        logger.error(
+        logger.warning(traceback.format_exc())
+        logger.warning(
+            f"身份授权异常\n"
+            f"Method:{request.method}\n"
+            f"URL:{request.url}\n"
+            f"Headers:{request.headers}\n"
+            f"Message:{exc.message}\n"
+        )
+
+        return ApiResponse(
+            http_status_code=StandardResponseCode.HTTP_200,
+            code=10032,
+            success=False,
+            message=exc.message,
+        )
+
+    @app.exception_handler(PermissionException)
+    async def permission_exception_handler(request: Request, exc: PermissionException):
+        logger.warning(traceback.format_exc())
+        logger.warning(
             f"权限操作异常\n"
             f"Method:{request.method}\n"
             f"URL:{request.url}\n"
             f"Headers:{request.headers}\n"
-            f"Message:{str(exc)}\n"
+            f"Message:{exc.message}\n"
         )
-        logger.error(traceback.format_exc())
-        return ForbiddenException(message=str(exc))
 
-    @app.exception_handler(TokenError)
-    async def token_exception_handler(request: Request, exc: TokenError):
-        logger.error(
-            f"令牌操作异常\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Message:{str(exc)}\n"
+        return ApiResponse(
+            http_status_code=StandardResponseCode.HTTP_200,
+            code=10032,
+            success=False,
+            message=exc.message,
         )
-        logger.error(traceback.format_exc())
-        return InvalidTokenException(message=str(exc))
 
     # 处理其他http请求异常
     @app.exception_handler(RequestValidationError)
@@ -67,6 +76,7 @@ def register_exceptions_handler(app: FastAPI):
         request: Request, exc: RequestValidationError
     ):
         """请求参数验证异常"""
+        logger.warning(traceback.format_exc())
         logger.warning(
             f"请求参数验证异常:\n"
             f"Method:{request.method}\n"
@@ -74,7 +84,7 @@ def register_exceptions_handler(app: FastAPI):
             f"Headers:{request.headers}\n"
             f"Message:{exc.errors()}\n"
         )
-        logger.error(traceback.format_exc())
+
         message = ".".join(
             [
                 f'{".".join(map(lambda x: str(x), error.get("loc")))}:'
@@ -83,7 +93,10 @@ def register_exceptions_handler(app: FastAPI):
             ]
         )
 
-        return ParameterException(
+        return ApiResponse(
+            http_status_code=StandardResponseCode.HTTP_400,
+            code=10040,
+            success=False,
             message="请求参数校验错误,请检查提交的参数信息",
             result={"detail": message, "body": exc.body},
         )
@@ -93,13 +106,15 @@ def register_exceptions_handler(app: FastAPI):
         request: Request, exc: ValidationError
     ):
         """内部参数验证异常"""
-        logger.error(
+        logger.warning(traceback.format_exc())
+        logger.warning(
             f"内部参数验证异常\n"
             f"Method:{request.method}\n"
             f"URL:{request.url}\n"
             f"Headers:{request.headers}\n"
             f"Message:{exc.errors()}\n"
         )
+
         message = ".".join(
             [
                 f'{".".join(map(lambda x: str(x), error.get("loc")))}:'
@@ -107,15 +122,19 @@ def register_exceptions_handler(app: FastAPI):
                 for error in exc.errors()
             ]
         )
-        logger.error(traceback.format_exc())
 
-        return ParameterException(
-            message="内部参数校验错误,请检查提交的参数信息", result={"detail": message}
+        return ApiResponse(
+            http_status_code=StandardResponseCode.HTTP_400,
+            code=10040,
+            success=False,
+            message="内部参数校验错误,请检查提交的参数信息",
+            result={"detail": message},
         )
 
     @app.exception_handler(CustomException)
     async def custom_exception_handler(request: Request, exc: CustomException):
         """全局业务异常处理"""
+        logger.warning(traceback.format_exc())
         logger.warning(
             f"业务处理异常\n"
             f"Method:{request.method}\n"
@@ -125,8 +144,10 @@ def register_exceptions_handler(app: FastAPI):
             f"Message:{exc.err_code_des}\n"
         )
 
-        return CustomError(
+        return ApiResponse(
+            http_status_code=StandardResponseCode.HTTP_200,
             code=exc.err_code,
+            success=False,
             message=exc.err_code_des,
         )
 
@@ -146,8 +167,14 @@ def register_exceptions_handler(app: FastAPI):
             f"Headers:{request.headers}\n"
             f"Message:{message}\n"
         )
-        logger.error(traceback.format_exc())
-        return InternalErrorException(result={"detail": str(exc)})
+
+        return ApiResponse(
+            http_status_code=StandardResponseCode.HTTP_500,
+            code=5000,
+            success=False,
+            message="程序员哥哥睡眠不足，系统崩溃了！",
+            result={"detail": message},
+        )
 
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handlers(request: Request, exc: StarletteHTTPException):
