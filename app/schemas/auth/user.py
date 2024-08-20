@@ -95,6 +95,10 @@ class ResetPasswordParam(BaseModel):
     confirm_password: str
 
 
+class UpdateUserParam(UserInfoSchemaBase):
+    pass
+
+
 class AvatarParam(BaseModel):
     url: HttpUrl = Field(..., description="头像 http 地址")
 
@@ -106,5 +110,5 @@ class RentalDemandListQuery(BaseModel):
 
 class UserRentalDemandListIn(ListPageRequestModel):
     query_params: Optional[RentalDemandListQuery] = Field(
-        default={}, description="房源列表查询参数"
+        default={}, description="查询参数"
     )

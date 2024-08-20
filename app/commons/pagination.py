@@ -23,4 +23,9 @@ class _Page(Generic[T]):
 
 
 class _PageData(BaseModel, Generic[DataT]):
+    """
+        data = _PageData[GetUserInfoNoRelationDetail](
+            page_data=result["data"]
+        ).model_dump()
+    """
     page_data: list[DataT] | None = None

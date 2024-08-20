@@ -14,7 +14,7 @@ from Cryptodome import Random
 from Cryptodome.Cipher import PKCS1_v1_5
 from Cryptodome.PublicKey import RSA
 from loguru import logger
-from config import AppConfig
+from config import settings
 
 PUBLIC_KEY = """-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2YZVJzRrn1kyJHZS+7O5/oteO
@@ -54,7 +54,7 @@ def get_password_hash(password: str) -> str:
 
 async def hash_psw(password: str) -> str:
     # 每次加密都进行一次salt生成, 让每次加密的hash都不同
-    salt_ = bcrypt.gensalt(rounds=AppConfig.BCRYPT_ROUNDS)
+    salt_ = bcrypt.gensalt(rounds=settings.BCRYPT_ROUNDS)
     hashed = bcrypt.hashpw(password.encode(), salt_)
     return hashed.decode()
 
@@ -70,7 +70,7 @@ async def verify_psw(plain_psw: str, hashed_psw: str) -> bool:
 
 def add_salt(password: str) -> str:
     m = hashlib.md5()
-    bt = f"{password}{AppConfig.SALT}".encode("utf-8")
+    bt = f"{password}{settings.SALT}".encode("utf-8")
     m.update(bt)
     return m.hexdigest()
 

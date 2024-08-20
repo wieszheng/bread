@@ -63,19 +63,8 @@ class JwtAuthMiddleware(AuthenticationBackend):
         scheme, token = get_authorization_scheme_param(token)
         if scheme.lower() != "bearer":
             return
-
-        try:
-            sub = await Jwt.decode_jwt_token(token)
-            current_user = await Jwt.get_current_user(sub)
-            user = CurrentUserIns.model_validate(current_user)
-        except TokenError as exc:
-            logger.exception(exc)
-            raise _AuthenticationError()
-        except Exception as e:
-            logger.exception(e)
-            raise _AuthenticationError(
-                code=getattr(e, "code", 500),
-                msg=getattr(e, "msg", "Internal Server Error"),
-            )
+        sub = await Jwt.decode_jwt_token(token)
+        current_user = await Jwt.get_current_user(sub)
+        user = CurrentUserIns.model_validate(current_user)
 
         return AuthCredentials(["authenticated"]), user

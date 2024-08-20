@@ -6,6 +6,11 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+from datetime import datetime, UTC
+from typing import Any
+
+from pydantic import BaseModel, Field, field_serializer
+
 CUSTOM_VALIDATION_ERROR_MESSAGES = {
     "arguments_type": "参数类型输入错误",
     "assertion_error": "断言执行错误",
@@ -135,3 +140,34 @@ CUSTOM_USAGE_ERROR_MESSAGES = {
     "type-adapter-config-unused": "类型适配器配置项定义错误",
     "root-model-extra": "根模型禁止定义额外字段",
 }
+
+
+class TimestampSchema(BaseModel):
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC).replace(tzinfo=None))
+    updated_at: datetime = Field(default=None)
+
+    @field_serializer("created_at")
+    def serialize_dt(self, created_at: datetime | None, _info: Any) -> str | None:
+        if created_at is not None:
+            return created_at.isoformat()
+
+        return None
+
+    @field_serializer("updated_at")
+    def serialize_updated_at(self, updated_at: datetime | None, _info: Any) -> str | None:
+        if updated_at is not None:
+            return updated_at.isoformat()
+
+        return None
+
+
+class PersistentDeletion(BaseModel):
+    deleted_at: datetime | None = Field(default=None)
+    is_deleted: bool = False
+
+    @field_serializer("deleted_at")
+    def serialize_dates(self, deleted_at: datetime | None, _info: Any) -> str | None:
+        if deleted_at is not None:
+            return deleted_at.isoformat()
+
+        return None

@@ -6,12 +6,12 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-import argparse
+
 import os
 import sys
 import time
 from functools import lru_cache
-from typing import ClassVar
+from argparse import ArgumentParser, Namespace
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
@@ -48,10 +48,6 @@ class AppSettings(BaseSettings):
     MEMBER: int
     MANAGER: int
     ADMIN: int
-
-    # 密码加密配置
-    BCRYPT_ROUNDS: int  # bcrypt迭代次数,越大耗时越长
-    SALT: str
 
     # 项目日志滚动配置（日志文件超过10 MB就自动新建文件扩充）
     LOGGING_ROTATION: str = "10 MB"
@@ -94,6 +90,12 @@ class AppSettings(BaseSettings):
             """
 
 
+class CryptSettings(BaseSettings):
+    # 密码加密配置
+    BCRYPT_ROUNDS: int  # bcrypt迭代次数,越大耗时越长
+    SALT: str
+
+
 class JwtSettings(BaseSettings):
     """
     Jwt配置
@@ -106,7 +108,11 @@ class JwtSettings(BaseSettings):
     JWT_ISS: str
 
 
-class DataBaseSettings(BaseSettings):
+class DatabaseSettings(BaseSettings):
+    pass
+
+
+class MySQLSettings(DatabaseSettings):
     """
     数据库配置
     """
@@ -124,7 +130,7 @@ class DataBaseSettings(BaseSettings):
     MYSQL_POOL_TIMEOUT: int
 
 
-class RedisSettings(BaseSettings):
+class RedisSettings(DatabaseSettings):
     """
     Redis配置
     """
@@ -151,112 +157,51 @@ class MinioSettings(BaseSettings):
     MINIO_BUCKET_SECRET_KEY: str
 
 
-class GetConfig:
+@lru_cache()
+def get_env_file() -> str:
+    """
+     .env 文件路径
+    """
+    run_env = os.environ.get("APP_ENV", "")
+    env_file = ".env.dev"
+    if run_env != "":
+        env_file = f".env.{run_env}"
+    return env_file
+
+
+def parse_cli_args():
+    """
+    解析命令行参数
+    """
+    if "uvicorn" in sys.argv[0]:
+        pass
+    else:
+        parser = ArgumentParser(description="命令行参数")
+        parser.add_argument("--env", type=str, default="", help="运行环境")
+
+        args, _ = parser.parse_known_args()
+        os.environ["APP_ENV"] = args.env if args.env else "dev"
+
+    # 加载配置
+    load_dotenv(os.path.join(ROOT, "conf", get_env_file()))
+
+
+class Settings(
+    AppSettings,
+    CryptSettings,
+    JwtSettings,
+    MySQLSettings,
+    RedisSettings,
+    MinioSettings,
+):
     """
     获取配置
     """
 
-    def __init__(self):
-        self.parse_cli_args()
-
-    @lru_cache()
-    def get_app_config(self):
-        """
-        获取应用配置
-        """
-        # 实例化应用配置模型
-        return AppSettings()
-
-    @lru_cache()
-    def get_jwt_config(self):
-        """
-        获取Jwt配置
-        """
-        # 实例化Jwt配置模型
-        return JwtSettings()
-
-    @lru_cache()
-    def get_database_config(self):
-        """
-        获取数据库配置
-        """
-        # 实例化数据库配置模型
-        return DataBaseSettings()
-
-    @lru_cache()
-    def get_redis_config(self):
-        """
-        获取Redis配置
-        """
-        # 实例化Redis配置模型
-        return RedisSettings()
-
-    @lru_cache()
-    def get_minio_config(self):
-        """
-        获取Minio配置
-        """
-        # 实例化Minio配置模型
-        return MinioSettings()
-
-    @staticmethod
-    def parse_cli_args():
-        """
-        解析命令行参数
-        """
-        if "uvicorn" in sys.argv[0]:
-            pass
-        else:
-            parser = argparse.ArgumentParser(description="命令行参数")
-            parser.add_argument("--env", type=str, default="", help="运行环境")
-
-            args, unknown = parser.parse_known_args()
-            os.environ["APP_ENV"] = args.env if args.env else "dev"
-
-        run_env = os.environ.get("APP_ENV", "")
-        env_file = ".env.dev"
-        if run_env != "":
-            env_file = f".env.{run_env}"
-        # 加载配置
-        load_dotenv(os.path.join(ROOT, "conf", env_file))
+    def __init__(self, **values):
+        parse_cli_args()
+        super().__init__(**values)
 
 
 # 实例化获取配置类
-get_config = GetConfig()
-
-# 应用配置
-AppConfig = get_config.get_app_config()
-# Jwt配置
-JwtConfig = get_config.get_jwt_config()
-# 数据库配置
-DataBaseConfig = get_config.get_database_config()
-# Redis配置
-RedisConfig = get_config.get_redis_config()
-# Minio配置
-MinioConfig = get_config.get_minio_config()
-
-# def get_all_configs():
-#     # 实例化获取配置类
-#     get_config = GetConfig()
-#
-#     # 定义配置名称及其对应的获取方法
-#     config_methods = {
-#         'app': get_config.get_app_config,
-#         'jwt': get_config.get_jwt_config,
-#         'database': get_config.get_database_config,
-#         'redis': get_config.get_redis_config,
-#         'minio': get_config.get_minio_config,
-#     }
-#
-#     # 创建一个字典来存储配置
-#     configs = {}
-#
-#     # 遍历字典获取配置
-#     for name, method in config_methods.items():
-#         configs[name] = method()
-#
-#     return configs
-#
-#
-# # 调用函数获取所有配置
-# conf = get_all_configs()
+settings = Settings()

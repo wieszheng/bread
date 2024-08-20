@@ -16,7 +16,7 @@ from fastapi.security import HTTPBearer
 from jwt import InvalidSignatureError, DecodeError, ExpiredSignatureError
 
 from app.exceptions.errors import TokenError, AuthorizationError
-from config import JwtConfig
+from config import settings
 
 # 设置时区
 ChinaTimeZone = pytz.timezone("Asia/Shanghai")
@@ -37,11 +37,11 @@ async def create_access_token(
     if expires_delta:
         expire = current_time + expires_delta
     else:
-        expire = current_time + timedelta(minutes=JwtConfig.JWT_EXPIRE_MINUTES)
+        expire = current_time + timedelta(minutes=settings.JWT_EXPIRE_MINUTES)
 
     to_encode = {
         "jti": current_time.strftime("%Y%m%d%H%M%f"),
-        "iss": JwtConfig.JWT_ISS,
+        "iss": settings.JWT_ISS,
         "iat": current_time,
         "exp": expire,
         "sub": sub,
@@ -50,7 +50,7 @@ async def create_access_token(
 
     # 生成并返回jwt
     return jwt.encode(
-        to_encode, key=JwtConfig.JWT_SECRET_KEY, algorithm=JwtConfig.JWT_ALGORITHM
+        to_encode, key=settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
     )
 
 
@@ -63,7 +63,7 @@ async def decode_jwt_token(token: str) -> int:
     """
     try:
         payload = jwt.decode(
-            token, JwtConfig.JWT_SECRET_KEY, algorithms=[JwtConfig.JWT_ALGORITHM]
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
         user_id = int(payload.get("sub"))
         if not user_id:

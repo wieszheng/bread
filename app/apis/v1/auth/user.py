@@ -12,6 +12,7 @@ from app.commons.response.response_schema import ResponseModel
 from app.core.security.Jwt import DependsJwtAuth
 from app.core.security.permission import RequestPermission
 from app.service.auth.user import UserService
+from config import settings
 
 router = APIRouter(prefix="/system/user", tags=["用户接口"])
 
@@ -28,6 +29,15 @@ router.add_api_route(
     dependencies=[DependsJwtAuth],
     methods=["get"],
     summary="获取当前用户信息",
+)
+
+router.add_api_route(
+    "/{username}",
+    endpoint=UserService.get_user,
+    response_model_exclude={"result": {"password"}},
+    dependencies=[DependsJwtAuth],
+    methods=["get"],
+    summary="查看用户信息",
 )
 
 router.add_api_route(
@@ -55,21 +65,30 @@ router.add_api_route(
 
 router.add_api_route(
     "/{username}",
-    endpoint=UserService.register_user,
+    endpoint=UserService.update_user,
     methods=["put"],
     summary="更新用户信息",
+    dependencies=[
+        Depends(RequestPermission(settings.MEMBER)),
+        DependsJwtAuth
+    ],
 )
 
 router.add_api_route(
     "",
     endpoint=UserService.get_pagination_users,
     methods=["post"],
-    summary="（模糊条件）分页获取所有用户",
+    summary="（支持条件）分页获取所有用户",
 )
 
 router.add_api_route(
-    "/{username}",
-    endpoint=UserService.register_user,
+    "/{userId}",
+    endpoint=UserService.delete_user,
     methods=["delete"],
     summary="用户注销",
+    description='用户注销 != 用户登出，注销之后用户将从数据库逻辑删除',
+    dependencies=[
+        Depends(RequestPermission(settings.ADMIN)),
+        DependsJwtAuth
+    ],
 )

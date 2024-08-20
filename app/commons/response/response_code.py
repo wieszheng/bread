@@ -91,13 +91,14 @@ class CustomErrorCode(CustomCodeBase):
         "密码输入错误超过次数，请5分钟后再登录！😭",
     )
     USERNAME_OR_EMAIL_IS_REGISTER = (10004, "用户名已被注册")
+    NICKNAME_OR_EMAIL_IS_REGISTER = (10004, "昵称已被注册")
     USER_EMAIL_OR_EMAIL_IS_REGISTER = (10004, "邮箱已被注册")
     USER_ID_IS_NULL = (10005, "用户id不能为空")
     PASSWORD_TWICE_IS_NOT_AGREEMENT = (10006, "两次输入的密码不一致")
     NEW_PWD_NO_OLD_PWD_EQUAL = (10007, "新密码不能与旧密码相同")
     OLD_PASSWORD_ERROR = (10008, "旧密码错误")
     USER_ACCOUNT_LOCKED = (10009, "用户账号被锁定，请联系管理员 😭")
-
+    YOU_INFO = (10010, "只能修改自己的信息呦 👉")  # 账号或密码错误
     # 用户状态 验证  11000 - 12000
     PARTNER_CODE_TOKEN_EXPIRED_FAIL = (11000, "用户信息以已过期 😂")  # token已过期
 

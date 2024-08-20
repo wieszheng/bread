@@ -231,8 +231,8 @@ def _nest_join_data(
 
 class BaseCRUD:
     __model__: Type[ModelType] = None
-    is_deleted_column: str = ("is_deleted",)
-    deleted_at_column: str = ("deleted_at",)
+    is_deleted_column: str = "is_deleted"
+    deleted_at_column: str = "deleted_at"
     updated_at_column: str = "updated_at"
 
     _SUPPORTED_FILTERS = {
@@ -803,13 +803,14 @@ class BaseCRUD:
             raise ValueError(
                 f"Expected exactly one record to delete, found {total_count}."
             )
-
+        logger.debug([col.key for col in cls.__model__.__table__.columns])
         if cls.is_deleted_column in [col.key for col in cls.__model__.__table__.columns]:
             update_stmt = (
                 update(cls.__model__)
                 .filter(*filters)
                 .values(is_deleted=True, deleted_at=datetime.now())
             )
+            logger.debug(update_stmt)
             await session.execute(update_stmt)
         else:
             delete_stmt = delete(cls.__model__).filter(*filters)

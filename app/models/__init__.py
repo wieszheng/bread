@@ -14,32 +14,31 @@ from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     mapped_column,
-    as_declarative,
-    declared_attr,
+
     MappedAsDataclass,
 )
-from sqlalchemy import URL, Column
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
-from config import DataBaseConfig
+from config import settings
 
 # 定义数据库URL
 async_database_url = URL.create(
-    DataBaseConfig.MYSQL_PROTOCOL,
-    DataBaseConfig.MYSQL_USERNAME,
-    DataBaseConfig.MYSQL_PASSWORD,
-    DataBaseConfig.MYSQL_HOST,
-    DataBaseConfig.MYSQL_PORT,
-    DataBaseConfig.MYSQL_DATABASE,
+    settings.MYSQL_PROTOCOL,
+    settings.MYSQL_USERNAME,
+    settings.MYSQL_PASSWORD,
+    settings.MYSQL_HOST,
+    settings.MYSQL_PORT,
+    settings.MYSQL_DATABASE,
     {"charset": "utf8mb4"},
 )
 # 创建异步引擎
 async_engine = create_async_engine(
     async_database_url,
-    echo=DataBaseConfig.MYSQL_ECHO,
-    pool_size=DataBaseConfig.MYSQL_POOL_SIZE,
-    pool_recycle=DataBaseConfig.MYSQL_POOL_RECYCLE,
-    pool_timeout=DataBaseConfig.MYSQL_POOL_TIMEOUT,
+    echo=settings.MYSQL_ECHO,
+    pool_size=settings.MYSQL_POOL_SIZE,
+    pool_recycle=settings.MYSQL_POOL_RECYCLE,
+    pool_timeout=settings.MYSQL_POOL_TIMEOUT,
 )
 
 # 初始化Session工厂
@@ -48,7 +47,7 @@ async_session_maker = async_sessionmaker(
 )
 
 
-class BaseOrmTable(AsyncAttrs, DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     """SQLAlchemy Base ORM Model"""
 
     __abstract__ = True
@@ -90,7 +89,7 @@ class BaseOrmTable(AsyncAttrs, DeclarativeBase):
             }
 
 
-class TimestampColumns(AsyncAttrs, DeclarativeBase):
+class TimestampMixin(AsyncAttrs, DeclarativeBase):
     """时间戳相关列"""
 
     __abstract__ = True
@@ -103,10 +102,13 @@ class TimestampColumns(AsyncAttrs, DeclarativeBase):
         default=datetime.now, onupdate=datetime.now, comment="更新时间"
     )
 
-    deleted_at: Mapped[datetime] = mapped_column(nullable=True, comment="删除时间")
+
+class SoftDeleteMixin(AsyncAttrs, DeclarativeBase):
+    deleted_at: Mapped[datetime | None] = mapped_column(default=None, comment="删除时间")
+    is_deleted: Mapped[bool] = mapped_column(default=False, index=True, comment="是否删除")
 
 
-class OperatorColumns(AsyncAttrs, DeclarativeBase):
+class OperatorMixin(AsyncAttrs, DeclarativeBase):
     """操作人相关列"""
 
     __abstract__ = True
@@ -116,5 +118,5 @@ class OperatorColumns(AsyncAttrs, DeclarativeBase):
     updated_by: Mapped[int] = mapped_column(nullable=True, comment="更新人")
 
 
-class BaseOrmTableWithTS(BaseOrmTable, TimestampColumns, OperatorColumns):
+class BaseOrmTableWithTS(Base, TimestampMixin, SoftDeleteMixin, OperatorMixin):
     __abstract__ = True

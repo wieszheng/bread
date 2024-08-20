@@ -14,8 +14,8 @@ from fastapi import FastAPI
 from loguru import logger
 
 from app.apis.v1 import register_routers
-from config import AppConfig
-from app.models import async_engine, BaseOrmTable
+from config import settings
+from app.models import async_engine, Base
 
 
 def init_logging(logging_conf: dict):
@@ -29,7 +29,7 @@ async def init_create_table():
     # 根据映射创建库表（异步）
     logger.info("初始化数据库连接...")
     async with async_engine.begin() as conn:
-        await conn.run_sync(BaseOrmTable.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all)
     logger.info("数据库连接成功")
 
 
@@ -37,11 +37,11 @@ async def init_create_table():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML model
-    logger.info(f"{AppConfig.APP_NAME} 开始启动")
-    logger.success(text2art(AppConfig.APP_NAME, font="block", chr_ignore=True))
+    logger.info(f"{settings.APP_NAME} 开始启动")
+    logger.success(text2art(settings.APP_NAME, font="block", chr_ignore=True))
     await init_create_table()
     await register_routers(app)
-    logger.info(f"{AppConfig.APP_NAME} 启动成功")
+    logger.info(f"{settings.APP_NAME} 启动成功")
     yield
     # Clean up the ML models and release the resources
-    logger.info(f"{AppConfig.APP_NAME} 关闭成功")
+    logger.info(f"{settings.APP_NAME} 关闭成功")

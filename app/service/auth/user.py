@@ -6,10 +6,9 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from fastapi import Request, Path, Query
+from fastapi import Request, Path
 from typing_extensions import Annotated
 
-from app.commons.pagination import _PageData
 from app.commons.response.response_code import CustomErrorCode
 
 from app.core.security.Jwt import create_access_token
@@ -25,17 +24,8 @@ from app.schemas.auth.user import (
     GetUserInfoNoRelationDetail,
     ResetPasswordParam,
     AvatarParam,
-    UserRentalDemandListIn,
+    UserRentalDemandListIn, UpdateUserParam,
 )
-
-
-def data_to_model(data_obj, data_model):
-    data_list = []
-    if isinstance(data_obj, list):
-        for item in data_obj:
-            return data_to_model(item, data_model)
-    if isinstance(data_obj, dict):
-        return data_model.model_validate(data_obj)
 
 
 class UserService:
@@ -112,7 +102,7 @@ class UserService:
 
     @staticmethod
     async def password_reset(
-        request: Request, obj: ResetPasswordParam
+            request: Request, obj: ResetPasswordParam
     ) -> ResponseModel:
         if obj.new_password == obj.old_password:
             raise CustomException(CustomErrorCode.NEW_PWD_NO_OLD_PWD_EQUAL)
@@ -131,11 +121,11 @@ class UserService:
 
     @staticmethod
     async def update_avatar(
-        request: Request, username: Annotated[str, Path(...)], avatar: AvatarParam
-    ):
-        if request.user.role == 2:
+            request: Request, username: Annotated[str, Path(...)], avatar: AvatarParam
+    ) -> ResponseModel:
+        if request.user.role < 2:
             if request.user.username != username:
-                raise AuthorizationError("不可操作管理员信息！")
+                raise AuthorizationError("不可操作,暂无权限！")
         input_user = await UserCRUD.exists(username=username)
         if not input_user:
             raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
@@ -143,23 +133,68 @@ class UserService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def get_pagination_users(rental_demand_item: UserRentalDemandListIn):
+    async def get_pagination_users(obj: UserRentalDemandListIn) -> ResponseModel:
         query_params = (
-            rental_demand_item.query_params.dict()
-            if rental_demand_item.query_params
+            obj.query_params.dict()
+            if obj.query_params
             else {}
         )
         query_params = {k: v for k, v in query_params.items()}
+
         result = await UserCRUD.get_list(
             filter_params=query_params,
-            orderings=rental_demand_item.orderings,
-            limit=rental_demand_item.limit,
-            offset=rental_demand_item.offset,
+            orderings=obj.orderings,
+            limit=obj.page_size,
+            offset=obj.page,
+            schema_to_select=GetUserInfoNoRelationDetail,
         )
-        data = _PageData[GetUserInfoNoRelationDetail](
-            page_data=result["data"]
-        ).model_dump()
 
         return await ResponseBase.success(
-            result={"total_count": result["total_count"], **data}
+            result={**result, "page": obj.page, "page_size": obj.page_size}
         )
+
+    @staticmethod
+    async def delete_user(request: Request, userId: Annotated[int, Path(...)]) -> ResponseModel:
+        if request.user.role < 2:
+            if request.user.id != userId:
+                raise AuthorizationError("不可操作,暂无权限！")
+        elif request.user.id == userId:
+            raise AuthorizationError("不可操作管理员信息！")
+
+        input_user = await UserCRUD.exists(id=userId)
+        if not input_user:
+            raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
+        await UserCRUD.delete(id=userId)
+
+        return await ResponseBase.success()
+
+    @staticmethod
+    async def get_user(username: Annotated[str, Path(...)]) -> ResponseModel:
+        input_user = await UserCRUD.get(username=username)
+        return await ResponseBase.success(result=input_user)
+
+    @staticmethod
+    async def update_user(
+            request: Request,
+            username: Annotated[str, Path(...)],
+            obj: UpdateUserParam,
+    ) -> ResponseModel:
+        if request.user.username != username:
+            raise CustomException(CustomErrorCode.YOU_INFO)
+        input_user = await UserCRUD.get(username=username)
+        if not input_user:
+            raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
+        if input_user["username"] != obj.username:
+            _username = await UserCRUD.get(username=obj.username)
+            if _username:
+                raise CustomException(CustomErrorCode.USERNAME_OR_EMAIL_IS_REGISTER)
+        if input_user["nickname"] != obj.nickname:
+            nickname = await UserCRUD.get(nickname=obj.nickname)
+            if nickname:
+                raise CustomException(CustomErrorCode.NICKNAME_OR_EMAIL_IS_REGISTER)
+        if input_user["email"] != obj.email:
+            email = await UserCRUD.get(email=obj.email)
+            if email:
+                raise CustomException(CustomErrorCode.USER_EMAIL_OR_EMAIL_IS_REGISTER)
+        await UserCRUD.update(obj=obj, id=input_user["id"])
+        return await ResponseBase.success()

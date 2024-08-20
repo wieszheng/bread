@@ -11,14 +11,14 @@ from fastapi import FastAPI
 from app import lifespan, init_logging
 from app.exceptions import register_exceptions_handler
 from app.middlewares import register_middlewares
-from config import AppConfig, ROOT
+from config import settings, ROOT
 from starlette.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 
 app = FastAPI(
-    title=AppConfig.APP_NAME,
-    description=f"{AppConfig.APP_NAME} 接口文档",
-    version=AppConfig.APP_VERSION,
+    title=settings.APP_NAME,
+    description=f"{settings.APP_NAME} 接口文档",
+    version=settings.APP_VERSION,
     # root_path=AppConfig.APP_ROOT_PATH,
     lifespan=lifespan,
 )
@@ -30,7 +30,7 @@ app.mount("/static", StaticFiles(directory=f"{ROOT}/static"), name="static")
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
         openapi_url="/openapi.json",
-        title=AppConfig.APP_NAME + " - Swagger UI",
+        title=settings.APP_NAME + " - Swagger UI",
         swagger_js_url="/static/swagger_ui/swagger-ui-bundle.js",
         swagger_css_url="/static/swagger_ui/swagger-ui.css",
         swagger_favicon_url="/static/favicon.ico",
@@ -41,14 +41,14 @@ async def custom_swagger_ui_html():
 async def custom_redoc_html():
     return get_redoc_html(
         openapi_url="/openapi.json",
-        title=AppConfig.APP_NAME + " - ReDoc",
+        title=settings.APP_NAME + " - ReDoc",
         redoc_js_url="/static/redoc_ui/redoc.standalone.js",
         redoc_favicon_url="/static/favicon.ico",
     )
 
 
 # 初始化日志
-init_logging(AppConfig.LOGGING_CONF)
+init_logging(settings.LOGGING_CONF)
 # 注册中间件处理方法
 register_middlewares(app)
 # 注册全局异常处理方法
