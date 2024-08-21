@@ -7,9 +7,17 @@
 @Software : PyCharm
 """
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
-from pydantic import BaseModel, Field, field_validator, EmailStr, ConfigDict, HttpUrl
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    EmailStr,
+    ConfigDict,
+    HttpUrl,
+    field_serializer,
+)
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from app.commons.enums import RoleType
@@ -65,6 +73,13 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     role: RoleType = Field(default=RoleType.MEMBER)
     is_valid: bool
     last_login_at: datetime | None = None
+
+    @field_serializer("last_login_at")
+    def serialize_dt(self, last_login_at: datetime | None, _info: Any) -> str | None:
+        if last_login_at is not None:
+            return last_login_at.strftime("%Y-%m-%d %H:%M:%S")
+
+        return None
 
 
 class GetCurrentUserInfoDetail(GetUserInfoNoRelationDetail):
