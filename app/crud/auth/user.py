@@ -49,11 +49,11 @@ class UserCRUD(BaseCRUD):
             raise CustomException(CustomErrorCode.USER_EMAIL_OR_EMAIL_IS_REGISTER)
 
         user_item.password = await hash_psw(user_item.password)
-        current_user = await cls.create(obj=user_item)
         # 创建注册用户
-        if await cls.count() == 1:
-            await cls.update_user_role(user_id=current_user.id)
-
+        if await cls.count() == 0:
+            current_user = await cls.create(obj=user_item, role=2)
+        else:
+            current_user = await cls.create(obj=user_item)
         return current_user
 
     @classmethod
@@ -68,12 +68,12 @@ class UserCRUD(BaseCRUD):
 
     @classmethod
     async def get_list(
-        cls,
-        limit: int = 10,
-        offset: int = 1,
-        filter_params: dict = None,
-        orderings: list[str] = None,
-        schema_to_select: Type[BaseModel] | None = None,
+            cls,
+            limit: int = 10,
+            offset: int = 1,
+            filter_params: dict = None,
+            orderings: list[str] = None,
+            schema_to_select: Type[BaseModel] | None = None,
     ):
         if not orderings:
             orderings = ["id"]

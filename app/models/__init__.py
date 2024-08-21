@@ -105,7 +105,7 @@ class SoftDeleteMixin(AsyncAttrs, DeclarativeBase):
         default=None, comment="删除时间"
     )
     is_deleted: Mapped[bool] = mapped_column(
-        default=False, index=True, comment="是否删除"
+        default=False, index=True, comment="是否逻辑删除"
     )
 
 

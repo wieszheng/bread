@@ -9,10 +9,8 @@
 import time
 import uuid
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from loguru import logger
-from starlette.requests import Request
-from starlette.responses import Response
 
 
 def add_custom_middleware(app: FastAPI):
