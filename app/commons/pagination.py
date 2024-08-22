@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from typing import Generic, TypeVar, Sequence
+from typing import Generic, Sequence, TypeVar
 
 from pydantic import BaseModel
 

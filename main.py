@@ -7,13 +7,13 @@
 @Software : PyCharm
 """
 from fastapi import FastAPI
+from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
+from starlette.staticfiles import StaticFiles
 
-from app import lifespan, init_logging
+from app import init_logging, lifespan
 from app.exceptions import register_exceptions_handler
 from app.middlewares import register_middlewares
-from config import settings, ROOT
-from starlette.staticfiles import StaticFiles
-from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from config import ROOT, settings
 
 app = FastAPI(
     title=settings.APP_NAME,

@@ -8,34 +8,35 @@
 """
 from datetime import datetime, timezone
 from functools import wraps
-from typing import Any, Optional, Callable, Union, Dict, Sequence, Type
+from typing import Any, Callable, Dict, Optional, Sequence, Type, Union
 
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 from sqlalchemy import (
+    Column,
     Insert,
+    Join,
     Result,
+    Row,
+    Select,
     and_,
-    select,
-    update,
+    asc,
+    column,
     delete,
+    desc,
     func,
     inspect,
-    asc,
-    desc,
     or_,
-    column,
-    Column,
-    Select,
-    Row,
-    Join,
+    select,
+    update,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.util import AliasedClass
 from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
+
 from app.crud.helper import JoinConfig
-from app.crud.types import ModelType, CreateSchemaType, UpdateSchemaType
+from app.crud.types import CreateSchemaType, ModelType, UpdateSchemaType
 from app.exceptions.errors import DBError
 from app.models import async_session_maker
 

@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from sqlalchemy import String, INT, BOOLEAN
+from sqlalchemy import BOOLEAN, INT, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models import BaseModel

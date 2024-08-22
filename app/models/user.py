@@ -9,8 +9,8 @@
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, DateTime, Boolean
 
 from app.models import BaseModel
 

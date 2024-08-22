@@ -9,22 +9,20 @@
 import traceback
 
 from fastapi import FastAPI
-from fastapi.requests import Request
-
 from fastapi.exceptions import RequestValidationError
+from fastapi.requests import Request
 from loguru import logger
 from pydantic import ValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.commons.response.response_code import CustomResponseCode, StandardResponseCode
 from app.commons.response.response_schema import ApiResponse
 from app.commons.schema import CUSTOM_VALIDATION_ERROR_MESSAGES
-
 from app.exceptions.errors import (
-    CustomException,
     AuthorizationException,
+    CustomException,
     PermissionException,
 )
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
 def register_exceptions_handler(app: FastAPI):

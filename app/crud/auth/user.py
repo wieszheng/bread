@@ -13,13 +13,12 @@ from typing import Type
 from pydantic import BaseModel
 
 from app.commons.response.response_code import CustomErrorCode
-
 from app.core.security.password import hash_psw
 from app.crud import BaseCRUD
 from app.crud.helper import compute_offset
 from app.exceptions.errors import CustomException
 from app.models.user import UserModel
-from app.schemas.auth.user import RegisterUserParam, AvatarParam
+from app.schemas.auth.user import AvatarParam, RegisterUserParam
 
 
 class UserCRUD(BaseCRUD):

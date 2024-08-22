@@ -11,13 +11,12 @@ from typing import Any
 from fastapi import Request, Response
 from fastapi.security.utils import get_authorization_scheme_param
 from loguru import logger
-
-from starlette.requests import HTTPConnection
 from starlette.authentication import (
     AuthCredentials,
     AuthenticationBackend,
     AuthenticationError,
 )
+from starlette.requests import HTTPConnection
 
 from app.commons.response.response_code import StandardResponseCode
 from app.commons.response.response_schema import ApiResponse

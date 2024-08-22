@@ -6,26 +6,24 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from fastapi import Request, Path
+from fastapi import Path, Request
 from typing_extensions import Annotated
 
 from app.commons.response.response_code import CustomErrorCode
-
-from app.core.security.Jwt import create_access_token
-
 from app.commons.response.response_schema import ResponseBase, ResponseModel
+from app.core.security.Jwt import create_access_token
 from app.core.security.password import verify_psw
 from app.crud.auth.user import UserCRUD
 from app.exceptions.errors import CustomException, PermissionException
 from app.schemas.auth.user import (
-    RegisterUserParam,
     AuthLoginParam,
+    AvatarParam,
     GetCurrentUserInfoDetail,
     GetUserInfoNoRelationDetail,
+    RegisterUserParam,
     ResetPasswordParam,
-    AvatarParam,
-    UserRentalDemandListIn,
     UpdateUserParam,
+    UserRentalDemandListIn,
 )
 
 

@@ -6,14 +6,13 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-import jwt
-import pytz
-
 from datetime import datetime, timedelta
 
+import jwt
+import pytz
 from fastapi import Depends
 from fastapi.security import HTTPBearer
-from jwt import InvalidSignatureError, DecodeError, ExpiredSignatureError
+from jwt import DecodeError, ExpiredSignatureError, InvalidSignatureError
 
 from app.exceptions.errors import AuthorizationException, TokenError
 from config import settings

@@ -8,10 +8,9 @@
 """
 from typing import Any, Optional
 
-from sqlalchemy.orm.util import AliasedClass
-
 from pydantic import BaseModel, ConfigDict
 from pydantic.functional_validators import field_validator
+from sqlalchemy.orm.util import AliasedClass
 
 
 class JoinConfig(BaseModel):
