@@ -8,7 +8,6 @@
 """
 from fastapi import APIRouter, Depends
 
-from app.commons.response.response_schema import ResponseModel
 from app.core.security.Jwt import DependsJwtAuth
 from app.core.security.permission import RequestPermission
 from app.service.auth.user import UserService

@@ -37,32 +37,28 @@ def render_html(filepath, **kwargs):
         return html_str.render(**kwargs)
 
 
-async def send_mail(
-        subject: str,
-        content_msg: str,
-        *recipient):
+async def send_mail(subject: str, content_msg: str, *recipient):
     data = get_config().get("email")
     from_addr = data.get("from_addr")
     smtp_server = data.get("smtp_server")
     password = data.get("password")
     # nickname base64
     original_str = "Bread 机器人"
-    encoded_bytes = original_str.encode('utf-8')
+    encoded_bytes = original_str.encode("utf-8")
     base64_encoded_str = base64.b64encode(encoded_bytes)
 
     # 设置总的邮件体对象，对象类型为mixed
     msg = MIMEMultipart("mixed")
-    msg["From"] = Header(f'"=?UTF-8?B?{base64_encoded_str.decode("utf-8")}?=" <{from_addr}>')
+    msg["From"] = Header(
+        f'"=?UTF-8?B?{base64_encoded_str.decode("utf-8")}?=" <{from_addr}>'
+    )
     msg["To"] = Header("其他同学")
     msg["Subject"] = Header(subject, "utf-8")
     # 邮件正文内容
     msg.attach(MIMEText(content_msg, "html", "utf-8"))
 
     try:
-        server = aiosmtplib.SMTP(
-            hostname=smtp_server,
-            port=465,
-            use_tls=True)
+        server = aiosmtplib.SMTP(hostname=smtp_server, port=465, use_tls=True)
         await server.connect()
         await server.login(from_addr, password)
         await server.sendmail(from_addr, [from_addr, *recipient], msg.as_string())

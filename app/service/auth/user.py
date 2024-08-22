@@ -103,6 +103,10 @@ class UserService:
     async def password_reset(
         request: Request, obj: ResetPasswordParam
     ) -> ResponseModel:
+        """
+        重置密码
+        :return:
+        """
         if obj.new_password == obj.old_password:
             raise CustomException(CustomErrorCode.NEW_PWD_NO_OLD_PWD_EQUAL)
 
@@ -122,6 +126,10 @@ class UserService:
     async def update_avatar(
         request: Request, username: Annotated[str, Path(...)], avatar: AvatarParam
     ) -> ResponseModel:
+        """
+        更新头像
+        :return:
+        """
         if request.user.role < 2:
             if request.user.username != username:
                 raise PermissionException("不可操作,暂无权限！")
@@ -133,6 +141,10 @@ class UserService:
 
     @staticmethod
     async def get_pagination_users(obj: UserRentalDemandListIn) -> ResponseModel:
+        """
+        分页查询用户
+        :return:
+        """
         query_params = obj.query_params.dict() if obj.query_params else {}
         query_params = {k: v for k, v in query_params.items()}
 
@@ -152,6 +164,10 @@ class UserService:
     async def delete_user(
         request: Request, userId: Annotated[int, Path(...)]
     ) -> ResponseModel:
+        """
+        删除用户
+        :return:
+        """
         if request.user.role < 2:
             if request.user.id != userId:
                 raise PermissionException("不可操作,暂无权限！")
@@ -167,6 +183,10 @@ class UserService:
 
     @staticmethod
     async def get_user(username: Annotated[str, Path(...)]) -> ResponseModel:
+        """
+        获取用户
+        :return:
+        """
         input_user = await UserCRUD.get(username=username)
         return await ResponseBase.success(result=input_user)
 
@@ -176,6 +196,10 @@ class UserService:
         username: Annotated[str, Path(...)],
         obj: UpdateUserParam,
     ) -> ResponseModel:
+        """
+        更新用户
+        :return:
+        """
         if request.user.username != username:
             raise CustomException(CustomErrorCode.YOU_INFO)
         input_user = await UserCRUD.get(username=username)
