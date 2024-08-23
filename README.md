@@ -5,7 +5,6 @@
   </h1>
 </div>
 
-<img align='right' src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif" width="280">
 
 ### Abilities
 
@@ -36,11 +35,16 @@
 
 > 由于微服务个人来做能力实在有限，缓慢开发功能...
 
+<img align='right' src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif" width="280">
+
 #### 🎉 技术栈
 
-- ⚡️ Fully async
-- 💎 FastAPI
-- 🚀 Pydantic V2 and SQLAlchemy 2.0
+- ⚡️ **Fully Async**
+- 📚 **SQLAlchemy 2.0**
+- 🚀 **Pydantic V2**
+- 🦾 **Powerful CRUD Functionality**
+- 🔐 **User authentication with JWT**
+- 🚚 **Easy running with docker compose**
 
 #### ☕ 说明
 
