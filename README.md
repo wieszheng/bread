@@ -33,11 +33,6 @@
   </a>
 </p>
 
-### 😆 Views
-
-<div align="left">
-<img src='https://count.getloli.com/get/@wieszheng.github.readme'>
-</div>
 
 > 由于微服务个人来做能力实在有限，缓慢开发功能...
 
@@ -89,11 +84,11 @@ git push origin main
 #### ❤️ 喜欢我？
 
 <p align="center">
-<a href="https://star-history.com/#wieszheng/Alden">
+<a href="https://star-history.com/#wieszheng/nread">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wieszheng/Alden&type=Date&title=50&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wieszheng/Alden&type=Date&title=50" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wieszheng/Alden&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wieszheng/nread&type=Date&title=50&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wieszheng/nread&type=Date&title=50" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wieszheng/nread&type=Date" />
   </picture>
 </a>
 </p>

@@ -6,7 +6,6 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-import asyncio
 import base64
 import json
 import os

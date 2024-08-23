@@ -31,6 +31,7 @@ router.add_api_route(
 router.add_api_route(
     "",
     endpoint=ProjectService.update_project,
+    dependencies=[DependsJwtAuth],
     methods=["put"],
     summary="修改项目",
 )
@@ -38,6 +39,7 @@ router.add_api_route(
 router.add_api_route(
     "/avatar/{project_id}",
     endpoint=ProjectService.update_project_avatar,
+    dependencies=[DependsJwtAuth],
     methods=["put"],
     summary="修改项目头像",
 )
@@ -45,6 +47,7 @@ router.add_api_route(
 router.add_api_route(
     "",
     endpoint=ProjectService.is_del_project,
+    dependencies=[DependsJwtAuth],
     methods=["delete"],
     summary="删除项目（逻辑删除）",
 )

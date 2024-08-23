@@ -108,6 +108,7 @@ class CustomErrorCode(CustomCodeBase):
     # project 项目 13000 - 14000
     PROJECT_HAS_MODULE_ASSOCIATION = (13000, "项目有模块或用例关联，不能删除")
     PROJECT_NAME_EXIST = (13001, "项目名已存在")  # 项目名以存在
+    PROJECT_ID_EXIST = (13001, "项目不存在，请确认")  # 项目名以存在
 
     # module 模块 14000 - 15000
     MODULE_HAS_CASE_ASSOCIATION = (

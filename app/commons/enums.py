@@ -6,12 +6,30 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-import enum
+from enum import Enum, IntEnum
 
 
-class RoleType(enum.IntEnum):
+class RoleType(IntEnum):
     """权限"""
 
     MEMBER = 0
     MANAGER = 1
     ADMIN = 2
+
+
+class HttpMethod(Enum):
+    GET = "GET"
+    POST = "POST"
+    PATCH = "PATCH"
+    PUT = "PUT"
+    DELETE = "DELETE"
+    HEAD = "HEAD"
+    OPTIONS = "OPTIONS"
+
+
+class RespFmt(Enum):
+    """http响应格式"""
+
+    JSON = "json"
+    BYTES = "bytes"
+    TEXT = "text"
