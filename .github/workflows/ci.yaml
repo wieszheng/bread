@@ -93,10 +93,10 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Install Dependencies for Testing
         run: |
-          pip install pytest pytest-cov pytest-asyncio pytest pytest-xdist
+          pip install pytest pytest-cov
       - name: Test with Pytest-Cov
         run: |
-          pytest --cov --cov-report=xml .
+          pytest --cov --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
