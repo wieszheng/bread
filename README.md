@@ -6,8 +6,6 @@
 </div>
 
 
-### Abilities
-
 <p align="center" >
   <a href="">
       <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" height="25">
@@ -18,8 +16,8 @@
   <a href="https://docs.pydantic.dev/2.4/">
       <img src="https://img.shields.io/badge/Pydantic-E92063?logo=pydantic&logoColor=fff&style=for-the-badge" alt="Pydantic" height="25">
   </a>
-  <a href="https://www.postgresql.org">
-      <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" height="25">
+  <a href="https://www.mysql.org">
+      <img src="https://img.shields.io/badge/MySQL-316192?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" height="25">
   </a>
   <a href="https://redis.io">
       <img src="https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=fff&style=for-the-badge" alt="Redis" height="25">
