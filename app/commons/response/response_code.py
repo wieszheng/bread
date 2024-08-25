@@ -100,15 +100,19 @@ class CustomErrorCode(CustomCodeBase):
     USER_ACCOUNT_LOCKED = (10009, "用户账号被锁定，请联系管理员 😭")
     YOU_INFO = (10010, "只能修改自己的信息呦 👉")  # 账号或密码错误
     # 用户状态 验证  11000 - 12000
-    PARTNER_CODE_TOKEN_EXPIRED_FAIL = (11000, "用户信息以已过期 😂")  # token已过期
+    PARTNER_CODE_TOKEN_EXPIRED_FAIL = (
+        11000,
+        "用户信息以已过期 😂",
+    )  # token已过期或未找到
 
     # 参数类型 12000 - 13000
     PARTNER_CODE_PARAMS_FAIL = (12000, "必填参数不能为空 😅")  # 必填参数不能为空
 
     # project 项目 13000 - 14000
     PROJECT_HAS_MODULE_ASSOCIATION = (13000, "项目有模块或用例关联，不能删除")
+    PROJECT_No_PERMISSION = (13000, "你没有权限修改项目头像，请联系项目管理员 😭")
     PROJECT_NAME_EXIST = (13001, "项目名已存在")  # 项目名以存在
-    PROJECT_ID_EXIST = (13001, "项目不存在，请确认")  # 项目名以存在
+    PROJECT_ID_EXIST = (13001, "项目不存在，请确认")  # 项目不存在
 
     # module 模块 14000 - 15000
     MODULE_HAS_CASE_ASSOCIATION = (

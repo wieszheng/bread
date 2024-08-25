@@ -63,13 +63,13 @@ class UserInfoSchemaBase(BaseModel):
     nickname: str
     email: EmailStr = Field(..., example="user@example.com")
     phone: CustomPhoneNumber | None = None
+    avatar: str | None = None
 
 
 class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    avatar: str | None = None
     role: RoleType = Field(default=RoleType.MEMBER)
     is_valid: bool
     last_login_at: datetime | None = None
@@ -118,12 +118,10 @@ class AvatarParam(BaseModel):
     url: HttpUrl = Field(..., description="头像 http 地址")
 
 
-class RentalDemandListQuery(BaseModel):
+class UserListQuery(BaseModel):
     username: Optional[str] = Field(default=None, description="用户账号")
     nickname: Optional[str] = Field(default=None, description="用户昵称")
 
 
-class UserRentalDemandListIn(ListPageRequestModel):
-    query_params: Optional[RentalDemandListQuery] = Field(
-        default={}, description="查询参数"
-    )
+class UserListIn(ListPageRequestModel):
+    query_params: Optional[UserListQuery] = Field(default={}, description="查询参数")

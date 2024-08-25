@@ -23,7 +23,7 @@ from app.schemas.auth.user import (
     RegisterUserParam,
     ResetPasswordParam,
     UpdateUserParam,
-    UserRentalDemandListIn,
+    UserListIn,
 )
 
 
@@ -140,7 +140,7 @@ class UserService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def get_pagination_users(obj: UserRentalDemandListIn) -> ResponseModel:
+    async def get_pagination_users(obj: UserListIn) -> ResponseModel:
         """
         分页查询用户
         :return:

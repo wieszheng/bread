@@ -14,20 +14,44 @@ from fastapi import File, Path, Request, UploadFile
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.core.client.miNio import minio_client
+from app.crud.helper import compute_offset
 from app.crud.project.project import ProjectCRUD
 from app.exceptions.errors import CustomException
+from app.models.project import ProjectModel
+from app.models.user import UserModel
+from app.schemas.auth.user import UserInfoSchemaBase
 from app.schemas.project.project import (
+    GetCurrentProjectInfoDetail,
     GetProjectInfo,
     ProjectSchemaBase,
     UpdateProjectParam,
 )
+from config import settings
 
 
 class ProjectService:
 
     @staticmethod
-    async def get_projects():
-        pass
+    async def get_projects(
+        page: int,
+        page_size: int,
+    ) -> ResponseModel:
+
+        result = await ProjectCRUD.get_multi_joined(
+            limit=page_size,
+            offset=compute_offset(page, page_size),
+            sort_columns=["id"],
+            sort_orders=["desc"],
+            join_model=UserModel,
+            schema_to_select=GetCurrentProjectInfoDetail,
+            join_schema_to_select=UserInfoSchemaBase,
+            is_deleted=False,
+            join_on=ProjectModel.created_by == UserModel.id,
+            return_as_model=True,
+        )
+        return await ResponseBase.success(
+            result={**result, "page": page, "page_size": page_size}
+        )
 
     @staticmethod
     async def create_project(request: Request, obj: ProjectSchemaBase) -> ResponseModel:
@@ -54,7 +78,15 @@ class ProjectService:
         :param obj:
         :return:
         """
-        pass
+        input_id = await ProjectCRUD.get(id=obj.id)
+        if not input_id:
+            raise CustomException(CustomErrorCode.PROJECT_ID_EXIST)
+        if input_id["owner"] != request.user.id and request.user.role < settings.ADMIN:
+            raise CustomException(CustomErrorCode.PROJECT_No_PERMISSION)
+        await ProjectCRUD.update(
+            obj={**obj.model_dump(), "updated_by": request.user.id}
+        )
+        return await ResponseBase.success()
 
     @staticmethod
     async def update_project_avatar(
@@ -70,9 +102,11 @@ class ProjectService:
         :return:
         """
         # 生成随机文件名
-        input_id = await ProjectCRUD.exists(id=project_id)
+        input_id = await ProjectCRUD.get(id=project_id)
         if not input_id:
             raise CustomException(CustomErrorCode.PROJECT_ID_EXIST)
+        if input_id["owner"] != request.user.id and request.user.role < settings.ADMIN:
+            raise CustomException(CustomErrorCode.PROJECT_No_PERMISSION)
         random_suffix = str(uuid.uuid4()).replace("-", "")
         object_name = (
             f"{request.user.id}/{random_suffix}.{avatar.filename.split('.')[-1]}"
@@ -90,8 +124,16 @@ class ProjectService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def is_del_project():
-        pass
+    async def is_del_project(
+        request: Request, project_id: Annotated[int, ...]
+    ) -> ResponseModel:
+        input_id = await ProjectCRUD.get(id=project_id)
+        if not input_id:
+            raise CustomException(CustomErrorCode.PROJECT_ID_EXIST)
+        if input_id["owner"] != request.user.id and request.user.role != settings.ADMIN:
+            raise CustomException(CustomErrorCode.PROJECT_No_PERMISSION)
+        await ProjectCRUD.delete(id=project_id)
+        return await ResponseBase.success()
 
     @staticmethod
     async def allocation_project_role():

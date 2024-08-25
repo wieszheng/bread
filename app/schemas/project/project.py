@@ -6,9 +6,11 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from fastapi import File, UploadFile
+from typing import List, Optional
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.commons.response.response_schema import ListPageRequestModel
 from app.commons.schema import PersistentDeletion, TimestampSchema
 
 
@@ -28,15 +30,23 @@ class ProjectSchemaBase(BaseModel):
 
 
 class UpdateProjectParam(ProjectSchemaBase):
-    model_config = ConfigDict(from_attributes=True)
     id: int
 
 
 class GetProjectInfo(ProjectSchemaBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    created_by: int | None = None
+    avatar: str | None = Field(serialization_alias="avatar_project")
 
 
-class GetCurrentProjectInfoDetail(GetProjectInfo, TimestampSchema, PersistentDeletion):
+class GetCurrentProjectInfoDetail(GetProjectInfo):
+    # model_config = ConfigDict(
+    #     from_attributes=True,
+    #     populate_by_name=True,  # 允许按字段别名填充模型
+    #     alias_generator=lambda field_name: f"_{field_name}"  # 设置别名生成器
+    # )
     pass
+
+
+class ProjectListIn(ListPageRequestModel):
+    page: int = Field(default=1, ge=0, description="分页偏移量")
+    page_size: int = Field(default=10, gt=0, description="每页显示数量")
+    orderings: Optional[List[str]] = Field(default=["id"], description="排序字段")

@@ -6,20 +6,17 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from datetime import datetime, timezone
+from datetime import datetime
 from functools import wraps
-from typing import Any, Callable, Dict, Optional, Sequence, Type, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 from sqlalchemy import (
-    Column,
-    Insert,
     Join,
     Result,
     Row,
     Select,
-    and_,
     asc,
     column,
     delete,
@@ -31,11 +28,18 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 from sqlalchemy.orm.util import AliasedClass
 from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
 
-from app.crud.helper import JoinConfig
+from app.crud.helper import (
+    JoinConfig,
+    _auto_detect_join_condition,
+    _extract_matching_columns_from_schema,
+    _get_primary_keys,
+    _handle_null_primary_key_multi_join,
+    _nest_join_data,
+    _nest_multi_join_data,
+)
 from app.crud.types import CreateSchemaType, ModelType, UpdateSchemaType
 from app.exceptions.errors import DBError
 from app.models import async_session_maker
@@ -77,161 +81,8 @@ def with_session(method):
     return wrapper
 
 
-def _extract_matching_columns_from_schema(
-    model: Union[ModelType, AliasedClass],
-    schema: Optional[type[BaseModel]],
-    prefix: Optional[str] = None,
-    alias: Optional[AliasedClass] = None,
-    use_temporary_prefix: Optional[bool] = False,
-    temp_prefix: Optional[str] = "joined__",
-) -> list[Any]:
-    if not hasattr(model, "__table__"):  # pragma: no cover
-        raise AttributeError(f"{model.__name__} does not have a '__table__' attribute.")
-
-    model_or_alias = alias if alias else model
-    columns = []
-    temp_prefix = (
-        temp_prefix if use_temporary_prefix and temp_prefix is not None else ""
-    )
-    if schema:
-        for field in schema.model_fields.keys():
-            if hasattr(model_or_alias, field):
-                column = getattr(model_or_alias, field)
-                if prefix is not None or use_temporary_prefix:
-                    column_label = (
-                        f"{temp_prefix}{prefix}{field}"
-                        if prefix
-                        else f"{temp_prefix}{field}"
-                    )
-                    column = column.label(column_label)
-                columns.append(column)
-    else:
-        for column in model.__table__.c:
-            column = getattr(model_or_alias, column.key)
-            if prefix is not None or use_temporary_prefix:
-                column_label = (
-                    f"{temp_prefix}{prefix}{column.key}"
-                    if prefix
-                    else f"{temp_prefix}{column.key}"
-                )
-                column = column.label(column_label)
-            columns.append(column)
-
-    return columns
-
-
-def _get_primary_key(
-    model: ModelType,
-) -> Union[str, None]:  # pragma: no cover
-    key: Optional[str] = _get_primary_keys(model)[0].name
-    return key
-
-
-def _get_primary_keys(
-    model: ModelType,
-) -> Sequence[Column]:
-    """Get the primary key of a SQLAlchemy model."""
-    inspector_result = inspect(model)
-    if inspector_result is None:  # pragma: no cover
-        raise ValueError("Model inspection failed, resulting in None.")
-    primary_key_columns: Sequence[Column] = inspector_result.mapper.primary_key
-
-    return primary_key_columns
-
-
-def _handle_one_to_many(nested_data, nested_key, nested_field, value):
-    if nested_key not in nested_data or not isinstance(nested_data[nested_key], list):
-        nested_data[nested_key] = []
-
-    if not nested_data[nested_key] or nested_field in nested_data[nested_key][-1]:
-        nested_data[nested_key].append({nested_field: value})
-    else:
-        nested_data[nested_key][-1][nested_field] = value
-
-    return nested_data
-
-
-def _handle_one_to_one(nested_data, nested_key, nested_field, value):
-    if nested_key not in nested_data or not isinstance(nested_data[nested_key], dict):
-        nested_data[nested_key] = {}
-    nested_data[nested_key][nested_field] = value
-    return nested_data
-
-
-def _nest_join_data(
-    data: dict,
-    join_definitions: list[JoinConfig],
-    temp_prefix: str = "joined__",
-    nested_data: Optional[dict[str, Any]] = None,
-) -> dict:
-    if nested_data is None:
-        nested_data = {}
-
-    for key, value in data.items():
-        nested = False
-        for join in join_definitions:
-            join_prefix = join.join_prefix or ""
-            full_prefix = f"{temp_prefix}{join_prefix}"
-
-            if isinstance(key, str) and key.startswith(full_prefix):
-                nested_key = (
-                    join_prefix.rstrip("_") if join_prefix else join.model.__tablename__
-                )
-                nested_field = key[len(full_prefix) :]
-
-                if join.relationship_type == "one-to-many":
-                    nested_data = _handle_one_to_many(
-                        nested_data, nested_key, nested_field, value
-                    )
-                else:
-                    nested_data = _handle_one_to_one(
-                        nested_data, nested_key, nested_field, value
-                    )
-
-                nested = True
-                break
-
-        if not nested:
-            stripped_key = (
-                key[len(temp_prefix) :]
-                if isinstance(key, str) and key.startswith(temp_prefix)
-                else key
-            )
-            if nested_data is None:  # pragma: no cover
-                nested_data = {}
-
-            nested_data[stripped_key] = value
-
-    if nested_data is None:  # pragma: no cover
-        nested_data = {}
-
-    for join in join_definitions:
-        join_primary_key = _get_primary_key(join.model)
-        nested_key = (
-            join.join_prefix.rstrip("_")
-            if join.join_prefix
-            else join.model.__tablename__
-        )
-        if join.relationship_type == "one-to-many" and nested_key in nested_data:
-            if isinstance(nested_data.get(nested_key, []), list):
-                if any(
-                    item[join_primary_key] is None for item in nested_data[nested_key]
-                ):
-                    nested_data[nested_key] = []
-
-        if nested_key in nested_data and isinstance(nested_data[nested_key], dict):
-            if (
-                join_primary_key in nested_data[nested_key]
-                and nested_data[nested_key][join_primary_key] is None
-            ):
-                nested_data[nested_key] = None
-
-    assert nested_data is not None, "Couldn't nest the data."
-    return nested_data
-
-
 class BaseCRUD:
-    __model__: Type[ModelType] = None
+    __model__: type[ModelType]
     is_deleted_column: str = "is_deleted"
     deleted_at_column: str = "deleted_at"
     updated_at_column: str = "updated_at"
@@ -648,6 +499,195 @@ class BaseCRUD:
             return data_list[0]
 
         return None
+
+    @classmethod
+    @with_session
+    async def get_multi_joined(
+        cls,
+        *,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        join_model: Optional[type[ModelType]] = None,
+        join_on: Optional[Any] = None,
+        join_prefix: Optional[str] = None,
+        join_schema_to_select: Optional[type[BaseModel]] = None,
+        join_type: str = "left",
+        alias: Optional[AliasedClass[Any]] = None,
+        join_filters: Optional[dict] = None,
+        nest_joins: bool = False,
+        offset: int = 0,
+        limit: Optional[int] = 100,
+        sort_columns: Optional[Union[str, list[str]]] = None,
+        sort_orders: Optional[Union[str, list[str]]] = None,
+        return_as_model: bool = False,
+        joins_config: Optional[list[JoinConfig]] = None,
+        return_total_count: bool = True,
+        relationship_type: Optional[str] = None,
+        session: AsyncSession = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+
+        if joins_config and (
+            join_model
+            or join_prefix
+            or join_on
+            or join_schema_to_select
+            or alias
+            or relationship_type
+        ):
+            raise ValueError(
+                "Cannot use both single join parameters and joins_config simultaneously."
+            )
+        elif not joins_config and not join_model:
+            raise ValueError("You need one of join_model or joins_config.")
+
+        if (limit is not None and limit < 0) or offset < 0:
+            raise ValueError("Limit and offset must be non-negative.")
+
+        if relationship_type is None:
+            relationship_type = "one-to-one"
+
+        primary_select = _extract_matching_columns_from_schema(
+            model=cls.__model__, schema=schema_to_select
+        )
+        stmt: Select = select(*primary_select)
+
+        join_definitions = joins_config if joins_config else []
+
+        if join_model:
+            join_definitions.append(
+                JoinConfig(
+                    model=join_model,
+                    join_on=join_on,
+                    join_prefix=join_prefix,
+                    schema_to_select=join_schema_to_select,
+                    join_type=join_type,
+                    alias=alias,
+                    filters=join_filters,
+                    relationship_type=relationship_type,
+                )
+            )
+
+        stmt = cls._prepare_and_apply_joins(
+            stmt=stmt, joins_config=join_definitions, use_temporary_prefix=nest_joins
+        )
+
+        primary_filters = cls._parse_filters(**kwargs)
+        if primary_filters:
+            stmt = stmt.filter(*primary_filters)
+
+        if sort_columns:
+            stmt = cls._apply_sorting(stmt, sort_columns, sort_orders)
+
+        if offset:
+            stmt = stmt.offset(offset)
+        if limit is not None:
+            stmt = stmt.limit(limit)
+
+        result = await session.execute(stmt)
+        data: list[Union[dict, BaseModel]] = []
+
+        for row in result.mappings().all():
+            row_dict = dict(row)
+
+            if nest_joins:
+                row_dict = _nest_join_data(
+                    data=row_dict,
+                    join_definitions=join_definitions,
+                )
+
+            if return_as_model:
+                if schema_to_select is None:
+                    raise ValueError(
+                        "schema_to_select must be provided when return_as_model is True."
+                    )
+                try:
+                    model_instance = schema_to_select(**row_dict)
+                    data.append(model_instance)
+                except ValidationError as e:
+                    raise ValueError(
+                        f"Data validation error for schema {schema_to_select.__name__}: {e}"
+                    )
+            else:
+                data.append(row_dict)
+
+        if nest_joins and any(
+            join.relationship_type == "one-to-many" for join in join_definitions
+        ):
+            nested_data = _nest_multi_join_data(
+                base_primary_key=_get_primary_keys(cls.__model__)[0].name,
+                data=data,
+                joins_config=join_definitions,
+                return_as_model=return_as_model,
+                schema_to_select=schema_to_select if return_as_model else None,
+                nested_schema_to_select={
+                    (
+                        join.join_prefix.rstrip("_")
+                        if join.join_prefix
+                        else join.model.__name__
+                    ): join.schema_to_select
+                    for join in join_definitions
+                    if join.schema_to_select
+                },
+            )
+        else:
+            nested_data = _handle_null_primary_key_multi_join(data, join_definitions)
+
+        response: dict[str, Any] = {"data": nested_data}
+
+        if return_total_count:
+            total_count: int = await cls.count(
+                db=session, joins_config=joins_config, **kwargs
+            )
+            response["total_count"] = total_count
+
+        return response
+
+    @classmethod
+    @with_session
+    async def get_multi_by_cursor(
+        cls,
+        *,
+        cursor: Any = None,
+        limit: int = 100,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        sort_column: str = "id",
+        sort_order: str = "asc",
+        session: AsyncSession = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+
+        if limit == 0:
+            return {"data": [], "next_cursor": None}
+
+        stmt = await cls.select(
+            schema_to_select=schema_to_select,
+            **kwargs,
+        )
+
+        if cursor:
+            if sort_order == "asc":
+                stmt = stmt.filter(getattr(cls.__model__, sort_column) > cursor)
+            else:
+                stmt = stmt.filter(getattr(cls.__model__, sort_column) < cursor)
+
+        stmt = stmt.order_by(
+            asc(getattr(cls.__model__, sort_column))
+            if sort_order == "asc"
+            else desc(getattr(cls.__model__, sort_column))
+        )
+        stmt = stmt.limit(limit)
+
+        result = await session.execute(stmt)
+        data = [dict(row) for row in result.mappings()]
+
+        next_cursor = None
+        if len(data) == limit:
+            if sort_order == "asc":
+                next_cursor = data[-1][sort_column]
+            else:
+                data[0][sort_column]
+
+        return {"data": data, "next_cursor": next_cursor}
 
     @classmethod
     def _as_single_response(

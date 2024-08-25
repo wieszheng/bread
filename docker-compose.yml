@@ -26,7 +26,7 @@ services:
     environment:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: mysql123
-      MYSQL_DATABASE: alden
+      MYSQL_DATABASE: bread
       MYSQL_ROOT_HOST: "%"
     ports:
       - "3306:3306"
@@ -50,7 +50,7 @@ services:
         aliases:
           - redis
 
-  alden:
+  bread:
     build:
       context: .
       dockerfile: Dockerfile
@@ -60,7 +60,7 @@ services:
     environment:
       TZ: Asia/Shanghai
     volumes:
-      - /alden/logs:/alden/logs
+      - /bread/logs:/bread/logs
     ports:
       - "5021:5021"
     depends_on:
@@ -71,7 +71,7 @@ services:
       server_network:
         ipv4_address: 192.168.20.18
         aliases:
-          - alden
+          - bread
 
 networks:
   server_network:
