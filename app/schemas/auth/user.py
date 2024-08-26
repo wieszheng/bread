@@ -36,7 +36,7 @@ class AuthSchemaBase(BaseModel):
 
 
 class AuthLoginParam(AuthSchemaBase):
-    captcha: str = None
+    pass
 
 
 class RegisterUserParam(AuthSchemaBase):
@@ -61,7 +61,7 @@ class CustomPhoneNumber(PhoneNumber):
 class UserInfoSchemaBase(BaseModel):
     username: str
     nickname: str
-    email: EmailStr = Field(..., example="user@example.com")
+    email: EmailStr = Field(..., example="user@qq.com")
     phone: CustomPhoneNumber | None = None
     avatar: str | None = None
 

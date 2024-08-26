@@ -9,7 +9,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import File, Path, Request, UploadFile
+from fastapi import File, Path, Query, Request, UploadFile
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
@@ -33,8 +33,8 @@ class ProjectService:
 
     @staticmethod
     async def get_projects(
-        page: int,
-        page_size: int,
+        page: Annotated[int, Query(1, ge=1, description="Page number")],
+        page_size: Annotated[int, Query(20, gt=0, le=100, description="Page size")],
     ) -> ResponseModel:
 
         result = await ProjectCRUD.get_multi_joined(
@@ -43,11 +43,13 @@ class ProjectService:
             sort_columns=["id"],
             sort_orders=["desc"],
             join_model=UserModel,
+            join_prefix="user_",
             schema_to_select=GetCurrentProjectInfoDetail,
             join_schema_to_select=UserInfoSchemaBase,
             is_deleted=False,
             join_on=ProjectModel.created_by == UserModel.id,
-            return_as_model=True,
+            is_active=True,
+            is_delete=True,
         )
         return await ResponseBase.success(
             result={**result, "page": page, "page_size": page_size}

@@ -12,25 +12,14 @@ from typing import Any, Callable, Dict, Optional, Union
 
 from loguru import logger
 from pydantic import BaseModel, ValidationError
-from sqlalchemy import (
-    Join,
-    Result,
-    Row,
-    Select,
-    asc,
-    column,
-    delete,
-    desc,
-    func,
-    inspect,
-    or_,
-    select,
-    update,
-)
+from sqlalchemy import Join, Result, Row, Select, asc
+from sqlalchemy import column as c
+from sqlalchemy import delete, desc, func, inspect, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.util import AliasedClass
 from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
 
+from app.commons import SingletonMetaCls
 from app.crud.helper import (
     JoinConfig,
     _auto_detect_join_condition,
@@ -81,7 +70,7 @@ def with_session(method):
     return wrapper
 
 
-class BaseCRUD:
+class BaseCRUD(SingletonMetaCls):
     __model__: type[ModelType]
     is_deleted_column: str = "is_deleted"
     deleted_at_column: str = "deleted_at"
@@ -131,7 +120,7 @@ class BaseCRUD:
                 field_name, op = key.rsplit("__", 1)
                 column_ = getattr(model, field_name, None)
                 if column_ is None:
-                    raise ValueError(f"Invalid filter column: {field_name}")
+                    raise ValueError(f"Invalid filter column_: {field_name}")
                 if op == "or":
                     or_filters = [
                         sqlalchemy_filter(column_)(or_value)
@@ -525,7 +514,59 @@ class BaseCRUD:
         session: AsyncSession = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
+        """
+        users = await user_crud.get_multi_joined(
+            db=session,
+            schema_to_select=ReadUserSchema,
+            joins_config=[
+                JoinConfig(
+                    model=Tier,
+                    join_on=User.tier_id == Tier.id,
+                    join_prefix="tier_",
+                    schema_to_select=ReadTierSchema,
+                    join_type="left",
+                ),
+                JoinConfig(
+                    model=Department,
+                    join_on=User.department_id == Department.id,
+                    join_prefix="dept_",
+                    schema_to_select=ReadDepartmentSchema,
+                    join_type="inner",
+                ),
+            ],
+            offset=0,
+            limit=10,
+            sort_columns='username',
+            sort_orders='asc',
+        )
 
+        stories = await story_crud.get_multi_joined(
+            db=session,
+            schema_to_select=ReadStorySchema,
+            joins_config=[
+                JoinConfig(
+                    model=Task,
+                    join_on=Story.id == Task.story_id,
+                    join_prefix="task_",
+                    schema_to_select=ReadTaskSchema,
+                    join_type="left",
+                ),
+                JoinConfig(
+                    model=User,
+                    join_on=Task.creator_id == User.id,
+                    join_prefix="creator_",
+                    schema_to_select=ReadUserSchema,
+                    join_type="left",
+                    alias=aliased(User, name="task_creator"),
+                ),
+            ],
+            nest_joins=True,
+            offset=0,
+            limit=5,
+            sort_columns='name',
+            sort_orders='asc',
+        )
+        """
         if joins_config and (
             join_model
             or join_prefix
@@ -777,7 +818,7 @@ class BaseCRUD:
             return_columns = [col.key for col in cls.__model__.__table__.columns]
 
         if return_columns:
-            stmt = stmt.returning(*[column(name) for name in return_columns])
+            stmt = stmt.returning(*[c(name) for name in return_columns])
             db_row = await session.execute(stmt)
             if allow_multiple:
                 return cls._as_multi_response(

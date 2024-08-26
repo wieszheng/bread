@@ -1,5 +1,5 @@
 <div align="center" >
-  <img src="docs/icon.svg" alt="icon" width="150px" height="150px">
+  <img src="docs/icon.svg" alt="icon" width="120px" height="120px">
   <h1>
     FasAPI-Bread v1.0.0 👋
   </h1>
@@ -86,11 +86,11 @@ git push origin main
 #### ❤️ 喜欢我？
 
 <p align="center">
-<a href="https://star-history.com/#wieszheng/nread">
+<a href="https://star-history.com/#wieszheng/bread">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wieszheng/nread&type=Date&title=50&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wieszheng/nread&type=Date&title=50" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wieszheng/nread&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wieszheng/bread&type=Date&title=50&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wieszheng/bread&type=Date&title=50" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wieszheng/bread&type=Date" />
   </picture>
 </a>
 </p>

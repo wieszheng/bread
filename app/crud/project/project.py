@@ -8,9 +8,15 @@
 """
 from app.crud import BaseCRUD
 from app.models.project import ProjectModel
+from app.models.project_role import ProjectRoleModel
 
 
 class ProjectCRUD(BaseCRUD):
     __model__ = ProjectModel
 
+    pass
+
+
+class ProjectRoleCRUD(BaseCRUD):
+    __model__ = ProjectRoleModel
     pass
