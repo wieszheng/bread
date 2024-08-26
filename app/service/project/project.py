@@ -15,7 +15,7 @@ from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.core.client.miNio import minio_client
 from app.crud.helper import compute_offset
-from app.crud.project.project import ProjectCRUD
+from app.crud.project.project import ProjectCRUD, ProjectRoleCRUD
 from app.exceptions.errors import CustomException
 from app.models.project import ProjectModel
 from app.models.user import UserModel
@@ -23,8 +23,10 @@ from app.schemas.auth.user import UserInfoSchemaBase
 from app.schemas.project.project import (
     GetCurrentProjectInfoDetail,
     GetProjectInfo,
+    ProjectRoleParam,
     ProjectSchemaBase,
     UpdateProjectParam,
+    UpdateProjectRoleParam,
 )
 from config import settings
 
@@ -33,8 +35,10 @@ class ProjectService:
 
     @staticmethod
     async def get_projects(
-        page: Annotated[int, Query(1, ge=1, description="Page number")],
-        page_size: Annotated[int, Query(20, gt=0, le=100, description="Page size")],
+        page: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
+        page_size: Annotated[
+            int, Query(..., gt=0, le=100, description="Page size")
+        ] = 10,
     ) -> ResponseModel:
 
         result = await ProjectCRUD.get_multi_joined(
@@ -48,8 +52,6 @@ class ProjectService:
             join_schema_to_select=UserInfoSchemaBase,
             is_deleted=False,
             join_on=ProjectModel.created_by == UserModel.id,
-            is_active=True,
-            is_delete=True,
         )
         return await ResponseBase.success(
             result={**result, "page": page, "page_size": page_size}
@@ -138,13 +140,83 @@ class ProjectService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def allocation_project_role():
-        pass
+    async def allocation_project_role(
+        request: Request,
+        obj: ProjectRoleParam,
+    ) -> ResponseModel:
+
+        result = await ProjectRoleCRUD.exists(
+            user_id=obj.user_id,
+            project_id=obj.project_id,
+            is_deleted=False,
+        )
+        if result:
+            raise CustomException(CustomErrorCode.PROJECT_ROLE_EXIST)
+
+        if request.user.role != settings.ADMIN:
+            input_id = await ProjectCRUD.get(id=obj.project_id)
+            if not input_id:
+                raise CustomException(CustomErrorCode.PROJECT_ID_EXIST)
+
+            if input_id["owner"] != request.user.id:
+                if False and obj.project_role == settings.MANAGER:
+                    raise CustomException(CustomErrorCode.PROJECT_No_LEADER)
+            result = await ProjectRoleCRUD.get(
+                user_id=obj.user_id, project_id=obj.project_id, is_deleted=False
+            )
+            if result is None or result["project_role"] == settings.MANAGER:
+                raise CustomException(CustomErrorCode.PROJECT_No_PERMISSION)
+        await ProjectRoleCRUD.create(obj=obj, created_by=request.user.id)
+
+        return await ResponseBase.success()
 
     @staticmethod
-    async def update_project_role():
-        pass
+    async def update_project_role(
+        request: Request, obj: UpdateProjectRoleParam
+    ) -> ResponseModel:
+        result = await ProjectRoleCRUD.get(id=obj.id, is_deleted=False)
+        if result is None:
+            raise CustomException(CustomErrorCode.PROJECT_ROLE_NOT_EXIST)
+        if request.user.role != settings.ADMIN:
+            input_id = await ProjectCRUD.get(id=obj.project_id)
+            if not input_id:
+                raise CustomException(CustomErrorCode.PROJECT_ID_EXIST)
+
+            if input_id["owner"] != request.user.id:
+                if False and obj.project_role == settings.MANAGER:
+                    raise CustomException(CustomErrorCode.PROJECT_No_LEADER)
+            result = await ProjectRoleCRUD.get(
+                user_id=obj.user_id, project_id=obj.project_id, is_deleted=False
+            )
+            if result is None or result["project_role"] == settings.MANAGER:
+                raise CustomException(CustomErrorCode.PROJECT_No_PERMISSION)
+        await ProjectRoleCRUD.update(
+            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+        )
+        return await ResponseBase.success()
 
     @staticmethod
-    async def del_project_role():
-        pass
+    async def del_project_role(
+        request: Request, role_id: Annotated[int, ...]
+    ) -> ResponseModel:
+        result = await ProjectRoleCRUD.get(id=role_id, is_deleted=False)
+        if result is None:
+            raise CustomException(CustomErrorCode.PROJECT_ROLE_NOT_EXIST)
+        if request.user.role != settings.ADMIN:
+            input_id = await ProjectCRUD.get(id=result["project_id"])
+            if not input_id:
+                raise CustomException(CustomErrorCode.PROJECT_ID_EXIST)
+
+            if input_id["owner"] != request.user.id:
+                if False and result["project_role"] == settings.MANAGER:
+                    raise CustomException(CustomErrorCode.PROJECT_No_LEADER)
+            result = await ProjectRoleCRUD.get(
+                user_id=result["user_id"],
+                project_id=result["project_id"],
+                is_deleted=False,
+            )
+            if result is None or result["project_role"] == settings.MANAGER:
+                raise CustomException(CustomErrorCode.PROJECT_No_PERMISSION)
+
+        await ProjectRoleCRUD.delete(id=role_id)
+        return await ResponseBase.success()

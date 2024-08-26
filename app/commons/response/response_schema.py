@@ -159,7 +159,7 @@ class ApiResponse(JSONResponse):
     http_status_code = 200
     # 默认成功
     code = 200
-    success = True
+    success = False
     message = "success"
     result: Optional[Dict[str, Any]] = None  # 结果可以是{} 或 []
 

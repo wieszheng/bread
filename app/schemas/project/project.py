@@ -8,10 +8,9 @@
 """
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.commons.response.response_schema import ListPageRequestModel
-from app.commons.schema import PersistentDeletion, TimestampSchema
 
 
 class ProjectSchemaBase(BaseModel):
@@ -23,6 +22,7 @@ class ProjectSchemaBase(BaseModel):
     dingtalk_url: str = None
 
     @field_validator("name")
+    @classmethod
     def validate_username(cls, value: str):
         if 2 > len(value) > 6:
             raise ValueError("项目名称不能小于2大于6个字符")
@@ -50,3 +50,13 @@ class ProjectListIn(ListPageRequestModel):
     page: int = Field(default=1, ge=0, description="分页偏移量")
     page_size: int = Field(default=10, gt=0, description="每页显示数量")
     orderings: Optional[List[str]] = Field(default=["id"], description="排序字段")
+
+
+class ProjectRoleParam(BaseModel):
+    user_id: int
+    project_role: int
+    project_id: int
+
+
+class UpdateProjectRoleParam(ProjectRoleParam):
+    id: int

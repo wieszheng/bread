@@ -55,6 +55,7 @@ router.add_api_route(
 router.add_api_route(
     "/role",
     endpoint=ProjectService.allocation_project_role,
+    dependencies=[DependsJwtAuth],
     methods=["post"],
     summary="分配项目角色",
 )
@@ -62,6 +63,7 @@ router.add_api_route(
 router.add_api_route(
     "/role",
     endpoint=ProjectService.update_project_role,
+    dependencies=[DependsJwtAuth],
     methods=["put"],
     summary="修改项目角色",
 )
@@ -69,6 +71,7 @@ router.add_api_route(
 router.add_api_route(
     "/role",
     endpoint=ProjectService.del_project_role,
+    dependencies=[DependsJwtAuth],
     methods=["delete"],
     summary="删除项目角色",
 )

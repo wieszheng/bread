@@ -113,6 +113,9 @@ class CustomErrorCode(CustomCodeBase):
     PROJECT_No_PERMISSION = (13000, "你没有权限修改项目头像，请联系项目管理员 😭")
     PROJECT_NAME_EXIST = (13001, "项目名已存在")  # 项目名以存在
     PROJECT_ID_EXIST = (13001, "项目不存在，请确认")  # 项目不存在
+    PROJECT_ROLE_EXIST = (13002, "该用户已存在")
+    PROJECT_No_LEADER = (13002, "不能修改组长的权限")
+    PROJECT_ROLE_NOT_EXIST = (13002, "该用户角色不存在")
 
     # module 模块 14000 - 15000
     MODULE_HAS_CASE_ASSOCIATION = (
