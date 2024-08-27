@@ -17,12 +17,12 @@ from app.core.security.password import hash_psw
 from app.crud import BaseCRUD
 from app.crud.helper import compute_offset
 from app.exceptions.errors import CustomException
-from app.models.user import UserModel
+from app.models.user import User
 from app.schemas.auth.user import AvatarParam, RegisterUserParam
 
 
 class UserCRUD(BaseCRUD):
-    __model__ = UserModel
+    __model__ = User
 
     @classmethod
     async def update_user_role(cls, user_id: int, role: int = 2):

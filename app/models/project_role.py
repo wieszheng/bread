@@ -12,12 +12,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.models import BaseModel
 
 
-class ProjectRoleModel(BaseModel):
+class ProjectRole(BaseModel):
     """
     项目角色表
     """
 
-    __tablename__ = "project_role"
+    __tablename__ = "bread_project_role"
 
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, comment="主键ID"

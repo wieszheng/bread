@@ -108,7 +108,7 @@ class CustomErrorCode(CustomCodeBase):
     # 参数类型 12000 - 13000
     PARTNER_CODE_PARAMS_FAIL = (12000, "必填参数不能为空 😅")  # 必填参数不能为空
 
-    # project 项目 13000 - 14000
+    # 项目 13000 - 14000
     PROJECT_HAS_MODULE_ASSOCIATION = (13000, "项目有模块或用例关联，不能删除")
     PROJECT_No_PERMISSION = (13000, "你没有权限修改项目头像，请联系项目管理员 😭")
     PROJECT_NAME_EXIST = (13001, "项目名已存在")  # 项目名以存在
@@ -116,6 +116,12 @@ class CustomErrorCode(CustomCodeBase):
     PROJECT_ROLE_EXIST = (13002, "该用户已存在")
     PROJECT_No_LEADER = (13002, "不能修改组长的权限")
     PROJECT_ROLE_NOT_EXIST = (13002, "该用户角色不存在")
+
+    ENVIRONMENT_NAME_EXIST = (14000, "环境名已存在")
+    ENVIRONMENT_ID_NOT_EXIST = (14001, "环境不存在,请检查")
+
+    ADDRESS_NAME_EXIST = (14100, "网关名已存在")
+    ADDRESS_ID_NOT_EXIST = (14101, "网关不存在,请检查")
 
     # module 模块 14000 - 15000
     MODULE_HAS_CASE_ASSOCIATION = (

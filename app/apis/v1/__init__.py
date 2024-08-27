@@ -10,11 +10,12 @@ from fastapi import APIRouter, FastAPI
 from loguru import logger
 
 from app.apis.v1.auth import user
+from app.apis.v1.config import address, environment, global_config
 from app.apis.v1.project import project
 
 v1 = APIRouter(prefix="/v1")
 
-RegisterRouterList = [user, project]
+RegisterRouterList = [user, project, address, environment, global_config]
 
 for item in RegisterRouterList:
     v1.include_router(item.router)

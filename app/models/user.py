@@ -15,12 +15,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.models import BaseModel
 
 
-class UserModel(BaseModel):
+class User(BaseModel):
     """
     用户信息表
     """
 
-    __tablename__ = "sys_user"
+    __tablename__ = "bread_user"
 
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, comment="主键ID"

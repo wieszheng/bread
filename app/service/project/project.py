@@ -17,8 +17,8 @@ from app.core.client.miNio import minio_client
 from app.crud.helper import compute_offset
 from app.crud.project.project import ProjectCRUD, ProjectRoleCRUD
 from app.exceptions.errors import CustomException
-from app.models.project import ProjectModel
-from app.models.user import UserModel
+from app.models.project import Project
+from app.models.user import User
 from app.schemas.auth.user import UserInfoSchemaBase
 from app.schemas.project.project import (
     GetCurrentProjectInfoDetail,
@@ -46,12 +46,12 @@ class ProjectService:
             offset=compute_offset(page, page_size),
             sort_columns=["id"],
             sort_orders=["desc"],
-            join_model=UserModel,
+            join_model=User,
             join_prefix="user_",
             schema_to_select=GetCurrentProjectInfoDetail,
             join_schema_to_select=UserInfoSchemaBase,
             is_deleted=False,
-            join_on=ProjectModel.created_by == UserModel.id,
+            join_on=Project.created_by == User.id,
         )
         return await ResponseBase.success(
             result={**result, "page": page, "page_size": page_size}

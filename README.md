@@ -68,6 +68,7 @@ docker-compose -f docker-compose.yml up -d
 
 ```shell
 black . # 格式化代码
+isort . --profile black 
 
 git commit -m "✨ feat: 添加新功能"
 git push origin main

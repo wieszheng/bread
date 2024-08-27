@@ -12,12 +12,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.models import BaseModel
 
 
-class ProjectModel(BaseModel):
+class Project(BaseModel):
     """
     项目表
     """
 
-    __tablename__ = "project"
+    __tablename__ = "bread_project"
 
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, comment="主键ID"

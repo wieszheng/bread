@@ -7,16 +7,16 @@
 @Software : PyCharm
 """
 from app.crud import BaseCRUD
-from app.models.project import ProjectModel
-from app.models.project_role import ProjectRoleModel
+from app.models.project import Project
+from app.models.project_role import ProjectRole
 
 
 class ProjectCRUD(BaseCRUD):
-    __model__ = ProjectModel
+    __model__ = Project
 
     pass
 
 
 class ProjectRoleCRUD(BaseCRUD):
-    __model__ = ProjectRoleModel
+    __model__ = ProjectRole
     pass
