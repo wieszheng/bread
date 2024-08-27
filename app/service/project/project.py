@@ -44,8 +44,8 @@ class ProjectService:
         result = await ProjectCRUD.get_multi_joined(
             limit=page_size,
             offset=compute_offset(page, page_size),
-            sort_columns=["id"],
-            sort_orders=["desc"],
+            sort_columns="id",
+            sort_orders="desc",
             join_model=User,
             join_prefix="user_",
             schema_to_select=GetCurrentProjectInfoDetail,

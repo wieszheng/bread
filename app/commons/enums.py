@@ -18,6 +18,10 @@ class RoleType(IntEnum):
 
 
 class HttpMethod(Enum):
+    """
+    请求方式
+    """
+
     GET = "GET"
     POST = "POST"
     PATCH = "PATCH"
@@ -33,3 +37,11 @@ class RespFmt(Enum):
     JSON = "json"
     BYTES = "bytes"
     TEXT = "text"
+
+
+class KeyType(Enum):
+    """变量属性"""
+
+    STRING = 0
+    JSON = 1
+    YAML = 2

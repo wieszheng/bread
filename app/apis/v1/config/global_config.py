@@ -20,3 +20,33 @@ router.add_api_route(
     methods=["post"],
     summary="新增全局变量",
 )
+
+router.add_api_route(
+    "",
+    endpoint=GlobalConfigService.get_global_config,
+    methods=["get"],
+    summary="查询全局信息",
+)
+
+router.add_api_route(
+    "",
+    endpoint=GlobalConfigService.delete_global_config,
+    dependencies=[DependsJwtAuth],
+    methods=["delete"],
+    summary="删除全局变量",
+)
+
+router.add_api_route(
+    "",
+    endpoint=GlobalConfigService.update_global_config,
+    dependencies=[DependsJwtAuth],
+    methods=["put"],
+    summary="修改全局变量",
+)
+
+router.add_api_route(
+    "list",
+    endpoint=GlobalConfigService.get_global_configs,
+    methods=["post"],
+    summary="获取全局变量（支持条件查询）",
+)

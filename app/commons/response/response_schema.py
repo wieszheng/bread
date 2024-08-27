@@ -41,7 +41,7 @@ class ListPageRequestModel(BaseModel):
     page: int = Field(default=1, ge=0, description="分页偏移量")
     page_size: int = Field(default=10, gt=0, description="每页显示数量")
     query_params: Optional[dict] = Field(default={}, description="查询参数")
-    orderings: Optional[List[str]] = Field(default=["id"], description="排序字段")
+    orderings: Optional[str] = Field(default="id", description="排序字段")
 
 
 class ListResponseDataModel(BaseModel):

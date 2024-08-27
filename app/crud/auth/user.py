@@ -71,11 +71,11 @@ class UserCRUD(BaseCRUD):
         limit: int = 10,
         offset: int = 1,
         filter_params: dict = None,
-        orderings: list[str] = None,
+        orderings: str = None,
         schema_to_select: Type[BaseModel] | None = None,
     ):
         if not orderings:
-            orderings = ["id"]
+            orderings = "id"
         if not filter_params:
             filter_params = {}
 
@@ -83,7 +83,7 @@ class UserCRUD(BaseCRUD):
             limit=limit,
             offset=compute_offset(offset, limit),
             sort_columns=orderings,
-            sort_orders=["desc"],
+            sort_orders="desc",
             schema_to_select=schema_to_select,
             is_deleted=False,
             **filter_params

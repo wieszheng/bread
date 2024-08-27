@@ -15,16 +15,20 @@ from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.crud.config.address import AddressCRUD
 from app.crud.config.environment import EnvironmentCRUD
 from app.exceptions.errors import CustomException
-from app.schemas.config.address import AddressSchemaBase, UpdateAddressParam
+from app.schemas.config.address import (
+    AddressListInParam,
+    AddressSchemaBase,
+    UpdateAddressParam,
+)
 
 
 class AddressService:
     @staticmethod
     async def create_address(request: Request, obj: AddressSchemaBase) -> ResponseModel:
         input_env_id = await EnvironmentCRUD.exists(id=obj.env)
-        # if not input_env_id:
-        #     raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
-        input_address_name = await AddressCRUD.exists(name=obj.name)
+        if not input_env_id:
+            raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
+        input_address_name = await AddressCRUD.exists(name=obj.name, is_deleted=True)
         if input_address_name:
             raise CustomException(CustomErrorCode.ADDRESS_NAME_EXIST)
         result = await AddressCRUD.create(obj=obj, created_by=request.user.id)
@@ -59,5 +63,16 @@ class AddressService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def get_address_list(obj) -> ResponseModel:
-        return await ResponseBase.success()
+    async def get_address_list(obj: AddressListInParam) -> ResponseModel:
+        query_params = obj.query_params.dict() if obj.query_params else {}
+        query_params = {k: v for k, v in query_params.items()}
+        result = await AddressCRUD.get_list(
+            filter_params=query_params,
+            orderings=obj.orderings,
+            limit=obj.page_size,
+            offset=obj.page,
+        )
+
+        return await ResponseBase.success(
+            result={**result, "page": obj.page, "page_size": obj.page_size}
+        )

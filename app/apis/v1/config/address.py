@@ -24,7 +24,6 @@ router.add_api_route(
 router.add_api_route(
     "",
     endpoint=AddressService.get_address,
-    dependencies=[DependsJwtAuth],
     methods=["get"],
     summary="查询网关地址",
 )
@@ -48,6 +47,6 @@ router.add_api_route(
 router.add_api_route(
     "/list",
     endpoint=AddressService.get_address_list,
-    methods=["get"],
+    methods=["post"],
     summary="获取网关地址（支持条件查询）",
 )

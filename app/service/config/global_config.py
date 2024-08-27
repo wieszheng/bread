@@ -7,9 +7,26 @@
 @Software : PyCharm
 """
 from app.commons.response.response_schema import ResponseBase, ResponseModel
+from app.schemas.config.global_config import GlobalConfigSchemaBase
 
 
 class GlobalConfigService:
     @staticmethod
-    async def create_global_config(obj) -> ResponseModel:
+    async def create_global_config(obj: GlobalConfigSchemaBase) -> ResponseModel:
+        return await ResponseBase.success()
+
+    @staticmethod
+    async def get_global_config(obj) -> ResponseModel:
+        return await ResponseBase.success()
+
+    @staticmethod
+    async def delete_global_config(obj) -> ResponseModel:
+        return await ResponseBase.success()
+
+    @staticmethod
+    async def update_global_config(obj) -> ResponseModel:
+        return await ResponseBase.success()
+
+    @staticmethod
+    async def get_global_configs(obj) -> ResponseModel:
         return await ResponseBase.success()

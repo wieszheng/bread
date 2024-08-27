@@ -24,7 +24,6 @@ router.add_api_route(
 router.add_api_route(
     "",
     endpoint=EnvironmentService.get_environment,
-    dependencies=[DependsJwtAuth],
     methods=["get"],
     summary="查询环境信息",
 )
@@ -48,6 +47,6 @@ router.add_api_route(
 router.add_api_route(
     "/list",
     endpoint=EnvironmentService.get_environments,
-    methods=["get"],
+    methods=["post"],
     summary="获取环境信息（支持条件查询）",
 )

@@ -6,8 +6,11 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+from app.commons.response.response_schema import ListPageRequestModel
 
 
 class AddressSchemaBase(BaseModel):
@@ -18,3 +21,12 @@ class AddressSchemaBase(BaseModel):
 
 class UpdateAddressParam(AddressSchemaBase):
     id: int
+
+
+class AddressQuery(BaseModel):
+    env: Optional[int] = Field(default=None, description="环境")
+    name: Optional[str] = Field(default=None, description="环境名称")
+
+
+class AddressListInParam(ListPageRequestModel):
+    query_params: Optional[AddressQuery] = Field(default={}, description="查询参数")
