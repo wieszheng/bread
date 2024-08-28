@@ -37,7 +37,10 @@ jobs:
         run:  |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
+      - uses: actions/checkout@v3
+      - name: 构建Docker镜像
+        run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPOSITORY }}:${{ github.run_id }}
+        
   code-quality:
     name: 'Code-Quality 💎'
     needs: build
