@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Create and publish a Docker Image
 
 on:
   push:
@@ -9,10 +9,11 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  BUILD_VERSION: latest
 
 jobs:
   build:
-    name: 'build-and-push-image 🏗'
+    name: "Build and Push Docker Image 🏗"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,8 +43,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
@@ -53,8 +57,3 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-#      - name: Build the Docker image
-#        run:
-#          | # 使用 上一步写的 Dockerfile 构建镜像并发布到私有仓库； 发布完成可以去 https://github.com/MrGaoGang?tab=packages 查看
-#          docker build . --file Dockerfile --tag ghcr.io/wieszheng/bread-image:latest
-#          docker push ghcr.io/wieszheng/bread-image:latest
