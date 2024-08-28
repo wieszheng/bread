@@ -47,7 +47,6 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
-          github-token: ${{ secrets.HUB_GITHUB_TOKEN }}
 
 #      - name: Build the Docker image
 #        run:
