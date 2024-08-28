@@ -4,12 +4,12 @@ FROM python:3.12-slim as requirements-stage
 WORKDIR /bread
 COPY ./requirements.txt .
 
+RUN python -m venv /bread/venv \
+    && /bread/venv/bin/pip install --no-cache-dir --upgrade -r requirements.txt
+
 RUN apt update -y \
     && apt install -y tzdata wget \
     && apt clean \
-
-RUN python -m venv /bread/venv \
-    && /bread/venv/bin/pip install --no-cache-dir --upgrade -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 
 # --------- final image build ---------
 
