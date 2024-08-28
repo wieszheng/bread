@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.10"
 services:
   minio:
     image: minio/minio:RELEASE.2023-02-09T05-16-53Z
@@ -75,8 +75,10 @@ services:
 
 networks:
   server_network:
+    name: server_network
     driver: bridge
     ipam:
+      driver: default
       config:
         - subnet: 192.168.20.0/24 # 指定网络的子网掩码，需包含服务IP地址
           gateway: 192.168.20.1
