@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_REPOSITORY }}:${{ github.run_id }}
+      run: docker build . --file Dockerfile --tag bread:${{ github.run_id }}
