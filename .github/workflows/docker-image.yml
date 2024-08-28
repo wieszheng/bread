@@ -14,7 +14,12 @@ jobs:
   build:
     name: 'build-and-push-image 🏗'
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,7 +39,7 @@ jobs:
 
       - name: Build and push Docker image
         id: push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
