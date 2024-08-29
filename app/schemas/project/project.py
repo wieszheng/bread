@@ -34,7 +34,7 @@ class UpdateProjectParam(ProjectSchemaBase):
 
 
 class GetProjectInfo(ProjectSchemaBase):
-    avatar: str | None = Field(serialization_alias="avatar_project")
+    avatar: str | None = None
 
 
 class GetCurrentProjectInfoDetail(GetProjectInfo):

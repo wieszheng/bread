@@ -7,6 +7,8 @@ services:
       TZ: Asia/Shanghai
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
+      MINIO_ACCESS_KEY: kSv4Se6lcae80x3k
+      MINIO_SECRET_KEY: my8Xi5Gbbi6FydBFmpM8pxKPLuG83oDu
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -54,8 +56,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        buildno: 1
     restart: always
     env_file:
       - /conf/.env.prod

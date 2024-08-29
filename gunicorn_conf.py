@@ -18,9 +18,9 @@ if max_workers_str:
 web_concurrency_str = os.getenv("WEB_CONCURRENCY", None)
 
 host = os.getenv("HOST", "0.0.0.0")
-port = os.getenv("PORT", "80")
+port = os.getenv("PORT", "9099")
 bind_env = os.getenv("BIND", None)
-use_loglevel = os.getenv("LOG_LEVEL", "info")
+use_loglevel = os.getenv("LOG_LEVEL", "debug")
 if bind_env:
     use_bind = bind_env
 else:
@@ -36,9 +36,9 @@ else:
     web_concurrency = max(int(default_web_concurrency), 2)
     if use_max_workers:
         web_concurrency = min(web_concurrency, use_max_workers)
-accesslog_var = os.getenv("ACCESS_LOG", "-")
+accesslog_var = os.getenv("ACCESS_LOG", "/bread/logs/access.log")
 use_accesslog = accesslog_var or None
-errorlog_var = os.getenv("ERROR_LOG", "-")
+errorlog_var = os.getenv("ERROR_LOG", "/bread/logs/debug.log")
 use_errorlog = errorlog_var or None
 graceful_timeout_str = os.getenv("GRACEFUL_TIMEOUT", "120")
 timeout_str = os.getenv("TIMEOUT", "120")
@@ -72,4 +72,3 @@ log_data = {
     "host": host,
     "port": port,
 }
-print(json.dumps(log_data))
