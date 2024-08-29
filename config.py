@@ -10,7 +10,7 @@
 import os
 import sys
 import time
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser
 from functools import lru_cache
 
 from dotenv import load_dotenv
@@ -157,7 +157,6 @@ class MinioSettings(BaseSettings):
     MINIO_BUCKET_SECRET_KEY: str
 
 
-@lru_cache()
 def get_env_file() -> str:
     """
     .env 文件路径
@@ -194,14 +193,15 @@ class Settings(
     RedisSettings,
     MinioSettings,
 ):
-    """
-    获取配置
-    """
+    pass
 
-    def __init__(self, **values):
-        parse_cli_args()
-        super().__init__(**values)
+
+@lru_cache
+def get_settings() -> Settings:
+    """获取全局配置"""
+    parse_cli_args()
+    return Settings()
 
 
 # 实例化获取配置类
-settings = Settings()
+settings = get_settings()

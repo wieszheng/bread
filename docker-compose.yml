@@ -57,12 +57,18 @@ services:
       args:
         buildno: 1
     restart: always
+    env_file:
+      - /conf/.env.prod
     environment:
       TZ: Asia/Shanghai
+      MINIO_HOST: 192.168.20.15
+      MINIO_PORT: 9000
+      MYSQL_HOST: 192.168.20.16
+      MYSQL_PORT: 3306
     volumes:
       - /bread/logs:/bread/logs
     ports:
-      - "5021:5021"
+      - "9099:9099"
     depends_on:
       - minio
       - mysql
