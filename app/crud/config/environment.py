@@ -21,19 +21,14 @@ class EnvironmentCRUD(BaseCRUD):
         cls,
         limit: int = 10,
         offset: int = 1,
-        filter_params: dict = None,
-        orderings: str = None,
+        name: str = None,
     ):
-        if not orderings:
-            orderings = "id"
-        if not filter_params:
-            filter_params = {}
-
+        filter_params = {}
+        if name:
+            filter_params = {"name": name}
         return await cls.get_multi_joined(
             limit=limit,
             offset=compute_offset(offset, limit),
-            sort_columns=orderings,
-            sort_orders="desc",
             joins_config=[
                 JoinConfig(
                     model=User,

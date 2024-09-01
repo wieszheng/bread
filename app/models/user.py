@@ -38,7 +38,11 @@ class User(BaseModel):
     email: Mapped[str] = mapped_column(
         String(100), unique=True, comment="电子邮箱，唯一"
     )
-    avatar: Mapped[Optional[str]] = mapped_column(String(255), comment="头像链接或路径")
+    avatar: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        default="http://82.157.176.120:8000/bread/commons/2282.gif",
+        comment="头像链接或路径",
+    )
     role: Mapped[int] = mapped_column(
         default=0, comment="0: 普通用户 1: 组长 2: 超级管理员"
     )

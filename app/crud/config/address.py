@@ -18,22 +18,15 @@ class AddressCRUD(BaseCRUD):
 
     @classmethod
     async def get_list(
-        cls,
-        limit: int = 10,
-        offset: int = 1,
-        filter_params: dict = None,
-        orderings: str = None,
+        cls, limit: int = 10, offset: int = 1, name: str = None, env: int = None
     ):
-        if not orderings:
-            orderings = "id"
-        if not filter_params:
-            filter_params = {}
+        filter_params = {}
+        if name or env:
+            filter_params = {"name": name, "env": env}
 
         return await cls.get_multi_joined(
             limit=limit,
             offset=compute_offset(offset, limit),
-            sort_columns=orderings,
-            sort_orders="desc",
             joins_config=[
                 JoinConfig(
                     model=User,

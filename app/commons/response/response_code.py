@@ -98,7 +98,8 @@ class CustomErrorCode(CustomCodeBase):
     NEW_PWD_NO_OLD_PWD_EQUAL = (10007, "新密码不能与旧密码相同")
     OLD_PASSWORD_ERROR = (10008, "旧密码错误")
     USER_ACCOUNT_LOCKED = (10009, "用户账号被锁定，请联系管理员 😭")
-    YOU_INFO = (10010, "只能修改自己的信息呦 👉")  # 账号或密码错误
+    USER_IS_ADMIN = (10010, "不可操作超级管理员")
+    YOU_INFO = (10010, "只能修改自己的信息呦 👉")
     # 用户状态 验证  11000 - 12000
     PARTNER_CODE_TOKEN_EXPIRED_FAIL = (
         11000,

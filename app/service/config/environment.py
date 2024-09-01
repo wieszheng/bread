@@ -8,17 +8,13 @@
 """
 from typing import Annotated
 
-from fastapi import Request
+from fastapi import Query, Request
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.crud.config.environment import EnvironmentCRUD
 from app.exceptions.errors import CustomException
-from app.schemas.config.environment import (
-    EnvironmentListInParam,
-    EnvironmentSchemaBase,
-    UpdateEnvironmentParam,
-)
+from app.schemas.config.environment import EnvironmentSchemaBase, UpdateEnvironmentParam
 
 
 class EnvironmentService:
@@ -65,15 +61,16 @@ class EnvironmentService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def get_environments(obj: EnvironmentListInParam) -> ResponseModel:
+    async def get_environments(
+        current: Annotated[int, Query(...)] = 1,
+        pageSize: Annotated[int, Query(...)] = 10,
+        name: Annotated[str | None, Query(description="环境名称")] = None,
+    ) -> ResponseModel:
 
         result = await EnvironmentCRUD.get_list(
-            filter_params=obj.query_params,
-            orderings=obj.orderings,
-            limit=obj.page_size,
-            offset=obj.page,
+            limit=current, offset=pageSize, name=name
         )
 
         return await ResponseBase.success(
-            result={**result, "page": obj.page, "page_size": obj.page_size}
+            result={**result, "current": current, "pageSize": pageSize}
         )

@@ -59,32 +59,3 @@ class UserCRUD(BaseCRUD):
     async def reset_password(cls, user_id: int, new_password: str):
         await cls.update(obj={"password": await hash_psw(new_password)}, id=user_id)
         return ""
-
-    @classmethod
-    async def update_avatar(cls, username: str, avatar: AvatarParam):
-        await cls.update(obj={"avatar": avatar.url}, username=username)
-        return ""
-
-    @classmethod
-    async def get_list(
-        cls,
-        limit: int = 10,
-        offset: int = 1,
-        filter_params: dict = None,
-        orderings: str = None,
-        schema_to_select: Type[BaseModel] | None = None,
-    ):
-        if not orderings:
-            orderings = "id"
-        if not filter_params:
-            filter_params = {}
-
-        return await cls.get_multi(
-            limit=limit,
-            offset=compute_offset(offset, limit),
-            sort_columns=orderings,
-            sort_orders="desc",
-            schema_to_select=schema_to_select,
-            is_deleted=False,
-            **filter_params
-        )

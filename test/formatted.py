@@ -47,3 +47,7 @@ formatted_lines = [
 
 # 输出格式化的结果
 print("".join(formatted_lines))
+name = None
+if not name:
+    filters = {"name__like": name}
+    print(filters)

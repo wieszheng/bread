@@ -31,7 +31,7 @@ router.add_api_route(
 )
 
 router.add_api_route(
-    "/{username}",
+    "/{userId}",
     endpoint=UserService.get_user,
     response_model_exclude={"result": {"password"}},
     dependencies=[DependsJwtAuth],
@@ -55,7 +55,7 @@ router.add_api_route(
 )
 
 router.add_api_route(
-    "/{username}/avatar",
+    "/avatar",
     endpoint=UserService.update_avatar,
     dependencies=[DependsJwtAuth],
     methods=["put"],
@@ -63,17 +63,17 @@ router.add_api_route(
 )
 
 router.add_api_route(
-    "/{username}",
+    "",
     endpoint=UserService.update_user,
     methods=["put"],
     summary="更新用户信息",
-    dependencies=[Depends(RequestPermission(settings.MEMBER)), DependsJwtAuth],
+    dependencies=[DependsJwtAuth],
 )
 
 router.add_api_route(
     "",
     endpoint=UserService.get_pagination_users,
-    methods=["post"],
+    methods=["get"],
     summary="（支持条件）分页获取所有用户",
 )
 
@@ -83,5 +83,21 @@ router.add_api_route(
     methods=["delete"],
     summary="用户注销",
     description="用户注销 != 用户登出，注销之后用户将从数据库逻辑删除",
+    dependencies=[Depends(RequestPermission(settings.ADMIN)), DependsJwtAuth],
+)
+
+router.add_api_route(
+    "/is_valid",
+    endpoint=UserService.is_valid,
+    methods=["put"],
+    summary="用户状态是否可用",
+    dependencies=[Depends(RequestPermission(settings.ADMIN)), DependsJwtAuth],
+)
+
+router.add_api_route(
+    "/role",
+    endpoint=UserService.update_user_role,
+    methods=["put"],
+    summary="用户权限和账号",
     dependencies=[Depends(RequestPermission(settings.ADMIN)), DependsJwtAuth],
 )

@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field, field_serializer
@@ -143,9 +143,7 @@ CUSTOM_USAGE_ERROR_MESSAGES = {
 
 
 class TimestampSchema(BaseModel):
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC).replace(tzinfo=None)
-    )
+    created_at: datetime = Field(default_factory=lambda: datetime.now)
     updated_at: datetime = Field(default=None)
 
     @field_serializer("created_at")
@@ -168,10 +166,3 @@ class TimestampSchema(BaseModel):
 class PersistentDeletion(BaseModel):
     deleted_at: datetime | None = Field(default=None)
     is_deleted: bool = False
-
-    @field_serializer("deleted_at")
-    def serialize_dates(self, deleted_at: datetime | None, _info: Any) -> str | None:
-        if deleted_at is not None:
-            return deleted_at.isoformat()
-
-        return None

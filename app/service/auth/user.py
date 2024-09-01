@@ -6,24 +6,28 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from fastapi import Path, Request
+import uuid
+
+from fastapi import File, Path, Query, Request, UploadFile
 from typing_extensions import Annotated
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
+from app.core.client.miNio import minio_client
 from app.core.security.Jwt import create_access_token
 from app.core.security.password import verify_psw
 from app.crud.auth.user import UserCRUD
+from app.crud.helper import compute_offset
 from app.exceptions.errors import CustomException, PermissionException
 from app.schemas.auth.user import (
     AuthLoginParam,
-    AvatarParam,
-    GetCurrentUserInfoDetail,
+    CurrentUserIns,
     GetUserInfoNoRelationDetail,
     RegisterUserParam,
     ResetPasswordParam,
+    UpdateUserControlParam,
     UpdateUserParam,
-    UserListIn,
+    UpdateUserRoleParam,
 )
 
 
@@ -41,35 +45,13 @@ class UserService:
         result = {"data": data, "access_token": access_token, "token_type": "Bearer"}
         return await ResponseBase.success(result=result)
 
-    # @staticmethod
-    # async def get_current_user_info(
-    #         credentials: Annotated[HTTPAuthorizationCredentials, DependsJwtAuth]
-    # ) -> ResponseModel:
-    #     """
-    #     个人信息
-    #     returns the current user
-    #     """
-    #     # token = request.headers.get('Authorization')
-    #     # if not token:
-    #     #     return
-    #     scheme, token = get_authorization_scheme_param(token)
-    #     if credentials.scheme.lower() != "bearer":
-    #         return await ResponseBase.fail()
-    #
-    #     sub = await Jwt.decode_jwt_token(credentials.credentials)
-    #     current_user = await Jwt.get_current_user(sub)
-    #     data = GetCurrentUserInfoDetail.model_validate(current_user).model_dump()
-    #
-    #     return await ResponseBase.success(result=data)
     @staticmethod
     async def get_current_user_info(request: Request) -> ResponseModel:
         """
         个人信息
         returns the current user
         """
-
-        data = GetCurrentUserInfoDetail(**request.user.model_dump()).model_dump()
-        return await ResponseBase.success(result=data)
+        return await ResponseBase.success(result=request.user.model_dump())
 
     @staticmethod
     async def login(obj: AuthLoginParam) -> ResponseModel:
@@ -91,9 +73,7 @@ class UserService:
 
         access_token = await create_access_token(current_user["id"])
         await UserCRUD.update_login_time(current_user["id"])
-        data = GetUserInfoNoRelationDetail.model_validate(current_user).model_dump()
         result = {
-            "data": data,
             "access_token": access_token,
             "token_type": "Bearer",
         }
@@ -124,40 +104,58 @@ class UserService:
 
     @staticmethod
     async def update_avatar(
-        request: Request, username: Annotated[str, Path(...)], avatar: AvatarParam
+        request: Request, avatar: UploadFile = File(..., description="上传的头像文件")
     ) -> ResponseModel:
         """
         更新头像
         :return:
         """
-        if request.user.role < 2:
-            if request.user.username != username:
-                raise PermissionException("不可操作,暂无权限！")
-        input_user = await UserCRUD.exists(username=username)
-        if not input_user:
-            raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
-        await UserCRUD.update_avatar(username, avatar)
-        return await ResponseBase.success()
+        random_suffix = str(uuid.uuid4()).replace("-", "")
+        object_name = (
+            f"{request.user.id}/{random_suffix}.{avatar.filename.split('.')[-1]}"
+        )
+        minio_client.upload_file(
+            object_name, avatar.file, content_type=avatar.content_type
+        )
+
+        avatar_url = minio_client.pre_signature_get_object_url(object_name)
+        await UserCRUD.update(
+            obj={"avatar": avatar_url.split("?", 1)[0], "updated_by": request.user.id},
+            id=request.user.id,
+        )
+        return await ResponseBase.success(
+            result={"avatar": avatar_url.split("?", 1)[0]}
+        )
 
     @staticmethod
-    async def get_pagination_users(obj: UserListIn) -> ResponseModel:
+    async def get_pagination_users(
+        current: Annotated[int, Query(...)] = 1,
+        pageSize: Annotated[int, Query(...)] = 10,
+        nickname: Annotated[str | None, Query(description="用户昵称")] = None,
+        id: Annotated[int | None, Query(description="用户ID")] = None,
+    ) -> ResponseModel:
         """
         分页查询用户
         :return:
         """
-        query_params = obj.query_params.dict() if obj.query_params else {}
-        query_params = {k: v for k, v in query_params.items()}
+        filter_params = {}
+        if nickname or id:
+            filter_params = {"nickname": nickname, "id": id}
+        sorting = ()
 
-        result = await UserCRUD.get_list(
-            filter_params=query_params,
-            orderings=obj.orderings,
-            limit=obj.page_size,
-            offset=obj.page,
-            schema_to_select=GetUserInfoNoRelationDetail,
+        result = await UserCRUD.get_multi(
+            limit=pageSize,
+            offset=compute_offset(current, pageSize),
+            is_deleted=False,
+            schema_to_select=CurrentUserIns,
+            # return_as_model=True,
+            # sort_columns='username',
+            # sort_orders='desc',
+            **filter_params,
         )
 
         return await ResponseBase.success(
-            result={**result, "page": obj.page, "page_size": obj.page_size}
+            result={**result, "current": current, "pageSize": pageSize}
         )
 
     @staticmethod
@@ -182,33 +180,28 @@ class UserService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def get_user(username: Annotated[str, Path(...)]) -> ResponseModel:
+    async def get_user(userId: Annotated[int, Path(...)]) -> ResponseModel:
         """
         获取用户
         :return:
         """
-        input_user = await UserCRUD.get(username=username)
+        input_user = await UserCRUD.get(id=userId)
         return await ResponseBase.success(result=input_user)
 
     @staticmethod
     async def update_user(
         request: Request,
-        username: Annotated[str, Path(...)],
         obj: UpdateUserParam,
     ) -> ResponseModel:
         """
         更新用户
         :return:
         """
-        if request.user.username != username:
+        if request.user.id != obj.id:
             raise CustomException(CustomErrorCode.YOU_INFO)
-        input_user = await UserCRUD.get(username=username)
+        input_user = await UserCRUD.get(id=obj.id)
         if not input_user:
             raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
-        if input_user["username"] != obj.username:
-            _username = await UserCRUD.get(username=obj.username)
-            if _username:
-                raise CustomException(CustomErrorCode.USERNAME_OR_EMAIL_IS_REGISTER)
         if input_user["nickname"] != obj.nickname:
             nickname = await UserCRUD.get(nickname=obj.nickname)
             if nickname:
@@ -218,4 +211,37 @@ class UserService:
             if email:
                 raise CustomException(CustomErrorCode.USER_EMAIL_OR_EMAIL_IS_REGISTER)
         await UserCRUD.update(obj=obj, id=input_user["id"])
+        return await ResponseBase.success()
+
+    @staticmethod
+    async def is_valid(
+        request: Request,
+        obj: UpdateUserControlParam,
+    ) -> ResponseModel:
+
+        result = await UserCRUD.get(id=obj.id)
+        if not result:
+            raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
+        if result["role"] == 2:
+            if request.user.id != obj.id or request.user.id == obj.id:
+                raise PermissionException("不可操作其他管理员信息,警告！")
+
+        await UserCRUD.update(
+            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+        )
+        return await ResponseBase.success()
+
+    @staticmethod
+    async def update_user_role(
+        request: Request, obj: UpdateUserRoleParam
+    ) -> ResponseModel:
+        result = await UserCRUD.get(id=obj.id)
+        if not result:
+            raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
+        if result["role"] == 2:
+            if request.user.id != obj.id or request.user.id == obj.id:
+                raise PermissionException("不可操作其他管理员信息,警告！")
+        await UserCRUD.update(
+            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+        )
         return await ResponseBase.success()

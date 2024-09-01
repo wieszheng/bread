@@ -14,14 +14,14 @@ from fastapi.middleware.cors import CORSMiddleware
 def add_cors_middleware(_app: FastAPI):
     # 前端页面url
     origins = [
-        "http://localhost:8088",
-        "http://127.0.0.1:8088",
+        "http://localhost:6066",
+        "http://127.0.0.1:6066",
     ]
 
     # 后台api允许跨域
     _app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,  # 允许的来源，可以是字符串、字符串列表，或通配符 "*"
+        allow_origins=["*"],  # 允许的来源，可以是字符串、字符串列表，或通配符 "*"
         allow_credentials=True,  # 是否允许携带凭证（例如，使用 HTTP 认证、Cookie 等）
         allow_methods=["*"],  # 允许的 HTTP 方法，可以是字符串、字符串列表，或通配符 "*"
         allow_headers=[

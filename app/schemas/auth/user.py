@@ -74,29 +74,8 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     is_valid: bool
     last_login_at: datetime | None = None
 
-    @field_serializer("last_login_at")
-    def serialize_dt(self, last_login_at: datetime | None, _info: Any) -> str | None:
-        if last_login_at is not None:
-            return last_login_at.strftime("%Y-%m-%d %H:%M:%S")
 
-        return None
-
-
-class GetCurrentUserInfoDetail(GetUserInfoNoRelationDetail):
-    model_config = ConfigDict(from_attributes=True)
-
-    created_at: datetime
-
-
-class GetUserInfoNoRelationDetail(GetUserInfoNoRelationDetail):
-    model_config = ConfigDict(from_attributes=True)
-
-
-class GetUserInfoListDetails(GetUserInfoNoRelationDetail):
-    model_config = ConfigDict(from_attributes=True)
-
-
-class CurrentUserIns(GetUserInfoListDetails):
+class CurrentUserIns(GetUserInfoNoRelationDetail):
     model_config = ConfigDict(from_attributes=True)
 
     created_at: datetime | None = None
@@ -110,18 +89,24 @@ class ResetPasswordParam(BaseModel):
     confirm_password: str
 
 
-class UpdateUserParam(UserInfoSchemaBase):
-    pass
+class UpdateUserParam(BaseModel):
+    id: int
+    nickname: str = None
+    email: EmailStr = Field(..., example="user@qq.com")
+    phone: CustomPhoneNumber | None = None
 
 
 class AvatarParam(BaseModel):
     url: HttpUrl = Field(..., description="头像 http 地址")
 
 
-class UserListQuery(BaseModel):
-    username: Optional[str] = Field(default=None, description="用户账号")
-    nickname: Optional[str] = Field(default=None, description="用户昵称")
+class UpdateUserControlParam(BaseModel):
+    id: int = Field(description="用户id")
+    is_valid: bool = Field(default=False, description="是否激活")
 
 
-class UserListIn(ListPageRequestModel):
-    query_params: Optional[UserListQuery] = Field(default={}, description="查询参数")
+class UpdateUserRoleParam(BaseModel):
+    id: int = Field(description="用户id")
+    role: int = Field(description="用户权限")
+    username: str = None
+    email: EmailStr = Field(example="user@qq.com")

@@ -8,7 +8,7 @@
 """
 from typing import Annotated
 
-from fastapi import Request
+from fastapi import Query, Request
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
@@ -63,16 +63,20 @@ class AddressService:
         return await ResponseBase.success()
 
     @staticmethod
-    async def get_address_list(obj: AddressListInParam) -> ResponseModel:
-        query_params = obj.query_params.dict() if obj.query_params else {}
-        query_params = {k: v for k, v in query_params.items()}
+    async def get_address_list(
+        current: Annotated[int, Query(...)] = 1,
+        pageSize: Annotated[int, Query(...)] = 10,
+        env: Annotated[int | None, Query(description="环境ID")] = None,
+        name: Annotated[str | None, Query(description="网关名称")] = None,
+    ) -> ResponseModel:
+
         result = await AddressCRUD.get_list(
-            filter_params=query_params,
-            orderings=obj.orderings,
-            limit=obj.page_size,
-            offset=obj.page,
+            limit=pageSize,
+            offset=current,
+            name=name,
+            env=env,
         )
 
         return await ResponseBase.success(
-            result={**result, "page": obj.page, "page_size": obj.page_size}
+            result={**result, "current": current, "pageSize": pageSize}
         )
