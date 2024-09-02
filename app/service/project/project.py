@@ -35,15 +35,15 @@ class ProjectService:
 
     @staticmethod
     async def get_projects(
-        page: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
-        page_size: Annotated[
+        current: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
+        pageSize: Annotated[
             int, Query(..., gt=0, le=100, description="Page size")
         ] = 10,
     ) -> ResponseModel:
 
         result = await ProjectCRUD.get_multi_joined(
-            limit=page_size,
-            offset=compute_offset(page, page_size),
+            limit=pageSize,
+            offset=compute_offset(current, pageSize),
             sort_columns="id",
             sort_orders="desc",
             join_model=User,

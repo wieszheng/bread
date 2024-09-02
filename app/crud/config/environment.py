@@ -19,8 +19,8 @@ class EnvironmentCRUD(BaseCRUD):
     @classmethod
     async def get_list(
         cls,
-        limit: int = 10,
-        offset: int = 1,
+        limit: int,
+        offset: int,
         name: str = None,
     ):
         filter_params = {}

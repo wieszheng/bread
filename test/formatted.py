@@ -51,3 +51,13 @@ name = None
 if not name:
     filters = {"name__like": name}
     print(filters)
+
+import json
+
+data = {
+    "Resources": [],
+    "ImageInfo": {"ClothesCode": "some_value"},  # 这里可以根据实际情况填充
+}
+
+data_str = json.dumps(data, ensure_ascii=False)
+print(data_str)

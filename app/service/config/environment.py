@@ -62,13 +62,15 @@ class EnvironmentService:
 
     @staticmethod
     async def get_environments(
-        current: Annotated[int, Query(...)] = 1,
-        pageSize: Annotated[int, Query(...)] = 10,
+        current: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
+        pageSize: Annotated[
+            int, Query(..., gt=0, le=100, description="Page size")
+        ] = 10,
         name: Annotated[str | None, Query(description="环境名称")] = None,
     ) -> ResponseModel:
 
         result = await EnvironmentCRUD.get_list(
-            limit=current, offset=pageSize, name=name
+            limit=pageSize, offset=current, name=name
         )
 
         return await ResponseBase.success(
