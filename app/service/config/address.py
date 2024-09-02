@@ -25,10 +25,10 @@ from app.schemas.config.address import (
 class AddressService:
     @staticmethod
     async def create_address(request: Request, obj: AddressSchemaBase) -> ResponseModel:
-        input_env_id = await EnvironmentCRUD.exists(id=obj.env)
+        input_env_id = await EnvironmentCRUD.exists(id=obj.env, is_deleted=False)
         if not input_env_id:
             raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
-        input_address_name = await AddressCRUD.exists(name=obj.name, is_deleted=True)
+        input_address_name = await AddressCRUD.exists(name=obj.name, is_deleted=False)
         if input_address_name:
             raise CustomException(CustomErrorCode.ADDRESS_NAME_EXIST)
         result = await AddressCRUD.create(obj=obj, created_by=request.user.id)
@@ -36,7 +36,7 @@ class AddressService:
 
     @staticmethod
     async def get_address(address_id: Annotated[int, ...]) -> ResponseModel:
-        input_address_id = await AddressCRUD.exists(id=address_id)
+        input_address_id = await AddressCRUD.exists(id=address_id, is_deleted=False)
         if not input_address_id:
             raise CustomException(CustomErrorCode.ADDRESS_ID_NOT_EXIST)
         result = await AddressCRUD.get(id=address_id)

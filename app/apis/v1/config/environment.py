@@ -47,6 +47,6 @@ router.add_api_route(
 router.add_api_route(
     "/list",
     endpoint=EnvironmentService.get_environments,
-    methods=["post"],
+    methods=["get"],
     summary="获取环境信息（支持条件查询）",
 )

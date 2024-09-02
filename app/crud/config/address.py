@@ -36,5 +36,6 @@ class AddressCRUD(BaseCRUD):
                     join_type="left",
                 ),
             ],
+            is_deleted=False,
             **filter_params
         )

@@ -47,6 +47,6 @@ router.add_api_route(
 router.add_api_route(
     "/list",
     endpoint=AddressService.get_address_list,
-    methods=["post"],
+    methods=["get"],
     summary="获取网关地址（支持条件查询）",
 )
