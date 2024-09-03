@@ -92,7 +92,7 @@ def register_exceptions_handler(app: FastAPI):
         )
 
         return ApiResponse(
-            http_status_code=StandardResponseCode.HTTP_400,
+            http_status_code=StandardResponseCode.HTTP_200,
             code=10040,
             success=False,
             message="请求参数校验错误,请检查提交的参数信息",
@@ -122,7 +122,7 @@ def register_exceptions_handler(app: FastAPI):
         )
 
         return ApiResponse(
-            http_status_code=StandardResponseCode.HTTP_400,
+            http_status_code=StandardResponseCode.HTTP_200,
             code=10040,
             success=False,
             message="内部参数校验错误,请检查提交的参数信息",
@@ -167,7 +167,7 @@ def register_exceptions_handler(app: FastAPI):
         )
 
         return ApiResponse(
-            http_status_code=StandardResponseCode.HTTP_500,
+            http_status_code=StandardResponseCode.HTTP_200,
             code=5000,
             success=False,
             message="程序员哥哥睡眠不足，系统崩溃了！",

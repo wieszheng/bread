@@ -9,8 +9,10 @@
 from app.crud import BaseCRUD
 from app.crud.helper import JoinConfig, compute_offset
 from app.models.address import Address
+from app.models.environment import Environment
 from app.models.user import User
 from app.schemas.auth.user import UserInfoSchemaBase
+from app.schemas.config.environment import EnvironmentSchemaBase
 
 
 class AddressCRUD(BaseCRUD):
@@ -33,6 +35,13 @@ class AddressCRUD(BaseCRUD):
                     join_on=cls.__model__.created_by == User.id,
                     join_prefix="user_",
                     schema_to_select=UserInfoSchemaBase,
+                    join_type="left",
+                ),
+                JoinConfig(
+                    model=Environment,
+                    join_on=cls.__model__.env == Environment.id,
+                    join_prefix="env_",
+                    schema_to_select=EnvironmentSchemaBase,
                     join_type="left",
                 ),
             ],

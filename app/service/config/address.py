@@ -57,6 +57,9 @@ class AddressService:
         input_address_id = await AddressCRUD.exists(id=obj.id)
         if not input_address_id:
             raise CustomException(CustomErrorCode.ADDRESS_ID_NOT_EXIST)
+        input_env_id = await EnvironmentCRUD.exists(id=obj.env, is_deleted=False)
+        if not input_env_id:
+            raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
         await AddressCRUD.update(
             obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
         )

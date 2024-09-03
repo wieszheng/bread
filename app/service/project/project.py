@@ -54,7 +54,7 @@ class ProjectService:
             join_on=Project.created_by == User.id,
         )
         return await ResponseBase.success(
-            result={**result, "page": page, "page_size": page_size}
+            result={**result, "current": current, "pageSize": pageSize}
         )
 
     @staticmethod
@@ -68,9 +68,8 @@ class ProjectService:
             raise CustomException(CustomErrorCode.PROJECT_NAME_EXIST)
         if obj.owner:
             obj.owner = request.user.id
-        project_data = await ProjectCRUD.create(obj=obj, created_by=request.user.id)
-        data = GetProjectInfo.model_validate(project_data).model_dump()
-        return await ResponseBase.success(result=data)
+        result = await ProjectCRUD.create(obj=obj, created_by=request.user.id)
+        return await ResponseBase.success(result=result.to_dict())
 
     @staticmethod
     async def update_project(
