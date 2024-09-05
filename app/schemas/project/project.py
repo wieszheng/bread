@@ -36,14 +36,6 @@ class GetProjectInfo(ProjectSchemaBase):
     # avatar: str | None = None
     pass
 
-class GetCurrentProjectInfoDetail(GetProjectInfo):
-    # model_config = ConfigDict(
-    #     from_attributes=True,
-    #     populate_by_name=True,  # 允许按字段别名填充模型
-    #     alias_generator=lambda field_name: f"_{field_name}"  # 设置别名生成器
-    # )
-    pass
-
 
 class ProjectListIn(ListPageRequestModel):
     page: int = Field(default=1, ge=0, description="分页偏移量")

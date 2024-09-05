@@ -21,8 +21,6 @@ from app.models.project import Project
 from app.models.user import User
 from app.schemas.auth.user import UserInfoSchemaBase
 from app.schemas.project.project import (
-    GetCurrentProjectInfoDetail,
-    GetProjectInfo,
     ProjectRoleParam,
     ProjectSchemaBase,
     UpdateProjectParam,
@@ -48,7 +46,6 @@ class ProjectService:
             sort_orders="desc",
             join_model=User,
             join_prefix="user_",
-            schema_to_select=GetCurrentProjectInfoDetail,
             join_schema_to_select=UserInfoSchemaBase,
             is_deleted=False,
             join_on=Project.created_by == User.id,
