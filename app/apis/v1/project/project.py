@@ -22,6 +22,13 @@ router.add_api_route(
 
 router.add_api_route(
     "",
+    endpoint=ProjectService.get_project,
+    methods=["get"],
+    summary="Id查询项目",
+)
+
+router.add_api_route(
+    "",
     endpoint=ProjectService.create_project,
     dependencies=[DependsJwtAuth],
     methods=["post"],
@@ -46,7 +53,7 @@ router.add_api_route(
 
 router.add_api_route(
     "",
-    endpoint=ProjectService.is_del_project,
+    endpoint=ProjectService.delete_project,
     dependencies=[DependsJwtAuth],
     methods=["delete"],
     summary="删除项目（逻辑删除）",
