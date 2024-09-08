@@ -15,6 +15,10 @@ from app.commons.enums import KeyType
 class GlobalConfigSchemaBase(BaseModel):
     key: str = Field(..., description="配置键值")
     value: str = Field(..., description="配置值")
-    env: str | None = None
-    key_type: KeyType = Field(..., description="配置类型")
+    env: int | None = None
+    key_type: int = Field(..., description="配置类型")
     enable: bool = Field(..., description="是否弃用")
+
+
+class UpdateGlobalConfigParam(GlobalConfigSchemaBase):
+    id: int = Field(..., description="配置ID")

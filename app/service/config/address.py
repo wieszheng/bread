@@ -54,7 +54,7 @@ class AddressService:
     async def update_address(
         request: Request, obj: UpdateAddressParam
     ) -> ResponseModel:
-        input_address_id = await AddressCRUD.exists(id=obj.id)
+        input_address_id = await AddressCRUD.exists(id=obj.id, is_deleted=False)
         if not input_address_id:
             raise CustomException(CustomErrorCode.ADDRESS_ID_NOT_EXIST)
         input_env_id = await EnvironmentCRUD.exists(id=obj.env, is_deleted=False)

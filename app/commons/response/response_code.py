@@ -124,6 +124,8 @@ class CustomErrorCode(CustomCodeBase):
     ADDRESS_NAME_EXIST = (14100, "网关名已存在")
     ADDRESS_ID_NOT_EXIST = (14101, "网关不存在,请检查")
 
+    GLOBAL_CONFIG_NAME_EXIST = (14100, "配置数据已存在")
+    GLOBAL_CONFIG_ID_NOT_EXIST = (14101, "配置数据不存在,请检查")
     # module 模块 14000 - 15000
     MODULE_HAS_CASE_ASSOCIATION = (
         14000,

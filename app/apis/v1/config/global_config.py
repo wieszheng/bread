@@ -45,8 +45,8 @@ router.add_api_route(
 )
 
 router.add_api_route(
-    "list",
+    "/list",
     endpoint=GlobalConfigService.get_global_configs,
-    methods=["post"],
+    methods=["get"],
     summary="获取全局变量（支持条件查询）",
 )
