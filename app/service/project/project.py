@@ -34,11 +34,11 @@ class ProjectService:
 
     @staticmethod
     async def get_projects(
-            current: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
-            pageSize: Annotated[
-                int, Query(..., gt=0, le=100, description="Page size")
-            ] = 10,
-            name: Annotated[str | None, Query(description="项目名称")] = None
+        current: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
+        pageSize: Annotated[
+            int, Query(..., gt=0, le=100, description="Page size")
+        ] = 10,
+        name: Annotated[str | None, Query(description="项目名称")] = None,
     ) -> ResponseModel:
 
         filter_params = {}
@@ -55,7 +55,7 @@ class ProjectService:
             join_schema_to_select=UserInfoSchemaBase,
             is_deleted=False,
             join_on=Project.owner == User.id,
-            **filter_params
+            **filter_params,
         )
         return await ResponseBase.success(
             result={**result, "current": current, "pageSize": pageSize}
@@ -85,7 +85,9 @@ class ProjectService:
             is_deleted=False,
         )
 
-        return await ResponseBase.success(result={"project": input_id, "roles": roles["data"]})
+        return await ResponseBase.success(
+            result={"project": input_id, "roles": roles["data"]}
+        )
 
     @staticmethod
     async def create_project(request: Request, obj: ProjectSchemaBase) -> ResponseModel:
@@ -101,7 +103,7 @@ class ProjectService:
 
     @staticmethod
     async def update_project(
-            request: Request, obj: UpdateProjectParam
+        request: Request, obj: UpdateProjectParam
     ) -> ResponseModel:
         """
         更新项目
@@ -122,9 +124,9 @@ class ProjectService:
 
     @staticmethod
     async def update_project_avatar(
-            request: Request,
-            project_id: Annotated[str, Path(...)],
-            avatar: UploadFile = File(..., description="上传的头像文件"),
+        request: Request,
+        project_id: Annotated[str, Path(...)],
+        avatar: UploadFile = File(..., description="上传的头像文件"),
     ) -> ResponseModel:
         """
         更新项目头像
@@ -159,7 +161,7 @@ class ProjectService:
 
     @staticmethod
     async def delete_project(
-            request: Request, project_id: Annotated[int, ...]
+        request: Request, project_id: Annotated[int, ...]
     ) -> ResponseModel:
         input_id = await ProjectCRUD.get(id=project_id)
         if not input_id:
@@ -171,8 +173,8 @@ class ProjectService:
 
     @staticmethod
     async def allocation_project_role(
-            request: Request,
-            obj: ProjectRoleParam,
+        request: Request,
+        obj: ProjectRoleParam,
     ) -> ResponseModel:
 
         result = await ProjectRoleCRUD.exists(
@@ -202,7 +204,7 @@ class ProjectService:
 
     @staticmethod
     async def update_project_role(
-            request: Request, obj: UpdateProjectRoleParam
+        request: Request, obj: UpdateProjectRoleParam
     ) -> ResponseModel:
         result = await ProjectRoleCRUD.get(id=obj.id, is_deleted=False)
         if result is None:
@@ -227,7 +229,7 @@ class ProjectService:
 
     @staticmethod
     async def del_project_role(
-            request: Request, role_id: Annotated[int, ...]
+        request: Request, role_id: Annotated[int, ...]
     ) -> ResponseModel:
         result = await ProjectRoleCRUD.get(id=role_id, is_deleted=False)
         if result is None:

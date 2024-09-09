@@ -39,7 +39,7 @@
 
 - <img src="docs/assets/images/Fire.png" width="17">&nbsp;&nbsp;**Fully Async**
 - <img src="docs/assets/images/Cyclone.png" width="16">&nbsp;&nbsp;**SQLAlchemy 2.0**
-- <img src="docs/assets/images/School.png" width="17">&nbsp;&nbsp;**Pydantic V2** 
+- <img src="docs/assets/images/School.png" width="17">&nbsp;&nbsp;**Pydantic V2**
 - <img src="docs/assets/images/Flexed Biceps Light Skin Tone.png" width="17">&nbsp;&nbsp;**Powerful CRUD Functionality**
 - <img src="docs/assets/images/Locked with Key.png" width="18">&nbsp;&nbsp;**User authentication with JWT**
 - <img src="docs/assets/images/Police Car.png" width="19">&nbsp;&nbsp;**Easy running with docker compose**
