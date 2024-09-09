@@ -1,7 +1,7 @@
 <div align="center" >
-  <img src="docs/icon.svg" alt="icon" width="120px" height="120px">
+  <img src="docs/assets/images/Baguette Bread.png" width="180">
   <h1>
-    FasAPI-Bread v1.0.0 👋
+    FasAPI-Bread v1.0.0 <img src="docs/assets/images/Waving Hand Medium-Light Skin Tone.png" width="38px">
   </h1>
 </div>
 
@@ -35,16 +35,16 @@
 
 <img align='right' src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif" width="280">
 
-#### 🎉 技术栈
+#### <img src="docs/assets/images/Party Popper.png" width="30"> 技术栈
 
-- ⚡️ **Fully Async**
-- 📚 **SQLAlchemy 2.0**
-- 🚀 **Pydantic V2**
-- 🦾 **Powerful CRUD Functionality**
-- 🔐 **User authentication with JWT**
-- 🚚 **Easy running with docker compose**
+- <img src="docs/assets/images/Fire.png" width="17">&nbsp;&nbsp;**Fully Async**
+- <img src="docs/assets/images/Cyclone.png" width="16">&nbsp;&nbsp;**SQLAlchemy 2.0**
+- <img src="docs/assets/images/School.png" width="17">&nbsp;&nbsp;**Pydantic V2** 
+- <img src="docs/assets/images/Flexed Biceps Light Skin Tone.png" width="17">&nbsp;&nbsp;**Powerful CRUD Functionality**
+- <img src="docs/assets/images/Locked with Key.png" width="18">&nbsp;&nbsp;**User authentication with JWT**
+- <img src="docs/assets/images/Police Car.png" width="19">&nbsp;&nbsp;**Easy running with docker compose**
 
-#### ☕ 说明
+#### <img src="docs/assets/images/Hot Beverage.png" width="25"> 说明
 
 > `-` 表示没有，端口代表占用本机端口，请自行保证端口未被占用
 
@@ -54,7 +54,7 @@
 | Redis | 6.2.6                        | 6379       | -     | -        | 键值存储   | 内存数据结构存储，用作数据库、缓存和消息代理。      |
 | Minio | RELEASE.2023-02-09T05-16-53Z | 9000, 9001 | minio | minio123 | 对象存储   | 高性能对象存储服务器，兼容 Amazon S3 API。 |
 
-#### 🎃 Docker部署
+#### <img src="docs/assets/images/Spouting Whale.png" width="25"> Docker部署
 
 1. 安装Docker
 2. 打开终端并进入根目录
@@ -64,7 +64,7 @@
 docker-compose -f docker-compose.yml up -d
 ```
 
-#### 🍰 提交规范
+#### <img src="docs/assets/images/Eyes.png" width="25"> 提交规范
 
 ```shell
 black . # 格式化代码
@@ -74,17 +74,17 @@ git commit -m "✨ feat: 添加新功能"
 git push origin main
 ```
 
-#### 🔐 许可证
+#### <img src="docs/assets/images/Bookmark Tabs.png" width="24"> 许可证
 
 [`MIT`](LICENSE)
 
-#### 📞 作者介绍
+#### <img src="docs/assets/images/Robot.png" width="25"> 作者介绍
 
     大家好，我是 wieszheng，一个乐于分享，喜欢钻研技术的测试开发工程师。
 
     一个打游戏不拿首胜不睡觉的酒0后。
 
-#### ❤️ 喜欢我？
+#### <img src="docs/assets/images/Heart on Fire.png" width="25"> 喜欢我？
 
 <p align="center">
 <a href="https://star-history.com/#wieszheng/bread">
@@ -97,5 +97,7 @@ git push origin main
 </p>
 
 <div align="center">
-✨ 🍰 ✨
+  <img src="docs/assets/images/Glowing Star.png" width="25"> 
+  <img src="docs/assets/images/Birthday Cake.png" width="23"> 
+  <img src="docs/assets/images/Glowing Star.png" width="25">
 </div>
