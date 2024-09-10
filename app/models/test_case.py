@@ -48,4 +48,7 @@ class TestCase(BaseModel):
     case_type: Mapped[int] = mapped_column(
         SMALLINT, comment="0: 普通用例 1: 前置用例 2: 数据工厂"
     )
-    out_parameters: List[TestCaseOutParameters | None] = mapped_column(default=None)
+    out_parameters: Mapped[List[TestCaseOutParameters]] = mapped_column(
+        "bread_out_parameters",
+        comment="输出参数",
+    )

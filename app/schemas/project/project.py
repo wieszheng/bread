@@ -37,12 +37,6 @@ class GetProjectInfo(ProjectSchemaBase):
     pass
 
 
-class ProjectListIn(ListPageRequestModel):
-    page: int = Field(default=1, ge=0, description="分页偏移量")
-    page_size: int = Field(default=10, gt=0, description="每页显示数量")
-    orderings: Optional[List[str]] = Field(default=["id"], description="排序字段")
-
-
 class ProjectRoleParam(BaseModel):
     user_id: int
     project_role: int

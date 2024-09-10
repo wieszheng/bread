@@ -8,19 +8,20 @@
 """
 import uuid
 
-from fastapi import File, Path, Query, Request, UploadFile
+from fastapi import Depends, File, Path, Query, UploadFile
 from typing_extensions import Annotated
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.core.client.miNio import minio_client
-from app.core.security.Jwt import create_access_token
+from app.core.security.Jwt import create_access_token, get_current_user_new
 from app.core.security.password import verify_psw
 from app.crud.auth.user import UserCRUD
 from app.crud.helper import compute_offset
 from app.exceptions.errors import CustomException, PermissionException
 from app.schemas.auth.user import (
     AuthLoginParam,
+    CurrentUserInfo,
     CurrentUserIns,
     GetUserInfoNoRelationDetail,
     RegisterUserParam,
@@ -46,12 +47,14 @@ class UserService:
         return await ResponseBase.success(result=result)
 
     @staticmethod
-    async def get_current_user_info(request: Request) -> ResponseModel:
+    async def get_current_user_info(
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
+    ) -> ResponseModel:
         """
         个人信息
         returns the current user
         """
-        return await ResponseBase.success(result=request.user.model_dump())
+        return await ResponseBase.success(result=user_info.model_dump())
 
     @staticmethod
     async def login(obj: AuthLoginParam) -> ResponseModel:
@@ -81,7 +84,8 @@ class UserService:
 
     @staticmethod
     async def password_reset(
-        request: Request, obj: ResetPasswordParam
+        obj: ResetPasswordParam,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         """
         重置密码
@@ -90,7 +94,7 @@ class UserService:
         if obj.new_password == obj.old_password:
             raise CustomException(CustomErrorCode.NEW_PWD_NO_OLD_PWD_EQUAL)
 
-        current_user = await UserCRUD.get(id=request.user.id)
+        current_user = await UserCRUD.get(id=user_info.id)
         if not await verify_psw(obj.old_password, current_user["password"]):
             raise CustomException(CustomErrorCode.OLD_PASSWORD_ERROR)
 
@@ -99,29 +103,28 @@ class UserService:
         if np1 != np2:
             raise CustomException(CustomErrorCode.PASSWORD_TWICE_IS_NOT_AGREEMENT)
 
-        await UserCRUD.reset_password(request.user.id, obj.new_password)
+        await UserCRUD.reset_password(user_info.id, obj.new_password)
         return await ResponseBase.success()
 
     @staticmethod
     async def update_avatar(
-        request: Request, avatar: UploadFile = File(..., description="上传的头像文件")
+        avatar: UploadFile = File(..., description="上传的头像文件"),
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         """
         更新头像
         :return:
         """
         random_suffix = str(uuid.uuid4()).replace("-", "")
-        object_name = (
-            f"{request.user.id}/{random_suffix}.{avatar.filename.split('.')[-1]}"
-        )
+        object_name = f"{user_info.id}/{random_suffix}.{avatar.filename.split('.')[-1]}"
         minio_client.upload_file(
             object_name, avatar.file, content_type=avatar.content_type
         )
 
         avatar_url = minio_client.pre_signature_get_object_url(object_name)
         await UserCRUD.update(
-            obj={"avatar": avatar_url.split("?", 1)[0], "updated_by": request.user.id},
-            id=request.user.id,
+            obj={"avatar": avatar_url.split("?", 1)[0], "updated_by": user_info.id},
+            id=user_info.id,
         )
         return await ResponseBase.success(
             result={"avatar": avatar_url.split("?", 1)[0]}
@@ -160,16 +163,17 @@ class UserService:
 
     @staticmethod
     async def delete_user(
-        request: Request, userId: Annotated[int, Path(...)]
+        userId: Annotated[int, Path(...)],
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         """
         删除用户
         :return:
         """
-        if request.user.role < 2:
-            if request.user.id != userId:
+        if user_info.role < 2:
+            if user_info.id != userId:
                 raise PermissionException("不可操作,暂无权限！")
-        elif request.user.id == userId:
+        elif user_info.id == userId:
             raise PermissionException("不可操作管理员信息！")
 
         input_user = await UserCRUD.exists(id=userId)
@@ -190,18 +194,21 @@ class UserService:
 
     @staticmethod
     async def update_user(
-        request: Request,
-        obj: UpdateUserParam,
+        obj: UpdateUserParam, user_info: CurrentUserInfo = Depends(get_current_user_new)
     ) -> ResponseModel:
         """
         更新用户
         :return:
         """
-        if request.user.id != obj.id:
-            raise CustomException(CustomErrorCode.YOU_INFO)
         input_user = await UserCRUD.get(id=obj.id)
         if not input_user:
             raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
+        if user_info.role < 2:
+            if user_info.id != obj.id:
+                raise CustomException(CustomErrorCode.YOU_INFO)
+        elif input_user["role"] == 2:
+            raise CustomException(CustomErrorCode.USER_IS_ADMIN)
+
         if input_user["nickname"] != obj.nickname:
             nickname = await UserCRUD.get(nickname=obj.nickname)
             if nickname:
@@ -215,33 +222,34 @@ class UserService:
 
     @staticmethod
     async def is_valid(
-        request: Request,
         obj: UpdateUserControlParam,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
 
         result = await UserCRUD.get(id=obj.id)
         if not result:
             raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
         if result["role"] == 2:
-            if request.user.id != obj.id or request.user.id == obj.id:
+            if user_info.id != obj.id or user_info.id == obj.id:
                 raise PermissionException("不可操作其他管理员信息,警告！")
 
         await UserCRUD.update(
-            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
         )
         return await ResponseBase.success()
 
     @staticmethod
     async def update_user_role(
-        request: Request, obj: UpdateUserRoleParam
+        obj: UpdateUserRoleParam,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         result = await UserCRUD.get(id=obj.id)
         if not result:
             raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
         if result["role"] == 2:
-            if request.user.id != obj.id or request.user.id == obj.id:
+            if user_info.id != obj.id or user_info.id == obj.id:
                 raise PermissionException("不可操作其他管理员信息,警告！")
         await UserCRUD.update(
-            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
         )
         return await ResponseBase.success()

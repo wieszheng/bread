@@ -133,6 +133,11 @@ class CustomErrorCode(CustomCodeBase):
     )  # 模块有用例关联
     MODULE_NAME_EXIST = (14001, "模块名已存在")  # 模块名以存在
 
+    # case 用例 15000 - 16000
+    CASE_NAME_EXIST = (15000, "用例名已存在")
+    CASE_ID_NOT_EXIST = (15001, "用例不存在,请检查")
+    CASE_ID_IS_NULL = (15002, "用例id不能为空")
+
 
 class StandardResponseCode:
     """标准响应状态码"""

@@ -8,12 +8,14 @@
 """
 from typing import Annotated
 
-from fastapi import Query, Request
+from fastapi import Depends, Query
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
+from app.core.security.Jwt import get_current_user_new
 from app.crud.config.environment import EnvironmentCRUD
 from app.exceptions.errors import CustomException
+from app.schemas.auth.user import CurrentUserInfo
 from app.schemas.config.environment import EnvironmentSchemaBase, UpdateEnvironmentParam
 
 
@@ -21,12 +23,13 @@ class EnvironmentService:
 
     @staticmethod
     async def create_environment(
-        request: Request, obj: EnvironmentSchemaBase
+        obj: EnvironmentSchemaBase,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         input_name = await EnvironmentCRUD.exists(name=obj.name, is_deleted=False)
         if input_name:
             raise CustomException(CustomErrorCode.ENVIRONMENT_NAME_EXIST)
-        result = await EnvironmentCRUD.create(obj=obj, created_by=request.user.id)
+        result = await EnvironmentCRUD.create(obj=obj, created_by=user_info.id)
         return await ResponseBase.success(result=result.to_dict())
 
     @staticmethod
@@ -47,7 +50,8 @@ class EnvironmentService:
 
     @staticmethod
     async def update_environment(
-        request: Request, obj: UpdateEnvironmentParam
+        obj: UpdateEnvironmentParam,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         input_id = await EnvironmentCRUD.exists(id=obj.id, is_deleted=False)
         if not input_id:
@@ -56,7 +60,7 @@ class EnvironmentService:
         if input_name and input_name["id"] != obj.id:
             raise CustomException(CustomErrorCode.ENVIRONMENT_NAME_EXIST)
         await EnvironmentCRUD.update(
-            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
         )
         return await ResponseBase.success()
 

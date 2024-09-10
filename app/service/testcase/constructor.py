@@ -10,7 +10,7 @@
 
 class ConstructorService:
     @staticmethod
-    async def create_constructor(id: int):
+    async def create_constructor(sid: int):
         pass
 
     @staticmethod

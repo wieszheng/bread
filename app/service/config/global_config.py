@@ -8,16 +8,17 @@
 """
 from typing import Annotated
 
-from fastapi import Query, Request
+from fastapi import Depends, Query
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
+from app.core.security.Jwt import get_current_user_new
 from app.crud.config.global_config import GlobalConfigCRUD
 from app.crud.helper import JoinConfig, compute_offset
 from app.exceptions.errors import CustomException
 from app.models.environment import Environment
 from app.models.user import User
-from app.schemas.auth.user import UserInfoSchemaBase
+from app.schemas.auth.user import CurrentUserInfo, UserInfoSchemaBase
 from app.schemas.config.global_config import (
     GlobalConfigSchemaBase,
     UpdateGlobalConfigParam,
@@ -27,7 +28,8 @@ from app.schemas.config.global_config import (
 class GlobalConfigService:
     @staticmethod
     async def create_global_config(
-        request: Request, obj: GlobalConfigSchemaBase
+        obj: GlobalConfigSchemaBase,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         input_data = await GlobalConfigCRUD.exists(
             key=obj.key, env=obj.env, is_deleted=False
@@ -35,7 +37,7 @@ class GlobalConfigService:
         if input_data:
             raise CustomException(CustomErrorCode.GLOBAL_CONFIG_NAME_EXIST)
 
-        result = await GlobalConfigCRUD.create(obj=obj, created_by=request.user.id)
+        result = await GlobalConfigCRUD.create(obj=obj, created_by=user_info.id)
         return await ResponseBase.success(result=result.to_dict())
 
     @staticmethod
@@ -56,7 +58,8 @@ class GlobalConfigService:
 
     @staticmethod
     async def update_global_config(
-        request: Request, obj: UpdateGlobalConfigParam
+        obj: UpdateGlobalConfigParam,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         input_id = await GlobalConfigCRUD.exists(id=obj.id, is_deleted=False)
         if not input_id:
@@ -67,7 +70,7 @@ class GlobalConfigService:
         if input_data:
             raise CustomException(CustomErrorCode.GLOBAL_CONFIG_NAME_EXIST)
         await GlobalConfigCRUD.update(
-            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
         )
         return await ResponseBase.success()
 

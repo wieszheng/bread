@@ -8,30 +8,31 @@
 """
 from typing import Annotated
 
-from fastapi import Query, Request
+from fastapi import Depends, Query
 
 from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
+from app.core.security.Jwt import get_current_user_new
 from app.crud.config.address import AddressCRUD
 from app.crud.config.environment import EnvironmentCRUD
 from app.exceptions.errors import CustomException
-from app.schemas.config.address import (
-    AddressListInParam,
-    AddressSchemaBase,
-    UpdateAddressParam,
-)
+from app.schemas.auth.user import CurrentUserInfo
+from app.schemas.config.address import AddressSchemaBase, UpdateAddressParam
 
 
 class AddressService:
     @staticmethod
-    async def create_address(request: Request, obj: AddressSchemaBase) -> ResponseModel:
+    async def create_address(
+        obj: AddressSchemaBase,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
+    ) -> ResponseModel:
         input_env_id = await EnvironmentCRUD.exists(id=obj.env, is_deleted=False)
         if not input_env_id:
             raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
         input_address_name = await AddressCRUD.exists(name=obj.name, is_deleted=False)
         if input_address_name:
             raise CustomException(CustomErrorCode.ADDRESS_NAME_EXIST)
-        result = await AddressCRUD.create(obj=obj, created_by=request.user.id)
+        result = await AddressCRUD.create(obj=obj, created_by=user_info.id)
         return await ResponseBase.success(result=result.to_dict())
 
     @staticmethod
@@ -52,7 +53,8 @@ class AddressService:
 
     @staticmethod
     async def update_address(
-        request: Request, obj: UpdateAddressParam
+        obj: UpdateAddressParam,
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         input_address_id = await AddressCRUD.exists(id=obj.id, is_deleted=False)
         if not input_address_id:
@@ -61,7 +63,7 @@ class AddressService:
         if not input_env_id:
             raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
         await AddressCRUD.update(
-            obj={**obj.model_dump(), "updated_by": request.user.id}, id=obj.id
+            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
         )
         return await ResponseBase.success()
 

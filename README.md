@@ -1,7 +1,7 @@
 <div align="center" >
   <img src="docs/assets/images/Baguette Bread.png" width="180">
   <h1>
-    FasAPI-Bread v1.0.0 <img src="docs/assets/images/Waving Hand Medium-Light Skin Tone.png" width="38px">
+    FasAPI-Bread v1.0.0 <img src="docs/assets/images/Waving Hand Medium-Light Skin Tone.png" width="45px">
   </h1>
 </div>
 

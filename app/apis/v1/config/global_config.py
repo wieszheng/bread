@@ -11,12 +11,13 @@ from fastapi import APIRouter
 from app.core.security.Jwt import DependsJwtAuth
 from app.service.config.global_config import GlobalConfigService
 
-router = APIRouter(prefix="/config/global_config", tags=["全局变量"])
+router = APIRouter(
+    prefix="/config/global_config", tags=["全局变量"], dependencies=[DependsJwtAuth]
+)
 
 router.add_api_route(
     "",
     endpoint=GlobalConfigService.create_global_config,
-    dependencies=[DependsJwtAuth],
     methods=["post"],
     summary="新增全局变量",
 )
@@ -31,7 +32,6 @@ router.add_api_route(
 router.add_api_route(
     "",
     endpoint=GlobalConfigService.delete_global_config,
-    dependencies=[DependsJwtAuth],
     methods=["delete"],
     summary="删除全局变量",
 )
@@ -39,7 +39,6 @@ router.add_api_route(
 router.add_api_route(
     "",
     endpoint=GlobalConfigService.update_global_config,
-    dependencies=[DependsJwtAuth],
     methods=["put"],
     summary="修改全局变量",
 )

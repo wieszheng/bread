@@ -9,7 +9,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.security.Jwt import DependsJwtAuth
-from app.core.security.permission import RequestPermission
+from app.core.security.permission import Permission
 from app.service.auth.user import UserService
 from config import settings
 
@@ -83,7 +83,7 @@ router.add_api_route(
     methods=["delete"],
     summary="用户注销",
     description="用户注销 != 用户登出，注销之后用户将从数据库逻辑删除",
-    dependencies=[Depends(RequestPermission(settings.ADMIN)), DependsJwtAuth],
+    dependencies=[Depends(Permission(settings.ADMIN)), DependsJwtAuth],
 )
 
 router.add_api_route(
@@ -91,7 +91,7 @@ router.add_api_route(
     endpoint=UserService.is_valid,
     methods=["put"],
     summary="用户状态是否可用",
-    dependencies=[Depends(RequestPermission(settings.ADMIN)), DependsJwtAuth],
+    dependencies=[Depends(Permission(settings.ADMIN)), DependsJwtAuth],
 )
 
 router.add_api_route(
@@ -99,5 +99,5 @@ router.add_api_route(
     endpoint=UserService.update_user_role,
     methods=["put"],
     summary="用户权限和账号",
-    dependencies=[Depends(RequestPermission(settings.ADMIN)), DependsJwtAuth],
+    dependencies=[Depends(Permission(settings.ADMIN)), DependsJwtAuth],
 )

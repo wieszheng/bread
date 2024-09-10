@@ -40,14 +40,14 @@ def register_exceptions_handler(app: FastAPI):
             f"Method:{request.method}\n"
             f"URL:{request.url}\n"
             f"Headers:{request.headers}\n"
-            f"Message:{exc.message}\n"
+            f"Message:{exc.detail}\n"
         )
 
         return ApiResponse(
             http_status_code=StandardResponseCode.HTTP_200,
-            code=10032,
+            code=401,
             success=False,
-            message=exc.message,
+            message=exc.detail,
         )
 
     @app.exception_handler(PermissionException)
@@ -58,14 +58,14 @@ def register_exceptions_handler(app: FastAPI):
             f"Method:{request.method}\n"
             f"URL:{request.url}\n"
             f"Headers:{request.headers}\n"
-            f"Message:{exc.message}\n"
+            f"Message:{exc.detail}\n"
         )
 
         return ApiResponse(
             http_status_code=StandardResponseCode.HTTP_200,
-            code=10032,
+            code=403,
             success=False,
-            message=exc.message,
+            message=exc.detail,
         )
 
     # 处理其他http请求异常
@@ -167,7 +167,7 @@ def register_exceptions_handler(app: FastAPI):
         )
 
         return ApiResponse(
-            http_status_code=StandardResponseCode.HTTP_200,
+            http_status_code=StandardResponseCode.HTTP_500,
             code=5000,
             success=False,
             message="程序员哥哥睡眠不足，系统崩溃了！",

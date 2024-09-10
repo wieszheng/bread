@@ -75,6 +75,18 @@ class GetUserInfoNoRelationDetail(UserInfoSchemaBase):
     last_login_at: datetime | None = None
 
 
+class CurrentUserInfo(BaseModel):
+    id: int
+    username: str
+    nickname: str
+    email: str | None = None
+    phone: str | None = None
+    avatar: str | None = None
+    role: RoleType
+    is_valid: bool
+    last_login_at: datetime | None = None
+
+
 class CurrentUserIns(GetUserInfoNoRelationDetail):
     model_config = ConfigDict(from_attributes=True)
 

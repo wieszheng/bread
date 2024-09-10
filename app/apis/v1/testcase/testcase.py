@@ -6,9 +6,10 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.core.security.Jwt import DependsJwtAuth
+from app.core.security.permission import Permission
 from app.service.testcase.constructor import ConstructorService
 from app.service.testcase.test_report import TestReportService
 from app.service.testcase.testcase import TestCaseService
@@ -17,13 +18,14 @@ from app.service.testcase.testcase_data import TestcaseDataService
 from app.service.testcase.testcase_directory import TestcaseDirectoryService
 from app.service.testcase.testcase_out_parameters import TestCaseOutParametersService
 
-router = APIRouter(prefix="/testcase", tags=["用例管理"])
+router = APIRouter(prefix="/testcase", tags=["用例管理"], dependencies=[DependsJwtAuth])
 
 router.add_api_route(
     "/list",
     endpoint=TestCaseService.get_testcase_list,
     methods=["get"],
     summary="（支持条件）分页获取所有项目",
+    dependencies=[Depends(Permission(2))],
 )
 
 router.add_api_route(

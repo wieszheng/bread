@@ -10,7 +10,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from app.commons.response.response_code import CustomErrorCode
+from app.commons.response.response_code import CustomErrorCode, StandardResponseCode
 
 
 class CustomException(Exception):
@@ -31,25 +31,25 @@ class CustomException(Exception):
         super().__init__(self)
 
 
-class AuthorizationException(Exception):
-    def __init__(self, message: str = "身份无效") -> None:
+class AuthorizationException(HTTPException):
+    def __init__(self, message: str):
         self.message = message
-        super().__init__(self.message)
+        super().__init__(status_code=StandardResponseCode.HTTP_200, detail=self.message)
 
 
-class PermissionException(Exception):
-    def __init__(self, message: str = "请求权限不足") -> None:
+class PermissionException(HTTPException):
+    def __init__(self, message: str = "请求权限不足"):
         self.message = message
-        super().__init__(self.message)
+        super().__init__(status_code=StandardResponseCode.HTTP_200, detail=self.message)
 
 
 class DBError(Exception):
-    def __init__(self, message: str = "") -> None:
+    def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
 
 
 class TokenError(Exception):
-    def __init__(self, message: str = "") -> None:
+    def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)

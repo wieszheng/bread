@@ -7,11 +7,9 @@
 @Software : PyCharm
 """
 from fastapi import FastAPI
-from starlette.middleware.authentication import AuthenticationMiddleware
 
 from app.middlewares.cors_middleware import add_cors_middleware
 from app.middlewares.custom_middleware import add_custom_middleware
-from app.middlewares.jwt_auth_middleware import JwtAuthMiddleware
 
 
 def register_middlewares(app: FastAPI):
@@ -22,9 +20,3 @@ def register_middlewares(app: FastAPI):
     add_cors_middleware(app)
     # 自定义
     add_custom_middleware(app)
-
-    app.add_middleware(
-        AuthenticationMiddleware,
-        backend=JwtAuthMiddleware(),
-        on_error=JwtAuthMiddleware.auth_exception_handler,
-    )
