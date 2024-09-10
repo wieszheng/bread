@@ -6,3 +6,15 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+from fastapi import APIRouter, FastAPI
+from loguru import logger
+
+from ..apis.v1 import router as v1_router
+
+router = APIRouter(prefix="/api")
+router.include_router(v1_router)
+
+
+async def register_routers(app: FastAPI):
+    logger.info("注册路由")
+    app.include_router(router)

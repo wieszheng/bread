@@ -24,7 +24,7 @@ class AddressService:
     @staticmethod
     async def create_address(
         obj: AddressSchemaBase,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_env_id = await EnvironmentCRUD.exists(id=obj.env, is_deleted=False)
         if not input_env_id:
@@ -54,7 +54,7 @@ class AddressService:
     @staticmethod
     async def update_address(
         obj: UpdateAddressParam,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_address_id = await AddressCRUD.exists(id=obj.id, is_deleted=False)
         if not input_address_id:

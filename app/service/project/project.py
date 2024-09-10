@@ -93,7 +93,7 @@ class ProjectService:
     @staticmethod
     async def create_project(
         obj: ProjectSchemaBase,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         """
         创建项目
@@ -108,12 +108,10 @@ class ProjectService:
     @staticmethod
     async def update_project(
         obj: UpdateProjectParam,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         """
         更新项目
-        :param request:
-        :param obj:
         :return:
         """
         input_id = await ProjectCRUD.get(id=obj.id)
@@ -130,14 +128,11 @@ class ProjectService:
     @staticmethod
     async def update_project_avatar(
         project_id: Annotated[str, Path(...)],
-        avatar: UploadFile = File(..., description="上传的头像文件"),
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        avatar: Annotated[UploadFile,File(..., description="上传的头像文件")],
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         """
         更新项目头像
-        :param request:
-        :param project_id:
-        :param avatar:
         :return:
         """
         # 生成随机文件名
@@ -165,7 +160,7 @@ class ProjectService:
     @staticmethod
     async def delete_project(
         project_id: Annotated[int, ...],
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_id = await ProjectCRUD.get(id=project_id)
         if not input_id:
@@ -178,7 +173,7 @@ class ProjectService:
     @staticmethod
     async def allocation_project_role(
         obj: ProjectRoleParam,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
 
         result = await ProjectRoleCRUD.exists(
@@ -209,7 +204,7 @@ class ProjectService:
     @staticmethod
     async def update_project_role(
         obj: UpdateProjectRoleParam,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         result = await ProjectRoleCRUD.get(id=obj.id, is_deleted=False)
         if result is None:
@@ -235,7 +230,7 @@ class ProjectService:
     @staticmethod
     async def del_project_role(
         role_id: Annotated[int, ...],
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         result = await ProjectRoleCRUD.get(id=role_id, is_deleted=False)
         if result is None:

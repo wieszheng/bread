@@ -18,7 +18,7 @@ class TestCaseOutParametersForm(BaseModel):
     source: int
 
 
-class TestCaseParametersDto(PityTestCaseOutParametersForm):
+class TestCaseParametersDto(TestCaseOutParametersForm):
     case_id: int = None
 
 

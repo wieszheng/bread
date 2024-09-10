@@ -24,7 +24,7 @@ class EnvironmentService:
     @staticmethod
     async def create_environment(
         obj: EnvironmentSchemaBase,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_name = await EnvironmentCRUD.exists(name=obj.name, is_deleted=False)
         if input_name:
@@ -51,7 +51,7 @@ class EnvironmentService:
     @staticmethod
     async def update_environment(
         obj: UpdateEnvironmentParam,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_id = await EnvironmentCRUD.exists(id=obj.id, is_deleted=False)
         if not input_id:

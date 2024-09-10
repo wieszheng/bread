@@ -29,7 +29,7 @@ class GlobalConfigService:
     @staticmethod
     async def create_global_config(
         obj: GlobalConfigSchemaBase,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_data = await GlobalConfigCRUD.exists(
             key=obj.key, env=obj.env, is_deleted=False
@@ -59,7 +59,7 @@ class GlobalConfigService:
     @staticmethod
     async def update_global_config(
         obj: UpdateGlobalConfigParam,
-        user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_id = await GlobalConfigCRUD.exists(id=obj.id, is_deleted=False)
         if not input_id:

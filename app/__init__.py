@@ -13,7 +13,7 @@ from art import text2art
 from fastapi import FastAPI
 from loguru import logger
 
-from app.apis.v1 import register_routers
+from app.apis import register_routers
 from app.models import Base, async_engine
 from config import settings
 

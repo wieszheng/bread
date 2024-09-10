@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from sqlalchemy import INT, SMALLINT, TEXT, String
+from sqlalchemy import INT, SMALLINT, TEXT, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models import BaseModel
