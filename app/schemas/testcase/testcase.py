@@ -24,7 +24,6 @@ class TestCaseSchemaBase(BaseModel):
     request_headers: str = None
     request_method: str = None
     status: int
-    # out_parameters: List[TestCaseOutParametersForm] = []
     directory_id: int
     request_type: int
 

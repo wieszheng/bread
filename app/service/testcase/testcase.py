@@ -15,6 +15,7 @@ from app.commons.response.response_code import CustomErrorCode
 from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.core.security.Jwt import get_current_user_new
 from app.crud.testcase.testcase import TestCaseCRUD
+from app.crud.testcase.testcase_directory import TestcaseDirectoryCRUD
 from app.exceptions.errors import CustomException
 from app.schemas.auth.user import CurrentUserInfo
 from app.schemas.testcase.testcase import TestCaseSchemaBase
@@ -23,16 +24,26 @@ from app.schemas.testcase.testcase import TestCaseSchemaBase
 class TestCaseService:
     @staticmethod
     async def get_testcase_list(
-        directory_id: Annotated[int, ...] = None,
-        name: str = "",
-        create_user: str = None,
+            directory_id: Annotated[int | None, ...] = None,
+            name: Annotated[str, ...] = "",
+            create_user: Annotated[str | None, ...] = None,
     ):
-        pass
+
+        parents = []
+        if directory_id:
+            parents = await TestcaseDirectoryCRUD.get_directory_son(directory_id)
+        result = await TestCaseCRUD.get_multi_by_cursor(
+            directory_id__in=parents,
+            name__startswith=name,
+            created_by=create_user
+        )
+
+        return await ResponseBase.success(result=result)
 
     @staticmethod
     async def add_testcase(
-        obj: TestCaseSchemaBase,
-        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+            obj: TestCaseSchemaBase,
+            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_ = await TestCaseCRUD.exists(name=obj.name, directory_id=obj.directory_id)
         if input_:

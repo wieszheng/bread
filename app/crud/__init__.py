@@ -80,6 +80,7 @@ class BaseCRUD(SingletonMetaCls):
         "gte": lambda column: column.__ge__,
         "lte": lambda column: column.__le__,
         "ne": lambda column: column.__ne__,
+        "eq": lambda column: column.__eq__,
         "is": lambda column: column.is_,
         "is_not": lambda column: column.is_not,
         "like": lambda column: column.like,
@@ -89,7 +90,6 @@ class BaseCRUD(SingletonMetaCls):
         "startswith": lambda column: column.startswith,
         "endswith": lambda column: column.endswith,
         "contains": lambda column: column.contains,
-        "match": lambda column: column.match,
         "between": lambda column: column.between,
         "in": lambda column: column.in_,
         "not_in": lambda column: column.not_in,
@@ -101,6 +101,7 @@ class BaseCRUD(SingletonMetaCls):
         operator: str,
         value: Any,
     ) -> Optional[Callable[[str], Callable]]:
+
         if operator in {"in", "not_in", "between"}:
             if not isinstance(value, (tuple, list, set)):
                 raise ValueError(f"<{operator}> filter must be tuple, list or set")
@@ -116,12 +117,12 @@ class BaseCRUD(SingletonMetaCls):
         for key, value in kwargs.items():
             if "__" in key:
                 field_name, op = key.rsplit("__", 1)
-                column_ = getattr(model, field_name, None)
-                if column_ is None:
-                    raise ValueError(f"Invalid filter column_: {field_name}")
+                column = getattr(model, field_name, None)
+                if column is None:
+                    raise ValueError(f"Invalid filter column: {field_name}")
                 if op == "or":
                     or_filters = [
-                        sqlalchemy_filter(column_)(or_value)
+                        sqlalchemy_filter(column)(or_value)
                         for or_key, or_value in value.items()
                         if (
                             sqlalchemy_filter := cls._get_sqlalchemy_filter(
@@ -134,12 +135,12 @@ class BaseCRUD(SingletonMetaCls):
                 else:
                     sqlalchemy_filter = cls._get_sqlalchemy_filter(op, value)
                     if sqlalchemy_filter:
-                        filters.append(sqlalchemy_filter(column_)(value))
+                        filters.append(sqlalchemy_filter(column)(value))
             else:
-                column_ = getattr(model, key, None)
-                if column_ is not None:
+                column = getattr(model, key, None)
+                if column is not None:
                     if value is not None:
-                        filters.append(column_ == value)
+                        filters.append(column == value)
 
         return filters
 
