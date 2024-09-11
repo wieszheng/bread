@@ -67,8 +67,14 @@ docker-compose -f docker-compose.yml up -d
 #### <img src="docs/assets/images/Eyes.png" width="25"> 提交规范
 
 ```shell
-black . # 格式化代码
+# black 格式化代码
+black . 
 isort . --profile black 
+
+# 或使用 ruff pre-commit
+pip install ruff
+pre-commit install
+git add .
 
 git commit -m "✨ feat: 添加新功能"
 git push origin main
