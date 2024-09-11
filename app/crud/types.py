@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from typing import Any, TypeVar
 
 from pydantic import BaseModel

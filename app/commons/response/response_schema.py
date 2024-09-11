@@ -6,12 +6,13 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 import datetime
 import decimal
 import inspect
 import json
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Optional, TypeVar
 
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -342,7 +343,6 @@ def unified_resp(func: Callable[..., RT]):
     @wraps(func)
     async def wrapper(*args, **kwargs) -> RT:
         if inspect.iscoroutinefunction(func):
-
             resp = await func(*args, **kwargs) or []
         else:
             resp = func(*args, **kwargs) or []

@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from typing import Annotated
 
 from fastapi import Depends, Query
@@ -20,7 +21,6 @@ from app.schemas.config.environment import EnvironmentSchemaBase, UpdateEnvironm
 
 
 class EnvironmentService:
-
     @staticmethod
     async def create_environment(
         obj: EnvironmentSchemaBase,
@@ -72,7 +72,6 @@ class EnvironmentService:
         ] = 10,
         name: Annotated[str | None, Query(description="环境名称")] = None,
     ) -> ResponseModel:
-
         result = await EnvironmentCRUD.get_list(
             limit=pageSize, offset=current, name=name
         )

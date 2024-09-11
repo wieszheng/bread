@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 import uuid
 from typing import Annotated
 
@@ -32,7 +33,6 @@ from config import settings
 
 
 class ProjectService:
-
     @staticmethod
     async def get_projects(
         current: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
@@ -41,7 +41,6 @@ class ProjectService:
         ] = 10,
         name: Annotated[str | None, Query(description="项目名称")] = None,
     ) -> ResponseModel:
-
         filter_params = {}
         if name:
             filter_params = {"name": name}
@@ -128,7 +127,7 @@ class ProjectService:
     @staticmethod
     async def update_project_avatar(
         project_id: Annotated[str, Path(...)],
-        avatar: Annotated[UploadFile,File(..., description="上传的头像文件")],
+        avatar: Annotated[UploadFile, File(..., description="上传的头像文件")],
         user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         """
@@ -175,7 +174,6 @@ class ProjectService:
         obj: ProjectRoleParam,
         user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
-
         result = await ProjectRoleCRUD.exists(
             user_id=obj.user_id,
             project_id=obj.project_id,

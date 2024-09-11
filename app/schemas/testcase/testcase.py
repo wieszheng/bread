@@ -6,17 +6,16 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from typing import List, Annotated
+
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
-from app.schemas.testcase.testcase_out_parameters import TestCaseOutParametersForm
-
 
 class TestCaseSchemaBase(BaseModel):
-    priority: Annotated[str, Field(min_length=2, max_length=30)]
-    url: str = ""
     name: str = ""
+    priority: Annotated[str, Field(min_length=1, max_length=3)]
+    url: str = ""
     case_type: int = 0
     base_path: str = None
     tag: str = None
@@ -25,7 +24,7 @@ class TestCaseSchemaBase(BaseModel):
     request_headers: str = None
     request_method: str = None
     status: int
-    out_parameters: List[TestCaseOutParametersForm] = []
+    # out_parameters: List[TestCaseOutParametersForm] = []
     directory_id: int
     request_type: int
 

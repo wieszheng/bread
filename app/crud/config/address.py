@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from app.crud import BaseCRUD
 from app.crud.helper import JoinConfig, compute_offset
 from app.models.address import Address
@@ -46,5 +47,5 @@ class AddressCRUD(BaseCRUD):
                 ),
             ],
             is_deleted=False,
-            **filter_params
+            **filter_params,
         )

@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 import traceback
 
 from fastapi import FastAPI

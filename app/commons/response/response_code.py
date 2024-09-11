@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-import dataclasses
+
 from enum import Enum
 from functools import lru_cache
 

@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from typing import Annotated
 
 from fastapi import Depends, Query
@@ -74,7 +75,6 @@ class AddressService:
         env: Annotated[int | None, Query(description="环境ID")] = None,
         name: Annotated[str | None, Query(description="网关名称")] = None,
     ) -> ResponseModel:
-
         result = await AddressCRUD.get_list(
             limit=pageSize,
             offset=current,

@@ -6,7 +6,8 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from sqlalchemy import INT, SMALLINT, TEXT, String, UniqueConstraint
+
+from sqlalchemy import INT, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models import BaseModel
@@ -18,7 +19,7 @@ class TestCaseOutParameters(BaseModel):
     """
 
     __tablename__ = "bread_out_parameters"
-
+    __table_args__ = (UniqueConstraint("case_id"),)
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, comment="主键ID"
     )

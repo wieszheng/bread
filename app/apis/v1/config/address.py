@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from fastapi import APIRouter
 
 from app.core.security.Jwt import DependsJwtAuth

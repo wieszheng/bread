@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 import uuid
 
 from fastapi import Depends, File, Path, Query, UploadFile
@@ -33,7 +34,6 @@ from app.schemas.auth.user import (
 
 
 class UserService:
-
     @staticmethod
     async def register_user(obj: RegisterUserParam) -> ResponseModel:
         """
@@ -48,7 +48,7 @@ class UserService:
 
     @staticmethod
     async def get_current_user_info(
-            user_info: CurrentUserInfo = Depends(get_current_user_new),
+        user_info: CurrentUserInfo = Depends(get_current_user_new),
     ) -> ResponseModel:
         """
         个人信息
@@ -84,8 +84,8 @@ class UserService:
 
     @staticmethod
     async def password_reset(
-            obj: ResetPasswordParam,
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        obj: ResetPasswordParam,
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         """
         重置密码
@@ -108,9 +108,8 @@ class UserService:
 
     @staticmethod
     async def update_avatar(
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
-            avatar: Annotated[UploadFile, File(..., description="上传的头像文件")],
-
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        avatar: Annotated[UploadFile, File(..., description="上传的头像文件")],
     ) -> ResponseModel:
         """
         更新头像
@@ -133,10 +132,10 @@ class UserService:
 
     @staticmethod
     async def get_pagination_users(
-            current: Annotated[int, Query(...)] = 1,
-            pageSize: Annotated[int, Query(...)] = 10,
-            nickname: Annotated[str | None, Query(description="用户昵称")] = None,
-            id: Annotated[int | None, Query(description="用户ID")] = None,
+        current: Annotated[int, Query(...)] = 1,
+        pageSize: Annotated[int, Query(...)] = 10,
+        nickname: Annotated[str | None, Query(description="用户昵称")] = None,
+        id: Annotated[int | None, Query(description="用户ID")] = None,
     ) -> ResponseModel:
         """
         分页查询用户
@@ -145,7 +144,6 @@ class UserService:
         filter_params = {}
         if nickname or id:
             filter_params = {"nickname": nickname, "id": id}
-        sorting = ()
 
         result = await UserCRUD.get_multi(
             limit=pageSize,
@@ -164,8 +162,8 @@ class UserService:
 
     @staticmethod
     async def delete_user(
-            userId: Annotated[int, Path(...)],
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        userId: Annotated[int, Path(...)],
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         """
         删除用户
@@ -195,7 +193,8 @@ class UserService:
 
     @staticmethod
     async def update_user(
-            obj: UpdateUserParam, user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        obj: UpdateUserParam,
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         """
         更新用户
@@ -223,10 +222,9 @@ class UserService:
 
     @staticmethod
     async def is_valid(
-            obj: UpdateUserControlParam,
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        obj: UpdateUserControlParam,
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
-
         result = await UserCRUD.get(id=obj.id)
         if not result:
             raise CustomException(CustomErrorCode.PARTNER_CODE_TOKEN_EXPIRED_FAIL)
@@ -241,8 +239,8 @@ class UserService:
 
     @staticmethod
     async def update_user_role(
-            obj: UpdateUserRoleParam,
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        obj: UpdateUserRoleParam,
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         result = await UserCRUD.get(id=obj.id)
         if not result:

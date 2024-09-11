@@ -6,8 +6,8 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from datetime import datetime
-from typing import Any, Optional
 
 from pydantic import (
     BaseModel,
@@ -15,13 +15,11 @@ from pydantic import (
     EmailStr,
     Field,
     HttpUrl,
-    field_serializer,
     field_validator,
 )
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from app.commons.enums import RoleType
-from app.commons.response.response_schema import ListPageRequestModel
 
 
 class AuthSchemaBase(BaseModel):

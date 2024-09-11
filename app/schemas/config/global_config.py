@@ -9,8 +9,6 @@
 
 from pydantic import BaseModel, Field
 
-from app.commons.enums import KeyType
-
 
 class GlobalConfigSchemaBase(BaseModel):
     key: str = Field(..., description="配置键值")

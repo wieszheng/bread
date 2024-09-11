@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from app.crud import BaseCRUD
 from app.models.project import Project
 from app.models.project_role import ProjectRole

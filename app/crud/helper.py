@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from typing import Any, Optional, Sequence, Union, cast
 
 from pydantic import BaseModel, ConfigDict

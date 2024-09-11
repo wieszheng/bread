@@ -6,7 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-import json
+
 import multiprocessing
 import os
 

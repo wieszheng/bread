@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from fastapi import FastAPI
 
 from app.middlewares.cors_middleware import add_cors_middleware

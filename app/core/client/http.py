@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from datetime import timedelta
 
 import httpx
@@ -14,7 +15,6 @@ from app.commons.enums import HttpMethod, RespFmt
 
 
 class AsyncHttpClient:
-
     def __init__(
         self,
         timeout=timedelta(seconds=10),
@@ -35,7 +35,7 @@ class AsyncHttpClient:
         params: dict = None,
         data: dict = None,
         timeout: timedelta = None,
-        **kwargs
+        **kwargs,
     ):
         """内部请求实现方法
 
@@ -61,7 +61,7 @@ class AsyncHttpClient:
             data=data,
             headers=headers,
             timeout=timeout.total_seconds(),
-            **kwargs
+            **kwargs,
         )
         return self.response
 
@@ -98,7 +98,7 @@ class AsyncHttpClient:
         params: dict = None,
         timeout: timedelta = None,
         resp_fmt: RespFmt = None,
-        **kwargs
+        **kwargs,
     ):
         """GET请求
 
@@ -123,7 +123,7 @@ class AsyncHttpClient:
         data: dict = None,
         timeout: timedelta = None,
         resp_fmt: RespFmt = None,
-        **kwargs
+        **kwargs,
     ):
         """POST请求
 
@@ -145,7 +145,7 @@ class AsyncHttpClient:
         data: dict = None,
         timeout: timedelta = None,
         resp_fmt: RespFmt = None,
-        **kwargs
+        **kwargs,
     ):
         """PUT请求
 
@@ -167,7 +167,7 @@ class AsyncHttpClient:
         data: dict = None,
         timeout: timedelta = None,
         resp_fmt: RespFmt = None,
-        **kwargs
+        **kwargs,
     ):
         """DELETE请求
 

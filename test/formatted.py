@@ -6,6 +6,9 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
+import json
+
 max_length = max(
     len(line.split("=")[0].strip())
     for line in [
@@ -52,7 +55,6 @@ if not name:
     filters = {"name__like": name}
     print(filters)
 
-import json
 
 data = {
     "Resources": [],

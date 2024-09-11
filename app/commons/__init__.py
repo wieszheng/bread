@@ -6,8 +6,9 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 import threading
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 

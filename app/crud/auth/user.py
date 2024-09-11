@@ -6,19 +6,17 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 import asyncio
 from datetime import datetime
-from typing import Type
 
-from pydantic import BaseModel
 
 from app.commons.response.response_code import CustomErrorCode
 from app.core.security.password import hash_psw
 from app.crud import BaseCRUD
-from app.crud.helper import compute_offset
 from app.exceptions.errors import CustomException
 from app.models.user import User
-from app.schemas.auth.user import AvatarParam, RegisterUserParam
+from app.schemas.auth.user import RegisterUserParam
 
 
 class UserCRUD(BaseCRUD):

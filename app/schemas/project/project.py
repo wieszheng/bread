@@ -6,11 +6,8 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from typing import List, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
-from app.commons.response.response_schema import ListPageRequestModel
+from pydantic import BaseModel, Field, field_validator
 
 
 class ProjectSchemaBase(BaseModel):

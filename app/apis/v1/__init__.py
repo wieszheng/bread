@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from fastapi import APIRouter
 
 from app.apis.v1.auth import user

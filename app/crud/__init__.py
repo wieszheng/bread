@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from datetime import datetime
 from functools import wraps
 from typing import Any, Callable, Dict, Optional, Union
@@ -22,7 +23,6 @@ from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
 from app.commons import SingletonMetaCls
 from app.crud.helper import (
     JoinConfig,
-    _auto_detect_join_condition,
     _extract_matching_columns_from_schema,
     _get_primary_keys,
     _handle_null_primary_key_multi_join,
@@ -56,8 +56,6 @@ def with_session(method):
                         kwargs["session"] = session
                         return await method(cls, *args, **kwargs)
         except Exception as e:
-            import traceback
-
             logger.error(
                 f"操作Model：{cls.__model__.__name__}\n"
                 f"方法：{method.__name__}\n"
@@ -152,7 +150,6 @@ class BaseCRUD(SingletonMetaCls):
         sort_columns: Union[str, list[str]],
         sort_orders: Optional[Union[str, list[str]]] = None,
     ) -> Select:
-
         if sort_orders and not sort_columns:
             raise ValueError("Sort orders provided without corresponding sort columns.")
 
@@ -195,7 +192,6 @@ class BaseCRUD(SingletonMetaCls):
         joins_config: list[JoinConfig],
         use_temporary_prefix: bool = False,
     ):
-
         for join in joins_config:
             model = join.alias or join.model
             join_select = _extract_matching_columns_from_schema(
@@ -222,6 +218,34 @@ class BaseCRUD(SingletonMetaCls):
 
     @classmethod
     @with_session
+    async def _insert(
+        cls,
+        *,
+        case_id: int,
+        user_id: int,
+        form: Optional[type[BaseModel]],
+        commit: bool = True,
+        session: AsyncSession = None,
+        **fields: tuple,
+    ):
+        for field, model_info in fields.items():
+            md, model = model_info
+            field_data = getattr(form, field)
+            for f in field_data:
+                if hasattr(f, "case_id"):
+                    setattr(f, "case_id", case_id)
+                    object_mt: ModelType = model(**f.model_dump(), user_id=user_id)
+                else:
+                    object_mt: ModelType = model(
+                        **f.model_dump(), user_id=user_id, case_id=case_id
+                    )
+
+                session.add(object_mt)
+                if commit:
+                    await session.commit()
+
+    @classmethod
+    @with_session
     async def create(
         cls,
         *,
@@ -230,7 +254,6 @@ class BaseCRUD(SingletonMetaCls):
         session: AsyncSession = None,
         **kwargs: Any,
     ) -> ModelType:
-
         object_dict = obj.model_dump()
         object_mt: ModelType = cls.__model__(**object_dict, **kwargs)
         session.add(object_mt)
@@ -284,6 +307,39 @@ class BaseCRUD(SingletonMetaCls):
         return schema_to_select(**out)
 
     @classmethod
+    @with_session
+    async def get_all(
+        cls,
+        *,
+        schema_to_select: Optional[type[BaseModel]] = None,
+        return_as_model: bool = False,
+        return_total_count: bool = True,
+        session: AsyncSession = None,
+        **kwargs: Any,
+    ) -> Optional[Union[dict, BaseModel]]:
+        stmt = await cls.select(schema_to_select=schema_to_select, **kwargs)
+        result = await session.execute(stmt)
+        data = [dict(row) for row in result.mappings()]
+        response: dict[str, Any] = {"data": data}
+        if return_total_count:
+            total_count = await cls.count(**kwargs)
+            response["total_count"] = total_count
+
+        if return_as_model:
+            if not schema_to_select:
+                raise ValueError(
+                    "schema_to_select must be provided when return_as_model is True."
+                )
+            try:
+                model_data = [schema_to_select(**row) for row in data]
+                response["data"] = model_data
+            except ValidationError as e:
+                raise ValueError(
+                    f"Data validation error for schema {schema_to_select.__name__}: {e}"
+                )
+        return response
+
+    @classmethod
     def _get_pk_dict(cls, instance):
         return {
             pk.name: getattr(instance, pk.name)
@@ -311,7 +367,7 @@ class BaseCRUD(SingletonMetaCls):
                 db_instance, from_attributes=True
             )
         else:
-            await cls.update(db, instance)  # type: ignore
+            await cls.update(instance)  # type: ignore
             db_instance = await cls.get(
                 schema_to_select=schema_to_select,
                 return_as_model=return_as_model,
@@ -363,7 +419,6 @@ class BaseCRUD(SingletonMetaCls):
         session: AsyncSession = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
-
         if (limit is not None and limit < 0) or offset < 0:
             raise ValueError("Limit and offset must be non-negative.")
 
@@ -422,7 +477,6 @@ class BaseCRUD(SingletonMetaCls):
         session: AsyncSession = None,
         **kwargs: Any,
     ) -> Optional[dict[str, Any]]:
-
         if joins_config and (
             join_model or join_prefix or join_on or join_schema_to_select or alias
         ):
@@ -696,7 +750,6 @@ class BaseCRUD(SingletonMetaCls):
         session: AsyncSession = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
-
         if limit == 0:
             return {"data": [], "next_cursor": None}
 
@@ -791,7 +844,6 @@ class BaseCRUD(SingletonMetaCls):
         session: AsyncSession = None,
         **kwargs: Any,
     ) -> Optional[Union[dict, BaseModel]]:
-
         if not allow_multiple and (total_count := await cls.count(**kwargs)) > 1:
             raise ValueError(
                 f"Expected exactly one record to update, found {total_count}."

@@ -6,7 +6,6 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from typing import Any
 
 from fastapi import HTTPException
 

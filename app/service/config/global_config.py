@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from typing import Annotated
 
 from fastapi import Depends, Query
@@ -105,7 +106,7 @@ class GlobalConfigService:
                 ),
             ],
             is_deleted=False,
-            **filter_params
+            **filter_params,
         )
         return await ResponseBase.success(
             result={**result, "current": current, "pageSize": pageSize}

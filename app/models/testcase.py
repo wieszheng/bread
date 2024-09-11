@@ -6,13 +6,11 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
-from typing import List
 
-from sqlalchemy import INT, SMALLINT, TEXT, String, UniqueConstraint, ForeignKey
+from sqlalchemy import INT, SMALLINT, TEXT, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models import BaseModel
-from app.models.out_parameters import TestCaseOutParameters
 
 
 class TestCase(BaseModel):
@@ -48,4 +46,3 @@ class TestCase(BaseModel):
     case_type: Mapped[int] = mapped_column(
         SMALLINT, comment="0: 普通用例 1: 前置用例 2: 数据工厂"
     )
-    out_parameters: Mapped[List[TestCaseOutParameters]] = mapped_column(ForeignKey("bread_out_parameters.case_id"))
