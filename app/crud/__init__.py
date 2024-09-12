@@ -228,9 +228,9 @@ class BaseCRUD(SingletonMetaCls):
         obj: BaseModel,
         commit: bool = True,
         session: AsyncSession = None,
-        **fields: tuple,
+        **kwargs: tuple,
     ):
-        for field, model_info in fields.items():
+        for field, model_info in kwargs.items():
             _md, model = model_info
             field_data = getattr(obj, field)
             for f in field_data:
