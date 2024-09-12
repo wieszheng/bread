@@ -12,7 +12,7 @@ from typing import Annotated, List
 from pydantic import BaseModel, Field
 
 from app.schemas.testcase.testcase_data import TestcaseDataParam
-from app.schemas.testcase.testcase_out_parameters import TestCaseParametersParam
+from app.schemas.testcase.testcase_out_parameters import TestCaseParametersParam, UpdateTestCaseParametersParam
 
 
 class TestCaseSchemaBase(BaseModel):
@@ -32,6 +32,11 @@ class TestCaseSchemaBase(BaseModel):
 
 
 class TestCaseParam(TestCaseSchemaBase):
+    id: int = None
+
+
+class UpdateTestCaseParam(TestCaseSchemaBase):
+    out_parameters: List[UpdateTestCaseParametersParam] = []
     id: int = None
 
 

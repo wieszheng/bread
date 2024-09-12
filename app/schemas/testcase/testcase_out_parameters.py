@@ -19,6 +19,9 @@ class TestCaseOutSchemaBase(BaseModel):
 
 class TestCaseParametersParam(TestCaseOutSchemaBase):
     id: int = None
+
+
+class UpdateTestCaseParametersParam(TestCaseOutSchemaBase):
     case_id: int = None
 
 

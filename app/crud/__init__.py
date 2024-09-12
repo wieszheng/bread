@@ -256,8 +256,9 @@ class BaseCRUD(SingletonMetaCls):
         session: AsyncSession = None,
         **kwargs: Any,
     ) -> ModelType:
-        object_dict = obj.model_dump()
-        object_mt: ModelType = cls.__model__(**object_dict, **kwargs)
+        object_dict = {**obj.model_dump(), **kwargs}
+
+        object_mt: ModelType = cls.__model__(**object_dict)
         session.add(object_mt)
         if commit:
             await session.commit()
