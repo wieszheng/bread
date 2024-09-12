@@ -6,11 +6,12 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from app.crud import BaseCRUD
 from app.models.testcase_data import TestCaseData
 
 
-class TestCaseAssertsCRUD(BaseCRUD):
+class TestCaseDataCRUD(BaseCRUD):
     __model__ = TestCaseData
 
     pass

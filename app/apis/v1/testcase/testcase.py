@@ -19,279 +19,279 @@ from app.service.testcase.testcase_data import TestcaseDataService
 from app.service.testcase.testcase_directory import TestcaseDirectoryService
 from app.service.testcase.testcase_out_parameters import TestCaseOutParametersService
 
-router = APIRouter(prefix="/testcase", tags=["用例管理"], dependencies=[DependsJwtAuth])
+router = APIRouter(prefix='/testcase', tags=['用例管理'], dependencies=[DependsJwtAuth])
 
 router.add_api_route(
-    "/list",
+    '/list',
     endpoint=TestCaseService.get_testcase_list,
-    methods=["get"],
-    summary="（支持条件）分页获取所有项目",
+    methods=['get'],
+    summary='（支持条件）获取所有用例',
     dependencies=[Depends(Permission(2))],
 )
 
 router.add_api_route(
-    "", endpoint=TestCaseService.add_testcase, methods=["post"], summary=""
+    '', endpoint=TestCaseService.add_testcase, methods=['post'], summary='添加用例 v1'
 )
 
 router.add_api_route(
-    "/create",
+    '/create',
     endpoint=TestCaseService.create_testcase,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='创建接口测试用例 v2 支持多参数',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=TestCaseService.update_testcase,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='修改用例',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=TestCaseService.delete_testcase,
-    methods=["delete"],
-    summary="",
+    methods=['delete'],
+    summary='删除用例',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=TestCaseService.get_testcase,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/asserts",
+    '/asserts',
     endpoint=TestCaseAssertsService.create_asserts,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 
 router.add_api_route(
-    "/asserts",
+    '/asserts',
     endpoint=TestCaseAssertsService.update_asserts,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='',
 )
 
 router.add_api_route(
-    "/asserts",
+    '/asserts',
     endpoint=TestCaseAssertsService.delete_asserts,
-    methods=["delete"],
-    summary="",
+    methods=['delete'],
+    summary='',
 )
 
 router.add_api_route(
-    "/constructor",
+    '/constructor',
     endpoint=ConstructorService.create_constructor,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 
 router.add_api_route(
-    "/constructor",
+    '/constructor',
     endpoint=ConstructorService.update_constructor,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='',
 )
 
 router.add_api_route(
-    "/constructor",
+    '/constructor',
     endpoint=ConstructorService.delete_constructor,
-    methods=["delete"],
-    summary="",
+    methods=['delete'],
+    summary='',
 )
 
 router.add_api_route(
-    "/constructor",
+    '/constructor',
     endpoint=ConstructorService.get_constructor,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/constructors",
+    '/constructors',
     endpoint=ConstructorService.get_constructor_list,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/constructor/order",
+    '/constructor/order',
     endpoint=ConstructorService.update_constructor_order,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='',
 )
 
 router.add_api_route(
-    "/constructor/tree",
+    '/constructor/tree',
     endpoint=ConstructorService.get_constructor_tree,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/report",
+    '/report',
     endpoint=TestReportService.get_report,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/reports",
+    '/reports',
     endpoint=TestReportService.get_report_list,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/xmind",
+    '/xmind',
     endpoint=TestCaseService.get_xmind,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/directory",
+    '/directory',
     endpoint=TestcaseDirectoryService.get_directory,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/tree",
+    '/tree',
     endpoint=TestcaseDirectoryService.get_tree,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/directory",
+    '/directory',
     endpoint=TestcaseDirectoryService.get_directory,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/directory",
+    '/directory',
     endpoint=TestcaseDirectoryService.create_directory,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 
 router.add_api_route(
-    "/directory",
+    '/directory',
     endpoint=TestcaseDirectoryService.update_directory,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='',
 )
 
 router.add_api_route(
-    "/directory",
+    '/directory',
     endpoint=TestcaseDirectoryService.delete_directory,
-    methods=["delete"],
-    summary="",
+    methods=['delete'],
+    summary='',
 )
 
 router.add_api_route(
-    "/data",
+    '/data',
     endpoint=TestcaseDataService.create_data,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 
 router.add_api_route(
-    "/data",
+    '/data',
     endpoint=TestcaseDataService.update_data,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='',
 )
 
 router.add_api_route(
-    "/data",
+    '/data',
     endpoint=TestcaseDataService.delete_data,
-    methods=["delete"],
-    summary="",
+    methods=['delete'],
+    summary='',
 )
 
 router.add_api_route(
-    "/move",
+    '/move',
     endpoint=TestCaseService.move_testcase,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 
 router.add_api_route(
-    "/parameters",
+    '/parameters',
     endpoint=TestCaseOutParametersService.create_parameters,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 
 router.add_api_route(
-    "/parameters",
+    '/parameters',
     endpoint=TestCaseOutParametersService.update_parameters,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='',
 )
 
 router.add_api_route(
-    "/parameters",
+    '/parameters',
     endpoint=TestCaseOutParametersService.delete_parameters,
-    methods=["delete"],
-    summary="",
+    methods=['delete'],
+    summary='',
 )
 
 router.add_api_route(
-    "/parameters/batch",
+    '/parameters/batch',
     endpoint=TestCaseOutParametersService.update_parameters_batch,
-    methods=["put"],
-    summary="",
+    methods=['put'],
+    summary='',
 )
 
 router.add_api_route(
-    "/record/start",
+    '/record/start',
     endpoint=TestCaseService.get_record_start,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/record/stop",
+    '/record/stop',
     endpoint=TestCaseService.get_record_stop,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 router.add_api_route(
-    "/record/status",
+    '/record/status',
     endpoint=TestCaseService.get_record_status,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 router.add_api_route(
-    "/record/remove",
+    '/record/remove',
     endpoint=TestCaseService.get_record_remove,
-    methods=["get"],
-    summary="",
+    methods=['get'],
+    summary='',
 )
 
 router.add_api_route(
-    "/generate",
+    '/generate',
     endpoint=TestCaseService.create_generate,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 
 router.add_api_route(
-    "/import",
+    '/import',
     endpoint=TestCaseService.testcase_import,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )
 router.add_api_route(
-    "/variables",
+    '/variables',
     endpoint=TestCaseService.get_variables,
-    methods=["post"],
-    summary="",
+    methods=['post'],
+    summary='',
 )

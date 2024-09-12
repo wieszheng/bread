@@ -1,4 +1,4 @@
-line-length = 88
+line-length = 100
 cache-dir = ".ruff_cache"
 target-version = "py312"
 unsafe-fixes = true

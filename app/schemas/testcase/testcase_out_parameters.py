@@ -10,19 +10,18 @@
 from pydantic import BaseModel
 
 
-class TestCaseOutParametersForm(BaseModel):
-    id: int = None
-    # case_id = None
+class TestCaseOutSchemaBase(BaseModel):
     name: str
     expression: str = None
     match_index: str = None
     source: int
 
 
-class TestCaseParametersDto(TestCaseOutParametersForm):
+class TestCaseParametersParam(TestCaseOutSchemaBase):
+    id: int = None
     case_id: int = None
 
 
-class TestCaseVariablesDto(BaseModel):
+class TestCaseVariablesParam(BaseModel):
     case_id: int
     step_name: str

@@ -7,15 +7,18 @@
 @Software : PyCharm
 """
 
-from typing import Annotated
+from typing import Annotated, List
 
 from pydantic import BaseModel, Field
 
+from app.schemas.testcase.testcase_data import TestcaseDataParam
+from app.schemas.testcase.testcase_out_parameters import TestCaseParametersParam
+
 
 class TestCaseSchemaBase(BaseModel):
-    name: str = ""
+    name: str = ''
     priority: Annotated[str, Field(min_length=1, max_length=3)]
-    url: str = ""
+    url: str = ''
     case_type: int = 0
     base_path: str = None
     tag: str = None
@@ -30,3 +33,20 @@ class TestCaseSchemaBase(BaseModel):
 
 class TestCaseParam(TestCaseSchemaBase):
     id: int = None
+
+
+class TestCaseAssertsParam(BaseModel):
+    id: int = None
+    name: str
+    case_id: int = None
+    assert_type: str
+    expected: str
+    actually: str
+
+
+class TestCaseInfoParam(BaseModel):
+    case: TestCaseSchemaBase = None
+    asserts: List[TestCaseAssertsParam] = []
+    data: List[TestcaseDataParam] = []
+    # constructor: List[ConstructorForm] = []
+    out_parameters: List[TestCaseParametersParam] = []
