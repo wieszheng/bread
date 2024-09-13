@@ -13,21 +13,9 @@ from typing import Any, Callable, Dict
 
 from loguru import logger
 from pydantic import BaseModel, ValidationError
-from sqlalchemy import (
-    Join,
-    Result,
-    Row,
-    Select,
-    asc,
-    delete,
-    desc,
-    func,
-    inspect,
-    or_,
-    select,
-    update,
-)
+from sqlalchemy import Join, Result, Row, Select, asc
 from sqlalchemy import column as c
+from sqlalchemy import delete, desc, func, inspect, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.util import AliasedClass
 from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
@@ -135,7 +123,11 @@ class BaseCRUD(SingletonMetaCls):
                     or_filters = [
                         sqlalchemy_filter(column)(or_value)
                         for or_key, or_value in value.items()
-                        if (sqlalchemy_filter := cls._get_sqlalchemy_filter(or_key, value))
+                        if (
+                            sqlalchemy_filter := cls._get_sqlalchemy_filter(
+                                or_key, value
+                            )
+                        )
                         is not None
                     ]
                     filters.append(or_(*or_filters))
@@ -169,7 +161,9 @@ class BaseCRUD(SingletonMetaCls):
                 if not isinstance(sort_orders, list):
                     sort_orders = [sort_orders] * len(sort_columns)
                 if len(sort_columns) != len(sort_orders):
-                    raise ValueError('The length of sort_columns and sort_orders must match.')
+                    raise ValueError(
+                        'The length of sort_columns and sort_orders must match.'
+                    )
 
                 for idx, order in enumerate(sort_orders):
                     if order not in ['asc', 'desc']:
@@ -177,7 +171,9 @@ class BaseCRUD(SingletonMetaCls):
                             f"Invalid sort order: {order}. Only 'asc' or 'desc' are allowed."
                         )
 
-            validated_sort_orders = ['asc'] * len(sort_columns) if not sort_orders else sort_orders
+            validated_sort_orders = (
+                ['asc'] * len(sort_columns) if not sort_orders else sort_orders
+            )
 
             for idx, column_name in enumerate(sort_columns):
                 column = getattr(cls.__model__, column_name, None)
@@ -205,7 +201,9 @@ class BaseCRUD(SingletonMetaCls):
                 join.alias,
                 use_temporary_prefix,
             )
-            joined_model_filters = cls._parse_filters(model=model, **(join.filters or {}))
+            joined_model_filters = cls._parse_filters(
+                model=model, **(join.filters or {})
+            )
 
             if join.join_type == 'left':
                 stmt = stmt.outerjoin(model, join.join_on).add_columns(*join_select)
@@ -304,7 +302,9 @@ class BaseCRUD(SingletonMetaCls):
         if not return_as_model:
             return out
         if not schema_to_select:
-            raise ValueError('schema_to_select must be provided when return_as_model is True.')
+            raise ValueError(
+                'schema_to_select must be provided when return_as_model is True.'
+            )
         return schema_to_select(**out)
 
     @classmethod
@@ -328,7 +328,9 @@ class BaseCRUD(SingletonMetaCls):
 
         if return_as_model:
             if not schema_to_select:
-                raise ValueError('schema_to_select must be provided when return_as_model is True.')
+                raise ValueError(
+                    'schema_to_select must be provided when return_as_model is True.'
+                )
             try:
                 model_data = [schema_to_select(**row) for row in data]
                 response['data'] = model_data
@@ -340,7 +342,10 @@ class BaseCRUD(SingletonMetaCls):
 
     @classmethod
     def _get_pk_dict(cls, instance):
-        return {pk.name: getattr(instance, pk.name) for pk in _get_primary_keys(cls.__model__)}
+        return {
+            pk.name: getattr(instance, pk.name)
+            for pk in _get_primary_keys(cls.__model__)
+        }
 
     @classmethod
     async def upsert(
@@ -359,7 +364,9 @@ class BaseCRUD(SingletonMetaCls):
         )
         if db_instance is None:
             db_instance = await cls.create(instance)  # type: ignore
-            db_instance = schema_to_select.model_validate(db_instance, from_attributes=True)
+            db_instance = schema_to_select.model_validate(
+                db_instance, from_attributes=True
+            )
         else:
             await cls.update(instance)  # type: ignore
             db_instance = await cls.get(
@@ -389,7 +396,9 @@ class BaseCRUD(SingletonMetaCls):
     ) -> int:
         filters = cls._parse_filters(**kwargs)
         if filters:
-            count_query = select(func.count()).select_from(cls.__model__).filter(*filters)
+            count_query = (
+                select(func.count()).select_from(cls.__model__).filter(*filters)
+            )
         else:
             count_query = select(func.count()).select_from(cls.__model__)
 
@@ -437,7 +446,9 @@ class BaseCRUD(SingletonMetaCls):
 
         if return_as_model:
             if not schema_to_select:
-                raise ValueError('schema_to_select must be provided when return_as_model is True.')
+                raise ValueError(
+                    'schema_to_select must be provided when return_as_model is True.'
+                )
             try:
                 model_data = [schema_to_select(**row) for row in data]
                 response['data'] = model_data
@@ -507,7 +518,9 @@ class BaseCRUD(SingletonMetaCls):
         db_rows = await session.execute(stmt)
         if any(join.relationship_type == 'one-to-many' for join in join_definitions):
             if nest_joins is False:  # pragma: no cover
-                raise ValueError('Cannot use one-to-many relationship with nest_joins=False')
+                raise ValueError(
+                    'Cannot use one-to-many relationship with nest_joins=False'
+                )
             results = db_rows.fetchall()
             data_list = [dict(row._mapping) for row in results]
         else:
@@ -693,7 +706,9 @@ class BaseCRUD(SingletonMetaCls):
             else:
                 data.append(row_dict)
 
-        if nest_joins and any(join.relationship_type == 'one-to-many' for join in join_definitions):
+        if nest_joins and any(
+            join.relationship_type == 'one-to-many' for join in join_definitions
+        ):
             nested_data = _nest_multi_join_data(
                 base_primary_key=_get_primary_keys(cls.__model__)[0].name,
                 data=data,
@@ -702,7 +717,9 @@ class BaseCRUD(SingletonMetaCls):
                 schema_to_select=schema_to_select if return_as_model else None,
                 nested_schema_to_select={
                     (
-                        join.join_prefix.rstrip('_') if join.join_prefix else join.model.__name__
+                        join.join_prefix.rstrip('_')
+                        if join.join_prefix
+                        else join.model.__name__
                     ): join.schema_to_select
                     for join in join_definitions
                     if join.schema_to_select
@@ -714,7 +731,9 @@ class BaseCRUD(SingletonMetaCls):
         response: dict[str, Any] = {'data': nested_data}
 
         if return_total_count:
-            total_count: int = await cls.count(db=session, joins_config=joins_config, **kwargs)
+            total_count: int = await cls.count(
+                db=session, joins_config=joins_config, **kwargs
+            )
             response['total_count'] = total_count
 
         return response
@@ -780,7 +799,9 @@ class BaseCRUD(SingletonMetaCls):
         if not return_as_model:
             return out
         if not schema_to_select:  # pragma: no cover
-            raise ValueError('schema_to_select must be provided when return_as_model is True.')
+            raise ValueError(
+                'schema_to_select must be provided when return_as_model is True.'
+            )
         return schema_to_select(**out)
 
     @classmethod
@@ -796,7 +817,9 @@ class BaseCRUD(SingletonMetaCls):
 
         if return_as_model:
             if not schema_to_select:  # pragma: no cover
-                raise ValueError('schema_to_select must be provided when return_as_model is True.')
+                raise ValueError(
+                    'schema_to_select must be provided when return_as_model is True.'
+                )
             try:
                 model_data = [schema_to_select(**row) for row in data]
                 response['data'] = model_data
@@ -823,7 +846,9 @@ class BaseCRUD(SingletonMetaCls):
         **kwargs: Any,
     ) -> dict | BaseModel | None:
         if not allow_multiple and (total_count := await cls.count(**kwargs)) > 1:
-            raise ValueError(f'Expected exactly one record to update, found {total_count}.')
+            raise ValueError(
+                f'Expected exactly one record to update, found {total_count}.'
+            )
         if isinstance(obj, dict):
             update_data = obj
         else:
@@ -876,7 +901,9 @@ class BaseCRUD(SingletonMetaCls):
         **kwargs: Any,
     ) -> None:
         if not allow_multiple and (total_count := await cls.count(**kwargs)) > 1:
-            raise ValueError(f'Expected exactly one record to delete, found {total_count}.')
+            raise ValueError(
+                f'Expected exactly one record to delete, found {total_count}.'
+            )
 
         filters = cls._parse_filters(**kwargs)
         stmt = delete(cls.__model__).filter(*filters)
@@ -896,7 +923,9 @@ class BaseCRUD(SingletonMetaCls):
     ) -> None:
         filters = cls._parse_filters(**kwargs)
         if db_row:
-            if hasattr(db_row, cls.is_deleted_column) and hasattr(db_row, cls.deleted_at_column):
+            if hasattr(db_row, cls.is_deleted_column) and hasattr(
+                db_row, cls.deleted_at_column
+            ):
                 setattr(db_row, cls.is_deleted_column, True)
                 setattr(db_row, cls.deleted_at_column, datetime.now())
                 if commit:
@@ -911,9 +940,13 @@ class BaseCRUD(SingletonMetaCls):
         if total_count == 0:
             raise ValueError('No record found to delete.')
         if not allow_multiple and total_count > 1:
-            raise ValueError(f'Expected exactly one record to delete, found {total_count}.')
+            raise ValueError(
+                f'Expected exactly one record to delete, found {total_count}.'
+            )
         logger.debug([col.key for col in cls.__model__.__table__.columns])
-        if cls.is_deleted_column in [col.key for col in cls.__model__.__table__.columns]:
+        if cls.is_deleted_column in [
+            col.key for col in cls.__model__.__table__.columns
+        ]:
             update_stmt = (
                 update(cls.__model__)
                 .filter(*filters)

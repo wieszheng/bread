@@ -18,15 +18,15 @@ from pydantic_settings import BaseSettings
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
-LOG_DIR = os.path.join(ROOT, "logs")
+LOG_DIR = os.path.join(ROOT, 'logs')
 if not os.path.exists(LOG_DIR):
     os.mkdir(LOG_DIR)
 
 # 项目运行时所有的日志文件
-SERVER_LOG_FILE: str = os.path.join(LOG_DIR, f'{time.strftime("%Y-%m-%d")}_server.log')
+SERVER_LOG_FILE: str = os.path.join(LOG_DIR, f'{time.strftime('%Y-%m-%d')}_server.log')
 
 # 错误时的日志文件
-ERROR_LOG_FILE: str = os.path.join(LOG_DIR, f'{time.strftime("%Y-%m-%d")}_error.log')
+ERROR_LOG_FILE: str = os.path.join(LOG_DIR, f'{time.strftime('%Y-%m-%d')}_error.log')
 
 
 class AppSettings(BaseSettings):
@@ -50,21 +50,21 @@ class AppSettings(BaseSettings):
     ADMIN: int
 
     # 项目日志滚动配置（日志文件超过10 MB就自动新建文件扩充）
-    LOGGING_ROTATION: str = "10 MB"
+    LOGGING_ROTATION: str = '10 MB'
     LOGGING_CONF: dict = {
-        "server_handler": {
-            "file": SERVER_LOG_FILE,
-            "level": "INFO",
-            "rotation": LOGGING_ROTATION,
-            "backtrace": False,
-            "diagnose": False,
+        'server_handler': {
+            'file': SERVER_LOG_FILE,
+            'level': 'INFO',
+            'rotation': LOGGING_ROTATION,
+            'backtrace': False,
+            'diagnose': False,
         },
-        "error_handler": {
-            "file": ERROR_LOG_FILE,
-            "level": "ERROR",
-            "rotation": LOGGING_ROTATION,
-            "backtrace": True,
-            "diagnose": True,
+        'error_handler': {
+            'file': ERROR_LOG_FILE,
+            'level': 'ERROR',
+            'rotation': LOGGING_ROTATION,
+            'backtrace': True,
+            'diagnose': True,
         },
     }
 
@@ -161,10 +161,10 @@ def get_env_file() -> str:
     """
     .env 文件路径
     """
-    run_env = os.environ.get("APP_ENV", "")
-    env_file = ".env.dev"
-    if run_env != "":
-        env_file = f".env.{run_env}"
+    run_env = os.environ.get('APP_ENV', '')
+    env_file = '.env.dev'
+    if run_env != '':
+        env_file = f'.env.{run_env}'
     return env_file
 
 
@@ -172,17 +172,17 @@ def parse_cli_args():
     """
     解析命令行参数
     """
-    if "uvicorn" in sys.argv[0]:
+    if 'uvicorn' in sys.argv[0]:
         pass
     else:
-        parser = ArgumentParser(description="命令行参数")
-        parser.add_argument("--env", type=str, default="", help="运行环境")
+        parser = ArgumentParser(description='命令行参数')
+        parser.add_argument('--env', type=str, default='', help='运行环境')
 
         args, _ = parser.parse_known_args()
-        os.environ["APP_ENV"] = args.env if args.env else "dev"
+        os.environ['APP_ENV'] = args.env if args.env else 'dev'
 
     # 加载配置
-    load_dotenv(os.path.join(ROOT, "conf", get_env_file()))
+    load_dotenv(os.path.join(ROOT, 'conf', get_env_file()))
 
 
 class Settings(

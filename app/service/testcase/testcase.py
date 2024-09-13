@@ -24,17 +24,17 @@ from app.models.testcase_data import TestCaseData
 from app.schemas.auth.user import CurrentUserInfo
 from app.schemas.testcase.testcase import (
     TestCaseInfoParam,
-    UpdateTestCaseParam,
     TestCaseSchemaBase,
+    UpdateTestCaseParam,
 )
 
 
 class TestCaseService:
     @staticmethod
     async def get_testcase_list(
-            directory_id: Annotated[int | None, ...] = None,
-            name: Annotated[str, ...] = '',
-            create_user: Annotated[str | None, ...] = None,
+        directory_id: Annotated[int | None, ...] = None,
+        name: Annotated[str, ...] = '',
+        create_user: Annotated[str | None, ...] = None,
     ) -> ResponseModel:
         parents = []
         if directory_id:
@@ -47,8 +47,8 @@ class TestCaseService:
 
     @staticmethod
     async def add_testcase(
-            obj: TestCaseSchemaBase,
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        obj: TestCaseSchemaBase,
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_ = await TestCaseCRUD.exists(name=obj.name, directory_id=obj.directory_id)
         if input_:
@@ -58,13 +58,17 @@ class TestCaseService:
 
     @staticmethod
     async def create_testcase(
-            obj: TestCaseInfoParam,
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        obj: TestCaseInfoParam,
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
-        input_ = await TestCaseCRUD.exists(directory_id=obj.case.directory_id, name=obj.case.name)
+        input_ = await TestCaseCRUD.exists(
+            directory_id=obj.case.directory_id, name=obj.case.name
+        )
         if input_:
             raise CustomException(CustomErrorCode.CASE_NAME_EXIST)
-        result = await TestCaseCRUD.create(obj=obj.case, created_by=user_info.id, commit=False)
+        result = await TestCaseCRUD.create(
+            obj=obj.case, created_by=user_info.id, commit=False
+        )
         await TestCaseCRUD._insert(
             case_id=result.id,
             user_id=user_info.id,
@@ -76,19 +80,28 @@ class TestCaseService:
 
     @staticmethod
     async def update_testcase(
-            obj: UpdateTestCaseParam,
-            user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
+        obj: UpdateTestCaseParam,
+        user_info: Annotated[CurrentUserInfo, Depends(get_current_user_new)],
     ) -> ResponseModel:
         input_id = await TestCaseCRUD.get(id=obj.id)
         if not input_id:
             raise CustomException(CustomErrorCode.CASE_ID_NOT_EXIST)
         await TestCaseCRUD.update(
-            obj={**obj.model_dump(exclude={'out_parameters'}), 'updated_by': user_info.id},
+            obj={
+                **obj.model_dump(exclude={'out_parameters'}),
+                'updated_by': user_info.id,
+            },
             id=obj.id,
         )
-        result = await TestCaseOutParametersCRUD.update_many(obj.id, user_info.id, obj.out_parameters)
+        result = await TestCaseOutParametersCRUD.update_many(
+            obj.id, user_info.id, obj.out_parameters
+        )
         return await ResponseBase.success(
-            result={"case_info": {**obj.model_dump(exclude={'out_parameters'})}, "out_parameters": result})
+            result={
+                'case_info': {**obj.model_dump(exclude={'out_parameters'})},
+                'out_parameters': result,
+            }
+        )
 
     @staticmethod
     async def delete_testcase(id: int):

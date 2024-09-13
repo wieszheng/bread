@@ -11,8 +11,8 @@ from typing import Generic, Sequence, TypeVar
 
 from pydantic import BaseModel
 
-T = TypeVar("T")
-DataT = TypeVar("DataT")
+T = TypeVar('T')
+DataT = TypeVar('DataT')
 
 
 class _Page(Generic[T]):

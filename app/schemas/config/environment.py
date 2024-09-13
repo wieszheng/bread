@@ -15,7 +15,7 @@ from app.commons.response.response_schema import ListPageRequestModel
 
 
 class EnvironmentSchemaBase(BaseModel):
-    name: str = Field(..., description="环境名称")
+    name: str = Field(..., description='环境名称')
     remarks: str | None = None
 
 
@@ -24,7 +24,7 @@ class UpdateEnvironmentParam(EnvironmentSchemaBase):
 
 
 class EnvironmentQuery(BaseModel):
-    name: Optional[str] = Field(default=None, description="环境名称")
+    name: Optional[str] = Field(default=None, description='环境名称')
 
 
 class EnvironmentListInParam(ListPageRequestModel):

@@ -23,25 +23,25 @@ class JoinConfig(BaseModel):
     join_on: Any
     join_prefix: Optional[str] = None
     schema_to_select: Optional[type[BaseModel]] = None
-    join_type: str = "left"
+    join_type: str = 'left'
     alias: Optional[AliasedClass] = None
     filters: Optional[dict] = None
-    relationship_type: Optional[str] = "one-to-one"
+    relationship_type: Optional[str] = 'one-to-one'
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    @field_validator("relationship_type")
+    @field_validator('relationship_type')
     def check_valid_relationship_type(cls, value):
-        valid_relationship_types = {"one-to-one", "one-to-many"}
+        valid_relationship_types = {'one-to-one', 'one-to-many'}
         if value is not None and value not in valid_relationship_types:
-            raise ValueError(f"Invalid relationship type: {value}")  # pragma: no cover
+            raise ValueError(f'Invalid relationship type: {value}')  # pragma: no cover
         return value
 
-    @field_validator("join_type")
+    @field_validator('join_type')
     def check_valid_join_type(cls, value):
-        valid_join_types = {"left", "inner"}
+        valid_join_types = {'left', 'inner'}
         if value not in valid_join_types:
-            raise ValueError(f"Unsupported join type: {value}")
+            raise ValueError(f'Unsupported join type: {value}')
         return value
 
 
@@ -71,7 +71,7 @@ def _get_primary_keys(
     """Get the primary key of a SQLAlchemy model."""
     inspector_result = inspect(model)
     if inspector_result is None:  # pragma: no cover
-        raise ValueError("Model inspection failed, resulting in None.")
+        raise ValueError('Model inspection failed, resulting in None.')
     primary_key_columns: Sequence[Column] = inspector_result.mapper.primary_key
 
     return primary_key_columns
@@ -83,15 +83,15 @@ def _extract_matching_columns_from_schema(
     prefix: Optional[str] = None,
     alias: Optional[AliasedClass] = None,
     use_temporary_prefix: Optional[bool] = False,
-    temp_prefix: Optional[str] = "joined__",
+    temp_prefix: Optional[str] = 'joined__',
 ) -> list[Any]:
-    if not hasattr(model, "__table__"):  # pragma: no cover
+    if not hasattr(model, '__table__'):  # pragma: no cover
         raise AttributeError(f"{model.__name__} does not have a '__table__' attribute.")
 
     model_or_alias = alias if alias else model
     columns = []
     temp_prefix = (
-        temp_prefix if use_temporary_prefix and temp_prefix is not None else ""
+        temp_prefix if use_temporary_prefix and temp_prefix is not None else ''
     )
     if schema:
         for field in schema.model_fields.keys():
@@ -99,9 +99,9 @@ def _extract_matching_columns_from_schema(
                 column = getattr(model_or_alias, field)
                 if prefix is not None or use_temporary_prefix:
                     column_label = (
-                        f"{temp_prefix}{prefix}{field}"
+                        f'{temp_prefix}{prefix}{field}'
                         if prefix
-                        else f"{temp_prefix}{field}"
+                        else f'{temp_prefix}{field}'
                     )
                     column = column.label(column_label)
                 columns.append(column)
@@ -110,9 +110,9 @@ def _extract_matching_columns_from_schema(
             column = getattr(model_or_alias, column.key)
             if prefix is not None or use_temporary_prefix:
                 column_label = (
-                    f"{temp_prefix}{prefix}{column.key}"
+                    f'{temp_prefix}{prefix}{column.key}'
                     if prefix
-                    else f"{temp_prefix}{column.key}"
+                    else f'{temp_prefix}{column.key}'
                 )
                 column = column.label(column_label)
             columns.append(column)
@@ -142,7 +142,7 @@ def _handle_one_to_one(nested_data, nested_key, nested_field, value):
 def _nest_join_data(
     data: dict,
     join_definitions: list[JoinConfig],
-    temp_prefix: str = "joined__",
+    temp_prefix: str = 'joined__',
     nested_data: Optional[dict[str, Any]] = None,
 ) -> dict:
     if nested_data is None:
@@ -151,16 +151,16 @@ def _nest_join_data(
     for key, value in data.items():
         nested = False
         for join in join_definitions:
-            join_prefix = join.join_prefix or ""
-            full_prefix = f"{temp_prefix}{join_prefix}"
+            join_prefix = join.join_prefix or ''
+            full_prefix = f'{temp_prefix}{join_prefix}'
 
             if isinstance(key, str) and key.startswith(full_prefix):
                 nested_key = (
-                    join_prefix.rstrip("_") if join_prefix else join.model.__tablename__
+                    join_prefix.rstrip('_') if join_prefix else join.model.__tablename__
                 )
                 nested_field = key[len(full_prefix) :]
 
-                if join.relationship_type == "one-to-many":
+                if join.relationship_type == 'one-to-many':
                     nested_data = _handle_one_to_many(
                         nested_data, nested_key, nested_field, value
                     )
@@ -189,11 +189,11 @@ def _nest_join_data(
     for join in join_definitions:
         join_primary_key = _get_primary_key(join.model)
         nested_key = (
-            join.join_prefix.rstrip("_")
+            join.join_prefix.rstrip('_')
             if join.join_prefix
             else join.model.__tablename__
         )
-        if join.relationship_type == "one-to-many" and nested_key in nested_data:
+        if join.relationship_type == 'one-to-many' and nested_key in nested_data:
             if isinstance(nested_data.get(nested_key, []), list):
                 if any(
                     item[join_primary_key] is None for item in nested_data[nested_key]
@@ -364,11 +364,11 @@ def _auto_detect_join_condition(
         ValueError: If the join condition cannot be automatically determined.
         AttributeError: If either base_model or join_model does not have a `__table__` attribute.
     """
-    if not hasattr(base_model, "__table__"):  # pragma: no cover
+    if not hasattr(base_model, '__table__'):  # pragma: no cover
         raise AttributeError(
             f"{base_model.__name__} does not have a '__table__' attribute."
         )
-    if not hasattr(join_model, "__table__"):  # pragma: no cover
+    if not hasattr(join_model, '__table__'):  # pragma: no cover
         raise AttributeError(
             f"{join_model.__name__} does not have a '__table__' attribute."
         )
@@ -391,10 +391,10 @@ def _auto_detect_join_condition(
 
         if join_on is None:  # pragma: no cover
             raise ValueError(
-                "Could not automatically determine join condition. Please provide join_on."
+                'Could not automatically determine join condition. Please provide join_on.'
             )
     else:  # pragma: no cover
-        raise ValueError("Could not automatically get model columns.")
+        raise ValueError('Could not automatically get model columns.')
 
     return join_on
 
@@ -406,9 +406,9 @@ def _handle_null_primary_key_multi_join(
         item_dict = item if isinstance(item, dict) else item.model_dump()
 
         for join in join_definitions:
-            join_prefix = join.join_prefix or ""
+            join_prefix = join.join_prefix or ''
             nested_key = (
-                join_prefix.rstrip("_") if join_prefix else join.model.__tablename__
+                join_prefix.rstrip('_') if join_prefix else join.model.__tablename__
             )
 
             if nested_key in item_dict and isinstance(item_dict[nested_key], dict):

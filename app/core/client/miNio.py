@@ -17,7 +17,7 @@ from config import settings
 
 class MinioClient:
     def __init__(self):
-        endpoint = f"{settings.MINIO_HOST}:{settings.MINIO_PORT}"
+        endpoint = f'{settings.MINIO_HOST}:{settings.MINIO_PORT}'
         self.client = Minio(
             endpoint=endpoint,
             access_key=settings.MINIO_ACCESS_KEY,
@@ -52,9 +52,9 @@ class MinioClient:
         :param part_size: 分块上传大小
         :return:
         """
-        if "length" not in kwargs:
+        if 'length' not in kwargs:
             # 不指定长度，适用于未知大小的流
-            kwargs["length"] = -1
+            kwargs['length'] = -1
         return self.client.put_object(
             self.bucket_name, object_name, data, part_size=part_size, **kwargs
         )

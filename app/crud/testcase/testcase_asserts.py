@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from app.crud import BaseCRUD
 from app.models.testcase_asserts import TestCaseAsserts
 

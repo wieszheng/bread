@@ -71,7 +71,7 @@ class GlobalConfigService:
         if input_data:
             raise CustomException(CustomErrorCode.GLOBAL_CONFIG_NAME_EXIST)
         await GlobalConfigCRUD.update(
-            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
+            obj={**obj.model_dump(), 'updated_by': user_info.id}, id=obj.id
         )
         return await ResponseBase.success()
 
@@ -79,35 +79,35 @@ class GlobalConfigService:
     async def get_global_configs(
         current: Annotated[int, Query(...)] = 1,
         pageSize: Annotated[int, Query(...)] = 10,
-        env_name: Annotated[int | None, Query(description="环境")] = None,
-        key: Annotated[str | None, Query(description="key")] = None,
+        env_name: Annotated[int | None, Query(description='环境')] = None,
+        key: Annotated[str | None, Query(description='key')] = None,
     ) -> ResponseModel:
         filter_params = {}
         if key or env_name:
-            filter_params = {"key": key, "env_name": env_name}
+            filter_params = {'key': key, 'env_name': env_name}
         result = await GlobalConfigCRUD.get_multi_joined(
             limit=pageSize,
             offset=compute_offset(current, pageSize),
-            sort_columns="id",
-            sort_orders="desc",
+            sort_columns='id',
+            sort_orders='desc',
             joins_config=[
                 JoinConfig(
                     model=User,
                     join_on=GlobalConfigCRUD.__model__.created_by == User.id,
-                    join_prefix="user_",
+                    join_prefix='user_',
                     schema_to_select=UserInfoSchemaBase,
-                    join_type="left",
+                    join_type='left',
                 ),
                 JoinConfig(
                     model=Environment,
                     join_on=GlobalConfigCRUD.__model__.env == Environment.id,
-                    join_prefix="env_",
-                    join_type="left",
+                    join_prefix='env_',
+                    join_type='left',
                 ),
             ],
             is_deleted=False,
             **filter_params,
         )
         return await ResponseBase.success(
-            result={**result, "current": current, "pageSize": pageSize}
+            result={**result, 'current': current, 'pageSize': pageSize}
         )

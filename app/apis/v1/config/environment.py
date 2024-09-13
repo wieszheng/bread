@@ -13,40 +13,40 @@ from app.core.security.Jwt import DependsJwtAuth
 from app.service.config.environment import EnvironmentService
 
 router = APIRouter(
-    prefix="/config/environment", tags=["环境配置"], dependencies=[DependsJwtAuth]
+    prefix='/config/environment', tags=['环境配置'], dependencies=[DependsJwtAuth]
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=EnvironmentService.create_environment,
-    methods=["post"],
-    summary="新增环境信息",
+    methods=['post'],
+    summary='新增环境信息',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=EnvironmentService.get_environment,
-    methods=["get"],
-    summary="查询环境信息",
+    methods=['get'],
+    summary='查询环境信息',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=EnvironmentService.delete_environment,
-    methods=["delete"],
-    summary="删除环境信息",
+    methods=['delete'],
+    summary='删除环境信息',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=EnvironmentService.update_environment,
-    methods=["put"],
-    summary="修改环境信息",
+    methods=['put'],
+    summary='修改环境信息',
 )
 
 router.add_api_route(
-    "/list",
+    '/list',
     endpoint=EnvironmentService.get_environments,
-    methods=["get"],
-    summary="获取环境信息（支持条件查询）",
+    methods=['get'],
+    summary='获取环境信息（支持条件查询）',
 )

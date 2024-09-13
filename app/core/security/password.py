@@ -66,13 +66,13 @@ async def verify_psw(plain_psw: str, hashed_psw: str) -> bool:
         result = bcrypt.checkpw(plain_psw.encode(), hashed_psw.encode())
         return result
     except Exception as e:
-        logger.error(f"Error occurred during password verification: {str(e)}")
+        logger.error(f'Error occurred during password verification: {str(e)}')
         return False
 
 
 def add_salt(password: str) -> str:
     m = hashlib.md5()
-    bt = f"{password}{settings.SALT}".encode("utf-8")
+    bt = f'{password}{settings.SALT}'.encode('utf-8')
     m.update(bt)
     return m.hexdigest()
 
@@ -86,7 +86,7 @@ def generate_secret_key() -> tuple[str, str]:
     rsa = RSA.generate(2048, random_generator)
     private_key = rsa.exportKey()
     public_key = rsa.publickey().exportKey()
-    return private_key.decode("utf8"), public_key.decode("utf8")
+    return private_key.decode('utf8'), public_key.decode('utf8')
 
 
 async def encrypt_rsa_password(password: str) -> bytes | str:
@@ -98,7 +98,7 @@ async def encrypt_rsa_password(password: str) -> bytes | str:
     try:
         public_key = RSA.import_key(PUBLIC_KEY)
         cipher = PKCS1_v1_5.new(public_key)
-        text = cipher.encrypt(password.encode("utf8"))
+        text = cipher.encrypt(password.encode('utf8'))
         return base64.b64encode(text)
     except Exception as err:
         print(err)
@@ -114,7 +114,7 @@ async def decrypt_rsa_password(password) -> str:
     try:
         private_key = RSA.import_key(PRIVATE_KEY)
         cipher = PKCS1_v1_5.new(private_key)
-        text = cipher.decrypt(base64.b64decode(password), b"")
+        text = cipher.decrypt(base64.b64decode(password), b'')
         return text.decode()
     except Exception as err:
         print(err)

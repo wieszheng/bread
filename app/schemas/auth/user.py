@@ -9,27 +9,20 @@
 
 from datetime import datetime
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    EmailStr,
-    Field,
-    HttpUrl,
-    field_validator,
-)
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from app.commons.enums import RoleType
 
 
 class AuthSchemaBase(BaseModel):
-    username: str = Field(..., description="用户名")
-    password: str = Field(..., description="密码")
+    username: str = Field(..., description='用户名')
+    password: str = Field(..., description='密码')
 
-    @field_validator("username")
+    @field_validator('username')
     def validate_username(cls, value: str):
         if len(value) < 4:
-            raise ValueError("用户名长度不能小于4")
+            raise ValueError('用户名长度不能小于4')
         return value
 
 
@@ -40,26 +33,26 @@ class AuthLoginParam(AuthSchemaBase):
 class RegisterUserParam(AuthSchemaBase):
     """用户注册入参"""
 
-    nickname: str = Field(..., title="姓名", description="必传")
+    nickname: str = Field(..., title='姓名', description='必传')
     email: EmailStr = Field(
-        ..., title="邮箱号", examples=["user@qq.com"], description="必传"
+        ..., title='邮箱号', examples=['user@qq.com'], description='必传'
     )
 
-    @field_validator("email")
+    @field_validator('email')
     def validate_email(cls, value: str):
-        if not value.endswith("@qq.com"):
-            raise ValueError("邮箱格式不正确")
+        if not value.endswith('@qq.com'):
+            raise ValueError('邮箱格式不正确')
         return value
 
 
 class CustomPhoneNumber(PhoneNumber):
-    default_region_code = "CN"
+    default_region_code = 'CN'
 
 
 class UserInfoSchemaBase(BaseModel):
     username: str
     nickname: str
-    email: EmailStr = Field(..., example="user@qq.com")
+    email: EmailStr = Field(..., example='user@qq.com')
     phone: CustomPhoneNumber | None = None
     avatar: str | None = None
 
@@ -102,21 +95,21 @@ class ResetPasswordParam(BaseModel):
 class UpdateUserParam(BaseModel):
     id: int
     nickname: str = None
-    email: EmailStr = Field(..., example="user@qq.com")
+    email: EmailStr = Field(..., example='user@qq.com')
     phone: CustomPhoneNumber | None = None
 
 
 class AvatarParam(BaseModel):
-    url: HttpUrl = Field(..., description="头像 http 地址")
+    url: HttpUrl = Field(..., description='头像 http 地址')
 
 
 class UpdateUserControlParam(BaseModel):
-    id: int = Field(description="用户id")
-    is_valid: bool = Field(default=False, description="是否激活")
+    id: int = Field(description='用户id')
+    is_valid: bool = Field(default=False, description='是否激活')
 
 
 class UpdateUserRoleParam(BaseModel):
-    id: int = Field(description="用户id")
-    role: int = Field(description="用户权限")
+    id: int = Field(description='用户id')
+    role: int = Field(description='用户权限')
     username: str = None
-    email: EmailStr = Field(example="user@qq.com")
+    email: EmailStr = Field(example='user@qq.com')

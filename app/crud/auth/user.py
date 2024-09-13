@@ -10,7 +10,6 @@
 import asyncio
 from datetime import datetime
 
-
 from app.commons.response.response_code import CustomErrorCode
 from app.core.security.password import hash_psw
 from app.crud import BaseCRUD
@@ -26,13 +25,13 @@ class UserCRUD(BaseCRUD):
     async def update_user_role(cls, user_id: int, role: int = 2):
         res = await cls.exists(id=user_id)
         if res:
-            await cls.update(obj={"role": role}, id=user_id)
+            await cls.update(obj={'role': role}, id=user_id)
 
     @classmethod
     async def update_login_time(cls, user_id: int):
         res = await cls.exists(id=user_id)
         if res:
-            return await cls.update(obj={"last_login_at": datetime.now()}, id=user_id)
+            return await cls.update(obj={'last_login_at': datetime.now()}, id=user_id)
 
     @classmethod
     async def user_add(cls, user_item: RegisterUserParam):
@@ -55,5 +54,5 @@ class UserCRUD(BaseCRUD):
 
     @classmethod
     async def reset_password(cls, user_id: int, new_password: str):
-        await cls.update(obj={"password": await hash_psw(new_password)}, id=user_id)
-        return ""
+        await cls.update(obj={'password': await hash_psw(new_password)}, id=user_id)
+        return ''

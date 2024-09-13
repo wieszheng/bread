@@ -6,6 +6,7 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+
 from collections import defaultdict
 from typing import Annotated
 
@@ -32,9 +33,11 @@ class TestcaseDirectoryCRUD(BaseCRUD):
     async def get_directory_son(cls, directory_id: Annotated[int | None, ...]):
         parent_map = defaultdict(list)
         ans = [directory_id]
-        result = await cls.get_multi_by_cursor(parent__or={"eq": directory_id, "ne": None})
-        for d in result["data"]:
-            parent_map[d["parent"]].append(d["id"])
+        result = await cls.get_multi_by_cursor(
+            parent__or={'eq': directory_id, 'ne': None}
+        )
+        for d in result['data']:
+            parent_map[d['parent']].append(d['id'])
         son = parent_map.get(directory_id)
         cls.get_sub_son(parent_map, son, ans)
         return ans

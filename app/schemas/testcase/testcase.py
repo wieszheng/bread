@@ -12,7 +12,10 @@ from typing import Annotated, List
 from pydantic import BaseModel, Field
 
 from app.schemas.testcase.testcase_data import TestcaseDataParam
-from app.schemas.testcase.testcase_out_parameters import TestCaseParametersParam, UpdateTestCaseParametersParam
+from app.schemas.testcase.testcase_out_parameters import (
+    TestCaseParametersParam,
+    UpdateTestCaseParametersParam,
+)
 
 
 class TestCaseSchemaBase(BaseModel):

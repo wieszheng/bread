@@ -18,11 +18,11 @@ class Address(BaseModel):
     地址表
     """
 
-    __tablename__ = "bread_address"
+    __tablename__ = 'bread_address'
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, comment="主键ID"
+        primary_key=True, autoincrement=True, comment='主键ID'
     )
-    env: Mapped[int] = mapped_column(INT, comment="对应环境名称")
-    name: Mapped[str] = mapped_column(String(16), comment="网关名称")
-    gateway: Mapped[str] = mapped_column(String(128), comment="网关地址")
+    env: Mapped[int] = mapped_column(INT, comment='对应环境名称')
+    name: Mapped[str] = mapped_column(String(16), comment='网关名称')
+    gateway: Mapped[str] = mapped_column(String(128), comment='网关地址')

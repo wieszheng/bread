@@ -18,11 +18,11 @@ class TestcaseDirectory(BaseModel):
     用例目录表
     """
 
-    __tablename__ = "bread_testcase_directory"
+    __tablename__ = 'bread_testcase_directory'
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, comment="主键ID"
+        primary_key=True, autoincrement=True, comment='主键ID'
     )
-    project_id: Mapped[int] = mapped_column(INT, index=True, comment="项目id")
-    name: Mapped[str] = mapped_column(String(16), nullable=False, comment="目录名称")
-    parent: Mapped[int | None] = mapped_column(INT, comment="上传目录")
+    project_id: Mapped[int] = mapped_column(INT, index=True, comment='项目id')
+    name: Mapped[str] = mapped_column(String(16), nullable=False, comment='目录名称')
+    parent: Mapped[int | None] = mapped_column(INT, comment='上传目录')

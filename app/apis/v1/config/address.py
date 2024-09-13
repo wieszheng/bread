@@ -13,40 +13,40 @@ from app.core.security.Jwt import DependsJwtAuth
 from app.service.config.address import AddressService
 
 router = APIRouter(
-    prefix="/config/address", tags=["网关地址配置"], dependencies=[DependsJwtAuth]
+    prefix='/config/address', tags=['网关地址配置'], dependencies=[DependsJwtAuth]
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=AddressService.create_address,
-    methods=["post"],
-    summary="新增网关地址",
+    methods=['post'],
+    summary='新增网关地址',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=AddressService.get_address,
-    methods=["get"],
-    summary="查询网关地址",
+    methods=['get'],
+    summary='查询网关地址',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=AddressService.delete_address,
-    methods=["delete"],
-    summary="删除网关地址",
+    methods=['delete'],
+    summary='删除网关地址',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=AddressService.update_address,
-    methods=["put"],
-    summary="修改网关地址",
+    methods=['put'],
+    summary='修改网关地址',
 )
 
 router.add_api_route(
-    "/list",
+    '/list',
     endpoint=AddressService.get_address_list,
-    methods=["get"],
-    summary="获取网关地址（支持条件查询）",
+    methods=['get'],
+    summary='获取网关地址（支持条件查询）',
 )

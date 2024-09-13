@@ -14,7 +14,7 @@ from app.apis.v1.config import address, environment, global_config
 from app.apis.v1.project import project
 from app.apis.v1.testcase import testcase
 
-router = APIRouter(prefix="/v1")
+router = APIRouter(prefix='/v1')
 
 RegisterRouterList = [user, project, address, environment, global_config, testcase]
 

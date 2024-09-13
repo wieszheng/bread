@@ -23,7 +23,7 @@ class Permission:
         self, current_user: CurrentUserInfo = Depends(get_current_user_new)
     ):
         if current_user.role < self.role:
-            raise PermissionException(message="该用户无此接口权限")
+            raise PermissionException(message='该用户无此接口权限')
         return True
 
 

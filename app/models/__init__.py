@@ -28,7 +28,7 @@ async_database_url = URL.create(
     settings.MYSQL_HOST,
     settings.MYSQL_PORT,
     settings.MYSQL_DATABASE,
-    {"charset": "utf8mb4"},
+    {'charset': 'utf8mb4'},
 )
 # 创建异步引擎
 async_engine = create_async_engine(
@@ -68,7 +68,7 @@ class Base(AsyncAttrs, DeclarativeBase):
         if exclude_none:
             return {
                 alias_dict.get(c.name, c.name): (
-                    getattr(self, c.name).strftime("%Y-%m-%d %H:%M:%S")
+                    getattr(self, c.name).strftime('%Y-%m-%d %H:%M:%S')
                     if isinstance(getattr(self, c.name), datetime)
                     else getattr(self, c.name)
                 )
@@ -78,7 +78,7 @@ class Base(AsyncAttrs, DeclarativeBase):
         else:
             return {
                 alias_dict.get(c.name, c.name): (
-                    getattr(self, c.name, None).strftime("%Y-%m-%d %H:%M:%S")
+                    getattr(self, c.name, None).strftime('%Y-%m-%d %H:%M:%S')
                     if isinstance(getattr(self, c.name, None), datetime)
                     else getattr(self, c.name, None)
                 )
@@ -92,20 +92,20 @@ class TimestampMixin(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
     created_at: Mapped[datetime] = mapped_column(
-        default=datetime.now, comment="创建时间"
+        default=datetime.now, comment='创建时间'
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        default=datetime.now, onupdate=datetime.now, comment="更新时间"
+        default=datetime.now, onupdate=datetime.now, comment='更新时间'
     )
 
 
 class SoftDeleteMixin(AsyncAttrs, DeclarativeBase):
     deleted_at: Mapped[datetime | None] = mapped_column(
-        default=None, comment="删除时间"
+        default=None, comment='删除时间'
     )
     is_deleted: Mapped[bool] = mapped_column(
-        default=False, index=True, comment="是否逻辑删除"
+        default=False, index=True, comment='是否逻辑删除'
     )
 
 
@@ -114,9 +114,9 @@ class OperatorMixin(AsyncAttrs, DeclarativeBase):
 
     __abstract__ = True
 
-    created_by: Mapped[int | None] = mapped_column(default=None, comment="创建人")
+    created_by: Mapped[int | None] = mapped_column(default=None, comment='创建人')
 
-    updated_by: Mapped[int | None] = mapped_column(default=None, comment="更新人")
+    updated_by: Mapped[int | None] = mapped_column(default=None, comment='更新人')
 
 
 class BaseModel(Base, TimestampMixin, SoftDeleteMixin, OperatorMixin):

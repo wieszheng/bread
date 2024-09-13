@@ -57,25 +57,25 @@ class EnvironmentService:
         if not input_id:
             raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
         input_name = await EnvironmentCRUD.get(name=obj.name, is_deleted=False)
-        if input_name and input_name["id"] != obj.id:
+        if input_name and input_name['id'] != obj.id:
             raise CustomException(CustomErrorCode.ENVIRONMENT_NAME_EXIST)
         await EnvironmentCRUD.update(
-            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
+            obj={**obj.model_dump(), 'updated_by': user_info.id}, id=obj.id
         )
         return await ResponseBase.success()
 
     @staticmethod
     async def get_environments(
-        current: Annotated[int, Query(..., ge=1, description="Page number")] = 1,
+        current: Annotated[int, Query(..., ge=1, description='Page number')] = 1,
         pageSize: Annotated[
-            int, Query(..., gt=0, le=100, description="Page size")
+            int, Query(..., gt=0, le=100, description='Page size')
         ] = 10,
-        name: Annotated[str | None, Query(description="环境名称")] = None,
+        name: Annotated[str | None, Query(description='环境名称')] = None,
     ) -> ResponseModel:
         result = await EnvironmentCRUD.get_list(
             limit=pageSize, offset=current, name=name
         )
 
         return await ResponseBase.success(
-            result={**result, "current": current, "pageSize": pageSize}
+            result={**result, 'current': current, 'pageSize': pageSize}
         )

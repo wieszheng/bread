@@ -64,7 +64,7 @@ class AddressService:
         if not input_env_id:
             raise CustomException(CustomErrorCode.ENVIRONMENT_ID_NOT_EXIST)
         await AddressCRUD.update(
-            obj={**obj.model_dump(), "updated_by": user_info.id}, id=obj.id
+            obj={**obj.model_dump(), 'updated_by': user_info.id}, id=obj.id
         )
         return await ResponseBase.success()
 
@@ -72,8 +72,8 @@ class AddressService:
     async def get_address_list(
         current: Annotated[int, Query(...)] = 1,
         pageSize: Annotated[int, Query(...)] = 10,
-        env: Annotated[int | None, Query(description="环境ID")] = None,
-        name: Annotated[str | None, Query(description="网关名称")] = None,
+        env: Annotated[int | None, Query(description='环境ID')] = None,
+        name: Annotated[str | None, Query(description='网关名称')] = None,
     ) -> ResponseModel:
         result = await AddressCRUD.get_list(
             limit=pageSize,
@@ -83,5 +83,5 @@ class AddressService:
         )
 
         return await ResponseBase.success(
-            result={**result, "current": current, "pageSize": pageSize}
+            result={**result, 'current': current, 'pageSize': pageSize}
         )

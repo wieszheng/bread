@@ -20,28 +20,28 @@ from config import settings
 
 def init_logging(logging_conf: dict):
     for log_handler, log_conf in logging_conf.items():
-        log_file = log_conf.pop("file", None)
+        log_file = log_conf.pop('file', None)
         logger.add(log_file, **log_conf)
-    logger.info("setup logging success")
+    logger.info('setup logging success')
 
 
 async def init_create_table():
     # 根据映射创建库表（异步）
-    logger.info("初始化数据库连接...")
+    logger.info('初始化数据库连接...')
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    logger.info("数据库连接成功")
+    logger.info('数据库连接成功')
 
 
 # 生命周期事件
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML model
-    logger.info(f"{settings.APP_NAME} 开始启动")
-    logger.success(text2art(settings.APP_NAME, font="block", chr_ignore=True))
+    logger.info(f'{settings.APP_NAME} 开始启动')
+    logger.success(text2art(settings.APP_NAME, font='block', chr_ignore=True))
     await init_create_table()
     await register_routers(app)
-    logger.info(f"{settings.APP_NAME} 启动成功")
+    logger.info(f'{settings.APP_NAME} 启动成功')
     yield
     # Clean up the ML models and release the resources
-    logger.info(f"{settings.APP_NAME} 关闭成功")
+    logger.info(f'{settings.APP_NAME} 关闭成功')

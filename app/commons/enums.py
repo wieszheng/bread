@@ -23,21 +23,21 @@ class HttpMethod(Enum):
     请求方式
     """
 
-    GET = "GET"
-    POST = "POST"
-    PATCH = "PATCH"
-    PUT = "PUT"
-    DELETE = "DELETE"
-    HEAD = "HEAD"
-    OPTIONS = "OPTIONS"
+    GET = 'GET'
+    POST = 'POST'
+    PATCH = 'PATCH'
+    PUT = 'PUT'
+    DELETE = 'DELETE'
+    HEAD = 'HEAD'
+    OPTIONS = 'OPTIONS'
 
 
 class RespFmt(Enum):
     """http响应格式"""
 
-    JSON = "json"
-    BYTES = "bytes"
-    TEXT = "text"
+    JSON = 'json'
+    BYTES = 'bytes'
+    TEXT = 'text'
 
 
 class KeyType(Enum):

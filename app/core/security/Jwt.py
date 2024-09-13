@@ -21,7 +21,7 @@ from app.schemas.auth.user import CurrentUserInfo
 from config import settings
 
 # 设置时区
-ChinaTimeZone = pytz.timezone("Asia/Shanghai")
+ChinaTimeZone = pytz.timezone('Asia/Shanghai')
 DependsJwtAuth = Depends(HTTPBearer())
 
 
@@ -42,11 +42,11 @@ async def create_access_token(
         expire = current_time + timedelta(minutes=settings.JWT_EXPIRE_MINUTES)
 
     to_encode = {
-        "jti": current_time.strftime("%Y%m%d%H%M%f"),
-        "iss": settings.JWT_ISS,
-        "iat": current_time,
-        "exp": expire,
-        "sub": sub,
+        'jti': current_time.strftime('%Y%m%d%H%M%f'),
+        'iss': settings.JWT_ISS,
+        'iat': current_time,
+        'exp': expire,
+        'sub': sub,
         **kwargs,
     }
 
@@ -69,15 +69,15 @@ async def decode_jwt_token(token: str) -> int:
         payload = jwt.decode(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
-        user_id = int(payload.get("sub"))
+        user_id = int(payload.get('sub'))
         if not user_id:
-            raise AuthorizationException(message="签名验证失败，请检查Token是否被篡改")
+            raise AuthorizationException(message='签名验证失败，请检查Token是否被篡改')
     except InvalidSignatureError:
-        raise AuthorizationException(message="签名验证失败，请检查Token是否被篡改")
+        raise AuthorizationException(message='签名验证失败，请检查Token是否被篡改')
     except ExpiredSignatureError:
-        raise AuthorizationException(message="很久没操作，令牌Token过期")
+        raise AuthorizationException(message='很久没操作，令牌Token过期')
     except DecodeError:
-        raise AuthorizationException(message="解码失败，请检查Token格式")
+        raise AuthorizationException(message='解码失败，请检查Token格式')
     return user_id
 
 
@@ -92,9 +92,9 @@ async def get_current_user(pk: int):
 
     user = await UserCRUD.get(id=pk)
     if not user:
-        raise TokenError(message="非法Token，请检查提交信息")
-    if not user["is_valid"]:
-        raise AuthorizationException(message="用户已被锁定，请联系系统管理员")
+        raise TokenError(message='非法Token，请检查提交信息')
+    if not user['is_valid']:
+        raise AuthorizationException(message='用户已被锁定，请联系系统管理员')
 
     return user
 
@@ -109,17 +109,17 @@ async def get_current_user_new(request: Request):
     """
     from app.crud.auth.user import UserCRUD
 
-    token = request.headers.get("Authorization")
+    token = request.headers.get('Authorization')
     if not token:
         return
 
     scheme, token = get_authorization_scheme_param(token)
-    if scheme.lower() != "bearer":
+    if scheme.lower() != 'bearer':
         return
 
     sub = await decode_jwt_token(token)
     user = await UserCRUD.get(id=sub)
-    if not user["is_valid"]:
-        raise AuthorizationException(message="用户已被锁定，请联系系统管理员")
+    if not user['is_valid']:
+        raise AuthorizationException(message='用户已被锁定，请联系系统管理员')
 
     return CurrentUserInfo(**user)

@@ -39,19 +39,19 @@ class ResponseModel(BaseModel):
 class ListPageRequestModel(BaseModel):
     """分页请求模型"""
 
-    page: int = Field(default=1, ge=0, description="分页偏移量")
-    page_size: int = Field(default=10, gt=0, description="每页显示数量")
-    query_params: Optional[dict] = Field(default={}, description="查询参数")
-    orderings: Optional[str] = Field(default="id", description="排序字段")
+    page: int = Field(default=1, ge=0, description='分页偏移量')
+    page_size: int = Field(default=10, gt=0, description='每页显示数量')
+    query_params: Optional[dict] = Field(default={}, description='查询参数')
+    orderings: Optional[str] = Field(default='id', description='排序字段')
 
 
 class ListResponseDataModel(BaseModel):
     """分页列表响应data模型"""
 
-    total: int = Field(default=0, description="数据总数量")
-    data_list: list = Field(default=[], description="数据列表")
-    has_more: bool = Field(default=False, description="是否有下一页")
-    next_offset: int = Field(default=0, description="offset下次起步")
+    total: int = Field(default=0, description='数据总数量')
+    data_list: list = Field(default=[], description='数据列表')
+    has_more: bool = Field(default=False, description='是否有下一页')
+    next_offset: int = Field(default=0, description='offset下次起步')
 
 
 class ListResponseModel(ResponseModel):
@@ -113,14 +113,14 @@ class ResponseBase:
 class CJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         # 如果对象具有keys和__getitem__属性，则返回对象的字典表示
-        if hasattr(obj, "keys") and hasattr(obj, "__getitem__"):
+        if hasattr(obj, 'keys') and hasattr(obj, '__getitem__'):
             return dict(obj)
         # 如果对象是datetime.datetime类型，则将其转换为字符串格式
         elif isinstance(obj, datetime.datetime):
-            return obj.strftime("%Y-%m-%d %H:%M:%S")
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
         # 如果对象是datetime.date类型，则将其转换为字符串格式
         elif isinstance(obj, datetime.date):
-            return obj.strftime("%Y-%m-%d")
+            return obj.strftime('%Y-%m-%d')
         # 如果对象是datetime.time类型，则将其转换为ISO格式字符串
         elif isinstance(obj, datetime.time):
             return obj.isoformat()
@@ -129,14 +129,14 @@ class CJsonEncoder(json.JSONEncoder):
             return float(obj)
         # 如果对象是bytes类型，则将其转换为UTF-8编码的字符串
         elif isinstance(obj, bytes):
-            return str(obj, encoding="utf-8")
+            return str(obj, encoding='utf-8')
         # 如果对象的类是DeclarativeMeta类型，则将其序列化为JSON
         elif isinstance(obj.__class__, DeclarativeMeta):
             # 如果是查询返回所有的那种models类型的，需要处理些
             # 将SqlAlchemy结果序列化为JSON--查询全部的时候的处理返回
-            return self.default(
-                {i.name: getattr(obj, i.name) for i in obj.__table__.columns}
-            )
+            return self.default({
+                i.name: getattr(obj, i.name) for i in obj.__table__.columns
+            })
         # 如果对象是字典类型，则递归处理其中的值
         elif isinstance(obj, dict):
             for k in obj:
@@ -161,7 +161,7 @@ class ApiResponse(JSONResponse):
     # 默认成功
     code = 200
     success = False
-    message = "success"
+    message = 'success'
     result: Optional[Dict[str, Any]] = None  # 结果可以是{} 或 []
 
     def __init__(
@@ -190,7 +190,7 @@ class ApiResponse(JSONResponse):
         super(ApiResponse, self).__init__(
             status_code=self.http_status_code,
             content=content,
-            media_type="application/json;charset=utf-8",
+            media_type='application/json;charset=utf-8',
         )
 
     # 这个render会自动调用，如果这里需要特殊的处理的话，可以重写这个地方
@@ -200,16 +200,16 @@ class ApiResponse(JSONResponse):
             ensure_ascii=False,
             allow_nan=False,
             indent=None,
-            separators=(",", ":"),
+            separators=(',', ':'),
             cls=CJsonEncoder,
-        ).encode("utf-8")
+        ).encode('utf-8')
 
 
 class Success(ApiResponse):
     http_status_code = 200
     code = 200
     result = None  # 结果可以是{} 或 []
-    message = "请求成功"
+    message = '请求成功'
     success = True
 
 
@@ -217,7 +217,7 @@ class Fail(ApiResponse):
     http_status_code = 200
     code = -1
     result = None  # 结果可以是{} 或 []
-    message = "操作失败"
+    message = '操作失败'
     success = False
 
 
@@ -225,14 +225,14 @@ class BadRequestException(ApiResponse):
     http_status_code = 400
     code = 10031
     result = None  # 结果可以是{} 或 []
-    message = "错误的请求"
+    message = '错误的请求'
     success = False
 
 
 class ParameterException(ApiResponse):
     http_status_code = 400
     result = {}
-    message = "参数校验错误,请检查提交的参数信息"
+    message = '参数校验错误,请检查提交的参数信息'
     code = 10031
     success = False
 
@@ -241,14 +241,14 @@ class CustomError(ApiResponse):
     http_status_code = 200
     code = 0000
     result = None  # 结果可以是{} 或 []
-    message = "业务错误逻辑处理"
+    message = '业务错误逻辑处理'
     success = False
 
 
 class InternalErrorException(ApiResponse):
     http_status_code = 500
     result = {}
-    message = "程序员哥哥睡眠不足，系统崩溃了！"
+    message = '程序员哥哥睡眠不足，系统崩溃了！'
     code = 5000
     success = False
 
@@ -257,14 +257,14 @@ class LimiterResException(ApiResponse):
     http_status_code = 429
     code = 429
     result = None  # 结果可以是{} 或 []
-    message = "访问的速度过快"
+    message = '访问的速度过快'
     success = False
 
 
 class UnauthorizedException(ApiResponse):
     http_status_code = 401
     result = {}
-    message = "未经许可授权"
+    message = '未经许可授权'
     code = 10032
     success = False
 
@@ -272,7 +272,7 @@ class UnauthorizedException(ApiResponse):
 class ForbiddenException(ApiResponse):
     http_status_code = 403
     result = {}
-    message = "失败！当前访问没有权限，或操作的数据没权限!"
+    message = '失败！当前访问没有权限，或操作的数据没权限!'
     code = 10033
     success = False
 
@@ -280,7 +280,7 @@ class ForbiddenException(ApiResponse):
 class NotfoundException(ApiResponse):
     http_status_code = 404
     result = {}
-    message = "访问地址不存在"
+    message = '访问地址不存在'
     code = 10034
     success = False
 
@@ -288,7 +288,7 @@ class NotfoundException(ApiResponse):
 class MethodNotAllowedException(ApiResponse):
     http_status_code = 405
     result = {}
-    message = "不允许使用此方法提交访问"
+    message = '不允许使用此方法提交访问'
     code = 10034
     success = False
 
@@ -296,7 +296,7 @@ class MethodNotAllowedException(ApiResponse):
 class OtherException(ApiResponse):
     http_status_code = 200
     result = {}
-    message = "未知的其他HTTP PARAMETER异常"
+    message = '未知的其他HTTP PARAMETER异常'
     code = 10034
     success = False
 
@@ -304,13 +304,13 @@ class OtherException(ApiResponse):
 class InvalidTokenException(ApiResponse):
     http_status_code = 401
     code = 401
-    message = "很久没操作，令牌失效"
+    message = '很久没操作，令牌失效'
     success = False
 
 
 class ExpiredTokenException(ApiResponse):
     http_status_code = 422
-    message = "很久没操作，令牌过期"
+    message = '很久没操作，令牌过期'
     code = 10050
     success = False
 
@@ -319,24 +319,24 @@ class FileTooLargeException(ApiResponse):
     http_status_code = 413
     code = 413
     result = None  # 结果可以是{} 或 []
-    message = "文件体积过大"
+    message = '文件体积过大'
 
 
 class FileTooManyException(ApiResponse):
     http_status_code = 413
-    message = "文件数量过多"
+    message = '文件数量过多'
     code = 10120
     result = None  # 结果可以是{} 或 []
 
 
 class FileExtensionException(ApiResponse):
     http_status_code = 401
-    message = "文件扩展名不符合规范"
+    message = '文件扩展名不符合规范'
     code = 10121
     result = None  # 结果可以是{} 或 []
 
 
-RT = TypeVar("RT")
+RT = TypeVar('RT')
 
 
 def unified_resp(func: Callable[..., RT]):

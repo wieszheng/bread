@@ -26,7 +26,7 @@ class EnvironmentCRUD(BaseCRUD):
     ):
         filter_params = {}
         if name:
-            filter_params = {"name": name}
+            filter_params = {'name': name}
         return await cls.get_multi_joined(
             limit=limit,
             offset=compute_offset(offset, limit),
@@ -34,9 +34,9 @@ class EnvironmentCRUD(BaseCRUD):
                 JoinConfig(
                     model=User,
                     join_on=cls.__model__.created_by == User.id,
-                    join_prefix="user_",
+                    join_prefix='user_',
                     schema_to_select=UserInfoSchemaBase,
-                    join_type="left",
+                    join_type='left',
                 ),
             ],
             is_deleted=False,

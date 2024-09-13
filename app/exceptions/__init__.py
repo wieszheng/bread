@@ -9,4 +9,4 @@
 
 from app.exceptions.handler import register_exceptions_handler
 
-__all__ = ["register_exceptions_handler"]
+__all__ = ['register_exceptions_handler']

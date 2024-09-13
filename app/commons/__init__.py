@@ -12,7 +12,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class SingletonMetaCls(type):
@@ -35,7 +35,7 @@ class SingletonMetaCls(type):
         return cls._instance
 
     def __call__(cls, *args, **kwargs):
-        reinit = kwargs.pop("reinit", True)
+        reinit = kwargs.pop('reinit', True)
         instance = cls._init_instance(*args, **kwargs)
         if reinit:
             # 重新初始化单例对象属性
@@ -49,11 +49,11 @@ class R(BaseModel, Generic[T]):
     message: str
 
     @staticmethod
-    def success(message: str = "success", data: T = None) -> "R":
+    def success(message: str = 'success', data: T = None) -> 'R':
         return R(code=200, message=message, data=data)
 
     @staticmethod
-    def fail(code: int = 400, message: str = "fail", data: T = None) -> "R":
+    def fail(code: int = 400, message: str = 'fail', data: T = None) -> 'R':
         return R(code=code, message=message, data=data)
 
     # @validator('error', always=True)

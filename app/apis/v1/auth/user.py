@@ -14,91 +14,91 @@ from app.core.security.permission import Permission
 from app.service.auth.user import UserService
 from config import settings
 
-router = APIRouter(prefix="/system/user", tags=["用户接口"])
+router = APIRouter(prefix='/system/user', tags=['用户接口'])
 
 router.add_api_route(
-    "/login",
+    '/login',
     endpoint=UserService.login,
-    methods=["post"],
-    summary="用户登录",
+    methods=['post'],
+    summary='用户登录',
 )
 
 router.add_api_route(
-    "/me",
+    '/me',
     endpoint=UserService.get_current_user_info,
     dependencies=[DependsJwtAuth],
-    methods=["get"],
-    summary="获取当前用户信息",
+    methods=['get'],
+    summary='获取当前用户信息',
 )
 
 router.add_api_route(
-    "/{userId}",
+    '/{userId}',
     endpoint=UserService.get_user,
-    response_model_exclude={"result": {"password"}},
+    response_model_exclude={'result': {'password'}},
     dependencies=[DependsJwtAuth],
-    methods=["get"],
-    summary="查看用户信息",
+    methods=['get'],
+    summary='查看用户信息',
 )
 
 router.add_api_route(
-    "/register",
+    '/register',
     endpoint=UserService.register_user,
-    methods=["post"],
-    summary="注册用户",
+    methods=['post'],
+    summary='注册用户',
 )
 
 router.add_api_route(
-    "/password/reset",
+    '/password/reset',
     endpoint=UserService.password_reset,
     dependencies=[DependsJwtAuth],
-    methods=["post"],
-    summary="密码重置",
+    methods=['post'],
+    summary='密码重置',
 )
 
 router.add_api_route(
-    "/avatar",
+    '/avatar',
     endpoint=UserService.update_avatar,
     dependencies=[DependsJwtAuth],
-    methods=["put"],
-    summary="更新头像",
+    methods=['put'],
+    summary='更新头像',
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=UserService.update_user,
-    methods=["put"],
-    summary="更新用户信息",
+    methods=['put'],
+    summary='更新用户信息',
     dependencies=[DependsJwtAuth],
 )
 
 router.add_api_route(
-    "",
+    '',
     endpoint=UserService.get_pagination_users,
-    methods=["get"],
-    summary="（支持条件）分页获取所有用户",
+    methods=['get'],
+    summary='（支持条件）分页获取所有用户',
 )
 
 router.add_api_route(
-    "/{userId}",
+    '/{userId}',
     endpoint=UserService.delete_user,
-    methods=["delete"],
-    summary="用户注销",
-    description="用户注销 != 用户登出，注销之后用户将从数据库逻辑删除",
+    methods=['delete'],
+    summary='用户注销',
+    description='用户注销 != 用户登出，注销之后用户将从数据库逻辑删除',
     dependencies=[Depends(Permission(settings.ADMIN)), DependsJwtAuth],
 )
 
 router.add_api_route(
-    "/is_valid",
+    '/is_valid',
     endpoint=UserService.is_valid,
-    methods=["put"],
-    summary="用户状态是否可用",
+    methods=['put'],
+    summary='用户状态是否可用',
     dependencies=[Depends(Permission(settings.ADMIN)), DependsJwtAuth],
 )
 
 router.add_api_route(
-    "/role",
+    '/role',
     endpoint=UserService.update_user_role,
-    methods=["put"],
-    summary="用户权限和账号",
+    methods=['put'],
+    summary='用户权限和账号',
     dependencies=[Depends(Permission(settings.ADMIN)), DependsJwtAuth],
 )

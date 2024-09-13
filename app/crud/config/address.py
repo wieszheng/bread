@@ -25,7 +25,7 @@ class AddressCRUD(BaseCRUD):
     ):
         filter_params = {}
         if name or env:
-            filter_params = {"name": name, "env": env}
+            filter_params = {'name': name, 'env': env}
 
         return await cls.get_multi_joined(
             limit=limit,
@@ -34,16 +34,16 @@ class AddressCRUD(BaseCRUD):
                 JoinConfig(
                     model=User,
                     join_on=cls.__model__.created_by == User.id,
-                    join_prefix="user_",
+                    join_prefix='user_',
                     schema_to_select=UserInfoSchemaBase,
-                    join_type="left",
+                    join_type='left',
                 ),
                 JoinConfig(
                     model=Environment,
                     join_on=cls.__model__.env == Environment.id,
-                    join_prefix="env_",
+                    join_prefix='env_',
                     schema_to_select=EnvironmentSchemaBase,
-                    join_type="left",
+                    join_type='left',
                 ),
             ],
             is_deleted=False,

@@ -57,86 +57,86 @@ class CustomCodeBase(Enum):
 class CustomResponseCode(CustomCodeBase):
     """响应状态码"""
 
-    HTTP_200 = (200, "请求成功")
-    HTTP_201 = (201, "新建请求成功")
-    HTTP_202 = (202, "请求已接受，但处理尚未完成")
-    HTTP_204 = (204, "请求成功，但没有返回内容")
-    HTTP_400 = (400, "错误的请求")
-    HTTP_401 = (401, "未经许可授权")
-    HTTP_403 = (403, "失败！当前访问没有权限，或操作的数据没权限!")
-    HTTP_404 = (404, "请求的地址不存在")
-    HTTP_405 = (405, "不允许使用此方法提交访问")
-    HTTP_410 = (410, "请求的资源已永久删除")
-    HTTP_422 = (422, "请求参数非法")
-    HTTP_425 = (425, "无法执行请求，由于服务器无法满足要求")
-    HTTP_429 = (429, "请求过多，服务器限制")
-    HTTP_500 = (500, "服务器内部错误")
-    HTTP_502 = (502, "网关错误")
-    HTTP_503 = (503, "服务器暂时无法处理请求")
-    HTTP_504 = (504, "网关超时")
+    HTTP_200 = (200, '请求成功')
+    HTTP_201 = (201, '新建请求成功')
+    HTTP_202 = (202, '请求已接受，但处理尚未完成')
+    HTTP_204 = (204, '请求成功，但没有返回内容')
+    HTTP_400 = (400, '错误的请求')
+    HTTP_401 = (401, '未经许可授权')
+    HTTP_403 = (403, '失败！当前访问没有权限，或操作的数据没权限!')
+    HTTP_404 = (404, '请求的地址不存在')
+    HTTP_405 = (405, '不允许使用此方法提交访问')
+    HTTP_410 = (410, '请求的资源已永久删除')
+    HTTP_422 = (422, '请求参数非法')
+    HTTP_425 = (425, '无法执行请求，由于服务器无法满足要求')
+    HTTP_429 = (429, '请求过多，服务器限制')
+    HTTP_500 = (500, '服务器内部错误')
+    HTTP_502 = (502, '网关错误')
+    HTTP_503 = (503, '服务器暂时无法处理请求')
+    HTTP_504 = (504, '网关超时')
 
 
 class CustomErrorCode(CustomCodeBase):
     """错误码枚举类"""
 
     # 业务状态码
-    PARTNER_CODE_OK = (0, "OK")
-    PARTNER_CODE_FAIL = (-1, "操作失败")
+    PARTNER_CODE_OK = (0, 'OK')
+    PARTNER_CODE_FAIL = (-1, '操作失败')
 
     # 10000 - 11000 账号体系
-    WRONG_USER_NAME_OR_PASSWORD = (10001, "账号或者密码错误！😱")  # 账号或密码错误
-    PARTNER_CODE_EMPLOYEE_FAIL = (10002, "账号错误！")  # 账号错误
+    WRONG_USER_NAME_OR_PASSWORD = (10001, '账号或者密码错误！😱')  # 账号或密码错误
+    PARTNER_CODE_EMPLOYEE_FAIL = (10002, '账号错误！')  # 账号错误
     WRONG_USER_NAME_OR_PASSWORD_LOCK = (
         10003,
-        "密码输入错误超过次数，请5分钟后再登录！😭",
+        '密码输入错误超过次数，请5分钟后再登录！😭',
     )
-    USERNAME_OR_EMAIL_IS_REGISTER = (10004, "用户名已被注册")
-    NICKNAME_OR_EMAIL_IS_REGISTER = (10004, "昵称已被注册")
-    USER_EMAIL_OR_EMAIL_IS_REGISTER = (10004, "邮箱已被注册")
-    USER_ID_IS_NULL = (10005, "用户id不能为空")
-    PASSWORD_TWICE_IS_NOT_AGREEMENT = (10006, "两次输入的密码不一致")
-    NEW_PWD_NO_OLD_PWD_EQUAL = (10007, "新密码不能与旧密码相同")
-    OLD_PASSWORD_ERROR = (10008, "旧密码错误")
-    USER_ACCOUNT_LOCKED = (10009, "用户账号被锁定，请联系管理员 😭")
-    USER_IS_ADMIN = (10010, "不可操作超级管理员")
-    YOU_INFO = (10010, "只能修改自己的信息呦 👉")
+    USERNAME_OR_EMAIL_IS_REGISTER = (10004, '用户名已被注册')
+    NICKNAME_OR_EMAIL_IS_REGISTER = (10004, '昵称已被注册')
+    USER_EMAIL_OR_EMAIL_IS_REGISTER = (10004, '邮箱已被注册')
+    USER_ID_IS_NULL = (10005, '用户id不能为空')
+    PASSWORD_TWICE_IS_NOT_AGREEMENT = (10006, '两次输入的密码不一致')
+    NEW_PWD_NO_OLD_PWD_EQUAL = (10007, '新密码不能与旧密码相同')
+    OLD_PASSWORD_ERROR = (10008, '旧密码错误')
+    USER_ACCOUNT_LOCKED = (10009, '用户账号被锁定，请联系管理员 😭')
+    USER_IS_ADMIN = (10010, '不可操作超级管理员')
+    YOU_INFO = (10010, '只能修改自己的信息呦 👉')
     # 用户状态 验证  11000 - 12000
     PARTNER_CODE_TOKEN_EXPIRED_FAIL = (
         11000,
-        "用户信息以已过期 😂",
+        '用户信息以已过期 😂',
     )  # token已过期或未找到
 
     # 参数类型 12000 - 13000
-    PARTNER_CODE_PARAMS_FAIL = (12000, "必填参数不能为空 😅")  # 必填参数不能为空
+    PARTNER_CODE_PARAMS_FAIL = (12000, '必填参数不能为空 😅')  # 必填参数不能为空
 
     # 项目 13000 - 14000
-    PROJECT_HAS_MODULE_ASSOCIATION = (13000, "项目有模块或用例关联，不能删除")
-    PROJECT_No_PERMISSION = (13000, "你没有权限修改项目头像，请联系项目管理员 😭")
-    PROJECT_NAME_EXIST = (13001, "项目名已存在")  # 项目名以存在
-    PROJECT_ID_EXIST = (13001, "项目不存在，请确认")  # 项目不存在
-    PROJECT_ROLE_EXIST = (13002, "该用户已存在")
-    PROJECT_No_LEADER = (13002, "不能修改组长的权限")
-    PROJECT_ROLE_NOT_EXIST = (13002, "该用户角色不存在")
+    PROJECT_HAS_MODULE_ASSOCIATION = (13000, '项目有模块或用例关联，不能删除')
+    PROJECT_No_PERMISSION = (13000, '你没有权限修改项目头像，请联系项目管理员 😭')
+    PROJECT_NAME_EXIST = (13001, '项目名已存在')  # 项目名以存在
+    PROJECT_ID_EXIST = (13001, '项目不存在，请确认')  # 项目不存在
+    PROJECT_ROLE_EXIST = (13002, '该用户已存在')
+    PROJECT_No_LEADER = (13002, '不能修改组长的权限')
+    PROJECT_ROLE_NOT_EXIST = (13002, '该用户角色不存在')
 
-    ENVIRONMENT_NAME_EXIST = (14000, "环境名已存在")
-    ENVIRONMENT_ID_NOT_EXIST = (14001, "环境不存在,请检查")
+    ENVIRONMENT_NAME_EXIST = (14000, '环境名已存在')
+    ENVIRONMENT_ID_NOT_EXIST = (14001, '环境不存在,请检查')
 
-    ADDRESS_NAME_EXIST = (14100, "网关名已存在")
-    ADDRESS_ID_NOT_EXIST = (14101, "网关不存在,请检查")
+    ADDRESS_NAME_EXIST = (14100, '网关名已存在')
+    ADDRESS_ID_NOT_EXIST = (14101, '网关不存在,请检查')
 
-    GLOBAL_CONFIG_NAME_EXIST = (14100, "配置数据已存在")
-    GLOBAL_CONFIG_ID_NOT_EXIST = (14101, "配置数据不存在,请检查")
+    GLOBAL_CONFIG_NAME_EXIST = (14100, '配置数据已存在')
+    GLOBAL_CONFIG_ID_NOT_EXIST = (14101, '配置数据不存在,请检查')
     # module 模块 14000 - 15000
     MODULE_HAS_CASE_ASSOCIATION = (
         14000,
-        " 模块有用例关联, 请删除对于模块下的用例",
+        ' 模块有用例关联, 请删除对于模块下的用例',
     )  # 模块有用例关联
-    MODULE_NAME_EXIST = (14001, "模块名已存在")  # 模块名以存在
+    MODULE_NAME_EXIST = (14001, '模块名已存在')  # 模块名以存在
 
     # case 用例 15000 - 16000
-    CASE_NAME_EXIST = (15000, "用例名已存在")
-    CASE_ID_NOT_EXIST = (15001, "用例不存在,请检查")
-    CASE_ID_IS_NULL = (15002, "用例id不能为空")
+    CASE_NAME_EXIST = (15000, '用例名已存在')
+    CASE_ID_NOT_EXIST = (15001, '用例不存在,请检查')
+    CASE_ID_IS_NULL = (15002, '用例id不能为空')
 
 
 class StandardResponseCode:

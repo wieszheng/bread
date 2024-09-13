@@ -25,9 +25,9 @@ class UpdateAddressParam(AddressSchemaBase):
 
 
 class AddressQuery(BaseModel):
-    env: Optional[int] = Field(default=None, description="环境")
-    name: Optional[str] = Field(default=None, description="环境名称")
+    env: Optional[int] = Field(default=None, description='环境')
+    name: Optional[str] = Field(default=None, description='环境名称')
 
 
 class AddressListInParam(ListPageRequestModel):
-    query_params: Optional[AddressQuery] = Field(default={}, description="查询参数")
+    query_params: Optional[AddressQuery] = Field(default={}, description='查询参数')

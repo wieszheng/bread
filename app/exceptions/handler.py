@@ -37,11 +37,11 @@ def register_exceptions_handler(app: FastAPI):
     ):
         logger.warning(traceback.format_exc())
         logger.warning(
-            f"身份授权异常\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Message:{exc.detail}\n"
+            f'身份授权异常\n'
+            f'Method:{request.method}\n'
+            f'URL:{request.url}\n'
+            f'Headers:{request.headers}\n'
+            f'Message:{exc.detail}\n'
         )
 
         return ApiResponse(
@@ -55,11 +55,11 @@ def register_exceptions_handler(app: FastAPI):
     async def permission_exception_handler(request: Request, exc: PermissionException):
         logger.warning(traceback.format_exc())
         logger.warning(
-            f"权限操作异常\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Message:{exc.detail}\n"
+            f'权限操作异常\n'
+            f'Method:{request.method}\n'
+            f'URL:{request.url}\n'
+            f'Headers:{request.headers}\n'
+            f'Message:{exc.detail}\n'
         )
 
         return ApiResponse(
@@ -77,27 +77,25 @@ def register_exceptions_handler(app: FastAPI):
         """请求参数验证异常"""
         logger.warning(traceback.format_exc())
         logger.warning(
-            f"请求参数验证异常:\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Message:{exc.errors()}\n"
+            f'请求参数验证异常:\n'
+            f'Method:{request.method}\n'
+            f'URL:{request.url}\n'
+            f'Headers:{request.headers}\n'
+            f'Message:{exc.errors()}\n'
         )
 
-        message = ".".join(
-            [
-                f'{".".join(map(lambda x: str(x), error.get("loc")))}:'
-                f'{CUSTOM_VALIDATION_ERROR_MESSAGES.get(error.get("type")), error.get("msg")};'
-                for error in exc.errors()
-            ]
-        )
+        message = '.'.join([
+            f'{'.'.join(map(lambda x: str(x), error.get('loc')))}:'
+            f'{(CUSTOM_VALIDATION_ERROR_MESSAGES.get(error.get('type')), error.get('msg'))};'
+            for error in exc.errors()
+        ])
 
         return ApiResponse(
             http_status_code=StandardResponseCode.HTTP_200,
             code=10040,
             success=False,
-            message="请求参数校验错误,请检查提交的参数信息",
-            result={"detail": message, "body": exc.body},
+            message='请求参数校验错误,请检查提交的参数信息',
+            result={'detail': message, 'body': exc.body},
         )
 
     @app.exception_handler(ValidationError)
@@ -107,27 +105,25 @@ def register_exceptions_handler(app: FastAPI):
         """内部参数验证异常"""
         logger.warning(traceback.format_exc())
         logger.warning(
-            f"内部参数验证异常\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Message:{exc.errors()}\n"
+            f'内部参数验证异常\n'
+            f'Method:{request.method}\n'
+            f'URL:{request.url}\n'
+            f'Headers:{request.headers}\n'
+            f'Message:{exc.errors()}\n'
         )
 
-        message = ".".join(
-            [
-                f'{".".join(map(lambda x: str(x), error.get("loc")))}:'
-                f'{CUSTOM_VALIDATION_ERROR_MESSAGES.get(error.get("type")), error.get("msg")};'
-                for error in exc.errors()
-            ]
-        )
+        message = '.'.join([
+            f'{'.'.join(map(lambda x: str(x), error.get('loc')))}:'
+            f'{(CUSTOM_VALIDATION_ERROR_MESSAGES.get(error.get('type')), error.get('msg'))};'
+            for error in exc.errors()
+        ])
 
         return ApiResponse(
             http_status_code=StandardResponseCode.HTTP_200,
             code=10040,
             success=False,
-            message="内部参数校验错误,请检查提交的参数信息",
-            result={"detail": message},
+            message='内部参数校验错误,请检查提交的参数信息',
+            result={'detail': message},
         )
 
     @app.exception_handler(CustomException)
@@ -135,12 +131,12 @@ def register_exceptions_handler(app: FastAPI):
         """全局业务异常处理"""
         logger.warning(traceback.format_exc())
         logger.warning(
-            f"业务处理异常\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Code:{exc.err_code}\n"
-            f"Message:{exc.err_code_des}\n"
+            f'业务处理异常\n'
+            f'Method:{request.method}\n'
+            f'URL:{request.url}\n'
+            f'Headers:{request.headers}\n'
+            f'Code:{exc.err_code}\n'
+            f'Message:{exc.err_code_des}\n'
         )
 
         return ApiResponse(
@@ -155,35 +151,35 @@ def register_exceptions_handler(app: FastAPI):
     async def exception_handler(request: Request, exc: Exception):
         """全局系统异常处理器"""
         if isinstance(exc, ConnectionError):
-            message = f"网络异常: {exc}"
+            message = f'网络异常: {exc}'
         else:
-            message = f"未知异常: {exc}"
+            message = f'未知异常: {exc}'
 
         logger.error(
-            f"全局系统异常\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Message:{message}\n"
+            f'全局系统异常\n'
+            f'Method:{request.method}\n'
+            f'URL:{request.url}\n'
+            f'Headers:{request.headers}\n'
+            f'Message:{message}\n'
         )
 
         return ApiResponse(
             http_status_code=StandardResponseCode.HTTP_500,
             code=5000,
             success=False,
-            message="程序员哥哥睡眠不足，系统崩溃了！",
-            result={"detail": message},
+            message='程序员哥哥睡眠不足，系统崩溃了！',
+            result={'detail': message},
         )
 
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handlers(request: Request, exc: StarletteHTTPException):
         logger.warning(
-            f"Http请求异常\n"
-            f"Method:{request.method}\n"
-            f"URL:{request.url}\n"
-            f"Headers:{request.headers}\n"
-            f"Code:{exc.status_code}\n"
-            f"Message:{exc.detail}\n"
+            f'Http请求异常\n'
+            f'Method:{request.method}\n'
+            f'URL:{request.url}\n'
+            f'Headers:{request.headers}\n'
+            f'Code:{exc.status_code}\n'
+            f'Message:{exc.detail}\n'
         )
 
         exc_msg = CustomResponseCode.use_code_get_enum_msg(exc.status_code)
