@@ -58,49 +58,49 @@ router.add_api_route(
     '',
     endpoint=TestCaseService.get_testcase,
     methods=['get'],
-    summary='',
+    summary='查询单条用例信息',
 )
 
 router.add_api_route(
     '/asserts',
     endpoint=TestCaseAssertsService.create_asserts,
     methods=['post'],
-    summary='',
+    summary='创建用例断言信息',
 )
 
 router.add_api_route(
     '/asserts',
     endpoint=TestCaseAssertsService.update_asserts,
     methods=['put'],
-    summary='',
+    summary='修改用例断言信息',
 )
 
 router.add_api_route(
     '/asserts',
     endpoint=TestCaseAssertsService.delete_asserts,
     methods=['delete'],
-    summary='',
+    summary='删除用例断言信息',
 )
 
 router.add_api_route(
     '/constructor',
     endpoint=ConstructorService.create_constructor,
     methods=['post'],
-    summary='',
+    summary='新建前置条件构造器',
 )
 
 router.add_api_route(
     '/constructor',
     endpoint=ConstructorService.update_constructor,
     methods=['put'],
-    summary='',
+    summary='修改前置条件构造器',
 )
 
 router.add_api_route(
     '/constructor',
     endpoint=ConstructorService.delete_constructor,
     methods=['delete'],
-    summary='',
+    summary='删除前置条件构造器',
 )
 
 router.add_api_route(

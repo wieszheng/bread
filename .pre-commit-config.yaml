@@ -10,12 +10,15 @@ repos:
     rev: v0.6.4
     hooks:
       - id: ruff
+        files: ^app/.*\.py$
         args:
           - --config
           - .ruff.toml
           - --fix
           - --unsafe-fixes
       - id: ruff-format
+        files: ^app/.*\.py$
+
 ci:
     autofix_commit_msg: 🎨 [pre-commit.ci] Auto format from pre-commit.com hooks
     autoupdate_commit_msg: ⬆ [pre-commit.ci] pre-commit autoupdate

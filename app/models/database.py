@@ -31,7 +31,7 @@ class DataBase(BaseModel):
     username: Mapped[str] = mapped_column(String(36), nullable=False)
     password: Mapped[str] = mapped_column(String(64), nullable=False)
     database: Mapped[str] = mapped_column(String(36), nullable=False)
-    sql_type = mapped_column(
+    sql_type: Mapped[int] = mapped_column(
         INT, nullable=False, comment='0: mysql 1: postgresql 2: mongo'
     )
     env_info: Environment

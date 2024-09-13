@@ -3,7 +3,11 @@ cache-dir = ".ruff_cache"
 target-version = "py312"
 unsafe-fixes = true
 show-fixes = true
-
+exclude = [
+    "venv/",
+    ".temp*",
+    "/tmp/*"
+]
 
 [lint.isort]
 lines-between-types = 1

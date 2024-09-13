@@ -137,6 +137,12 @@ class CustomErrorCode(CustomCodeBase):
     CASE_NAME_EXIST = (15000, '用例名已存在')
     CASE_ID_NOT_EXIST = (15001, '用例不存在,请检查')
     CASE_ID_IS_NULL = (15002, '用例id不能为空')
+    CASE_ASSERTS_NOT_EXIST = (15003, '断言不存在,请检查')
+    CASE_ASSERTS_NOT_EMPTY = (15004, '断言不能为空')
+    CASE_ASSERTS_EXIST = (15005, '断言信息已存在, 请检查')
+    CASE_CONSTRUCTOR_NOT_EXIST = (15006, '构造器不存在,请检查')
+    CASE_CONSTRUCTOR_NOT_EMPTY = (15007, '构造器不能为空')
+    CASE_CONSTRUCTOR_EXIST = (15008, '构造器信息已存在, 请检查')
 
 
 class StandardResponseCode:

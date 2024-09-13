@@ -74,8 +74,10 @@ isort . --profile black
 # 或使用 ruff pre-commit
 pip install ruff
 pre-commit install
-git add .
+# 手动运行全部检查
+pre-commit run --all-files
 
+git add .
 git commit -m "✨ feat: 添加新功能"
 git push origin main
 ```

@@ -7,7 +7,7 @@
 @Software : PyCharm
 """
 
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import Depends
 
@@ -16,6 +16,7 @@ from app.commons.response.response_schema import ResponseBase, ResponseModel
 from app.core.security.Jwt import get_current_user_new
 from app.crud.testcase.testcase import TestCaseCRUD
 from app.crud.testcase.testcase_asserts import TestCaseAssertsCRUD
+from app.crud.testcase.testcase_data import TestCaseDataCRUD
 from app.crud.testcase.testcase_directory import TestcaseDirectoryCRUD
 from app.crud.testcase.testcase_out_parameters import TestCaseOutParametersCRUD
 from app.exceptions.errors import CustomException
@@ -104,12 +105,20 @@ class TestCaseService:
         )
 
     @staticmethod
-    async def delete_testcase(id: int):
-        pass
+    async def delete_testcase(
+        id_list: Annotated[List[int], ...],
+    ) -> ResponseModel:
+        await TestCaseCRUD.delete_records(id_list=id_list)
+        # 删除断言
+        await TestCaseAssertsCRUD.delete_records(id_list, column='case_id')
+        # 删除测试数据
+        await TestCaseDataCRUD.delete_records(id_list, column='case_id')
+        return await ResponseBase.success()
 
     @staticmethod
-    async def get_testcase(id: int):
-        pass
+    async def get_testcase(case_id: Annotated[int, ...]) -> ResponseModel:
+        result = await TestCaseCRUD.get(id=case_id, is_deleted=False)
+        return await ResponseBase.success(result=result)
 
     @staticmethod
     async def get_xmind(id: int):
