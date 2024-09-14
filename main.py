@@ -6,12 +6,14 @@
 @Author   : wiesZheng
 @Software : PyCharm
 """
+import os
 
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from starlette.staticfiles import StaticFiles
 
 from app import init_logging, lifespan
+from app.commons.openapi import get_stoplight_ui_html
 from app.exceptions import register_exceptions_handler
 from app.middlewares import register_middlewares
 from config import ROOT, settings
@@ -25,6 +27,19 @@ app = FastAPI(
 )
 # 挂载静态文件目录
 app.mount('/static', StaticFiles(directory=f'{ROOT}/static'), name='static')
+
+
+# stoplight_elements doc
+@app.get("/openapi", include_in_schema=False)
+async def api_documentation():
+    """Add stoplight elements api doc. https://dev.to/amal/replacing-fastapis-default-api-docs-with-elements-391d"""
+    return get_stoplight_ui_html(
+        openapi_url='/openapi.json',
+        title=settings.APP_NAME + " - openapi",
+        # base_path="openapi",
+        logo='/static/Baguette Bread.png',
+        stoplight_elements_favicon_url='/static/Baguette Bread.png',
+    )
 
 
 @app.get('/docs', include_in_schema=False)
