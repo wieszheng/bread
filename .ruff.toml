@@ -1,0 +1,11 @@
+line-length = 88
+
+[lint.isort]
+lines-between-types = 1
+order-by-type = true
+
+[format]
+preview = true
+quote-style = "single"
+docstring-code-format = true
+skip-magic-trailing-comma = false
