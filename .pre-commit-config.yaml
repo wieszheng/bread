@@ -15,7 +15,7 @@ repos:
 #          - --config
 #          - .ruff.toml
           - --fix
-#          - --unsafe-fixes
+          - --unsafe-fixes
       - id: ruff-format
         files: ^app/.*\.py$
 
