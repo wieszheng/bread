@@ -11,7 +11,11 @@ repos:
     hooks:
       - id: ruff
         files: ^app/.*\.py$
-        args: [--fix]
+        args:
+#          - --config
+#          - .ruff.toml
+          - --fix
+#          - --unsafe-fixes
       - id: ruff-format
         files: ^app/.*\.py$
 
