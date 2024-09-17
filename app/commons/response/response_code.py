@@ -143,6 +143,9 @@ class CustomErrorCode(CustomCodeBase):
     CASE_CONSTRUCTOR_NOT_EXIST = (15006, '构造器不存在,请检查')
     CASE_CONSTRUCTOR_NOT_EMPTY = (15007, '构造器不能为空')
     CASE_CONSTRUCTOR_EXIST = (15008, '构造器信息已存在, 请检查')
+    CASE_DIRECTORY_NOT_EXIST = (15009, '目录不存在,请检查')
+    CASE_DIRECTORY_EXIST = (15009, '目录信息已存在, 请检查')
+    CASE_DIRECTORY_NOT_EMPTY = (15010, '目录不能为空')
 
 
 class StandardResponseCode:

@@ -107,28 +107,28 @@ router.add_api_route(
     '/constructor',
     endpoint=ConstructorService.get_constructor,
     methods=['get'],
-    summary='',
+    summary='获取数据构造器',
 )
 
 router.add_api_route(
     '/constructors',
     endpoint=ConstructorService.get_constructor_list,
     methods=['get'],
-    summary='',
+    summary='获取数据构造器全部',
 )
 
 router.add_api_route(
     '/constructor/order',
     endpoint=ConstructorService.update_constructor_order,
     methods=['put'],
-    summary='',
+    summary='修改前后置构造器顺序',
 )
 
 router.add_api_route(
     '/constructor/tree',
     endpoint=ConstructorService.get_constructor_tree,
     methods=['get'],
-    summary='',
+    summary='获取数据构造器树',
 )
 
 router.add_api_route(
@@ -156,7 +156,7 @@ router.add_api_route(
     '/directory',
     endpoint=TestcaseDirectoryService.get_directory,
     methods=['get'],
-    summary='',
+    summary='获取case目录',
 )
 
 router.add_api_route(
@@ -167,7 +167,7 @@ router.add_api_route(
 )
 
 router.add_api_route(
-    '/directory',
+    '/directory/query',
     endpoint=TestcaseDirectoryService.get_directory,
     methods=['get'],
     summary='',
@@ -177,21 +177,21 @@ router.add_api_route(
     '/directory',
     endpoint=TestcaseDirectoryService.create_directory,
     methods=['post'],
-    summary='',
+    summary='新增case目录',
 )
 
 router.add_api_route(
     '/directory',
     endpoint=TestcaseDirectoryService.update_directory,
     methods=['put'],
-    summary='',
+    summary='修改case目录',
 )
 
 router.add_api_route(
     '/directory',
     endpoint=TestcaseDirectoryService.delete_directory,
     methods=['delete'],
-    summary='',
+    summary='删除case目录',
 )
 
 router.add_api_route(
