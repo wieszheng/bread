@@ -15,7 +15,7 @@ from pydantic import BaseModel
 class TestcaseDirectoryParams(BaseModel):
     name: str
     project_id: int
-    parent: int = None
+    parent: int | None = None
 
 
 class UpdateTestcaseDirectoryParams(TestcaseDirectoryParams):
